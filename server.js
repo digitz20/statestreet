@@ -28,7 +28,7 @@ const swaggerDefinition = {
     description: 'This is a swagger documentation for the web application statestreet',
     license: {
       name: 
-      'Base_URL: https://heavenlist2-zaz3.onrender.com ',
+      'Base_URL: https://statestreet.onrender.com',
     },
   },
   "components": {
@@ -48,7 +48,7 @@ security: [
 ],
   servers: [
     {
-      url: 'https://heavenlist2-zaz3.onrender.com',
+      url: 'https://statestreet.onrender.com',
       description: 'Production server',
     },
     {

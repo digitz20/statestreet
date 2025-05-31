@@ -32,11 +32,11 @@ const { authenticate } = require('../middlewares/authentication')
  *               password:
  *                 type: string
  *                 description: this is the password of the user
- *                 example: ebusr09
+ *                 example: Successtoall20$
  *               confirmPassword:
  *                 type: string
  *                 description: this is the confirm password of the user
- *                 example: ebusr09
+ *                 example: Successtoall20$
  *     responses:
  *       201:
  *         description: user created successfully
@@ -60,7 +60,7 @@ const { authenticate } = require('../middlewares/authentication')
  *                 password:
  *                   type: string
  *                   description: this is the password of the user
- *                   example: ebusr09
+ *                   example: Successtoall20$
  *                 isVerified:
  *                   type: boolean 
  *                   description: this is the verification status of the user
@@ -266,7 +266,7 @@ router.post('/reset-password/:token', resetPassword)
  *               password:
  *                 type: string
  *                 description: The password of the user
- *                 example: ebusr09
+ *                 example: Successtoall20$
  *     responses:
  *       200:
  *         description: user login successfully
