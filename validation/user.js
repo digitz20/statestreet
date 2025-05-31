@@ -12,6 +12,8 @@ exports.registerSchema = Joi.object().keys({
         'any.required': 'Email is required',
         'string.empty': 'Email cannot be empty',
     }),
+    username: Joi.string().min(3).required(),
+
     password: Joi.string().pattern(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/).trim().messages({
         'string.pattern.base': 'Password must be at least 8 characters long and include at least one uppercase letter, one lowercase letter, one number, and one special character [!@#$%^&*]',
         'any.required': 'Password is required',
@@ -48,8 +50,9 @@ exports.loginSchema = Joi.object().keys({
         'any.required': 'invalid credentials',
         'string.empty': 'password cannot be empty',
     }).required(),
+        username: Joi.string().min(3).optional(),
+}).or('email', 'username') 
     
-})
 
 
 exports.verificationEmailSchema = Joi.object().keys({
@@ -86,15 +89,6 @@ exports.verifyPasswordSchema = Joi.object().keys({
 
 
 exports.resetPasswordschema = Joi.object().keys({
-    // email: Joi.string().trim().email().required().messages({
-    //     'string.email': 'Invalid email format',
-    //     'any.required': 'Email is required',
-    //     'string.empty': 'Email cannot be empty',
-    // }),
-    // otp: Joi.string().length(4).required().messages({
-    //     'any.required': 'OTP is required',
-    //     'string.length': 'OTP must be exactly 4 characters',
-    // }),
     password: Joi.string().pattern(/^(?=.*\d)(?=.*[!@#$%^&*])(?=.*[a-z])(?=.*[A-Z]).{8,}$/).trim().messages({
         "any.required":"password is required",
          "string.empty": "password cannot be Empty",
