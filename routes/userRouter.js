@@ -1,7 +1,7 @@
 const router = require('express').Router()
 
 
-const { register, login, verifyEmail, forgotPassword, resetPassword, resendVerificationEmail } = require('../controller/userController')
+const { register, login, verifyEmail, forgotPassword, resetPassword, resendVerificationEmail, changePassword, logout } = require('../controller/userController')
 const { authenticate } = require('../middlewares/authentication')
 
 
@@ -222,11 +222,11 @@ router.post('/forget-password', forgotPassword)
  *               password:
  *                 type: string
  *                 description: The new password for the user
- *                 example: brown
+ *                 example: Successtoall20$
  *               confirmPassword:
  *                  type: string
  *                  description: this is the confirm password of the user
- *                  example: brown
+ *                  example: Successtoall20$
  *     responses:
  *       200:
  *         description: Password reset successfully
@@ -310,6 +310,126 @@ router.post('/login', login)
 
 
 
+/**
+ * @swagger
+ * /api/v1/changePassword:
+ *   post:
+ *     summary: Change user password
+ *     security:
+ *       - bearerAuth: [] # token is required for authentication
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *                 description: this is the user's current password
+ *                 example: Successtoall20$
+ *               newPassword:
+ *                 type: string
+ *                 description: this is the new password for the user
+ *                 example: NewPassword456!
+ *               confirmPassword:
+ *                 type: string
+ *                 description: this is the confirm password of the user
+ *                 example: NewPassword456!
+ *     responses:
+ *       200:
+ *         description: Password change successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Password change successful
+ *       400:
+ *         description: Bad request (e.g., passwords do not match, invalid credentials)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Passwords do not match
+ *       401:
+ *         description: Unauthorized (user not authenticated)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized. tenant not authenticated
+ *       404:
+ *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: user not found
+ *       500:
+ *         description: Error initiating change password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: internal server error
+ */
+router.post('/changePassword', authenticate, changePassword)
+
+/**
+ * @swagger
+ * /api/v1/logout:
+ *   post:
+ *     summary: Logout user
+ *     security:
+ *       - bearerAuth: [] # token is required for authentication
+ *     responses:
+ *       200:
+ *         description: User logged out successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User logged out successfully
+ *       401:
+ *         description: Unauthorized (user not authenticated)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Unauthorized
+ *       500:
+ *         description: Error logging out user
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: internal server error
+ */
+router.post('/logout', authenticate, logout)
 
 module.exports = router
 

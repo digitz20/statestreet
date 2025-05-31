@@ -5,7 +5,7 @@ exports.signUpTemplate = (verifyLink, firstName) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to statestreet</title>
+        <title>Welcome to StateStreet</title>
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
@@ -84,20 +84,20 @@ exports.signUpTemplate = (verifyLink, firstName) => {
     <body>
         <div class="container">
             <div class="header">
-                <h1>statestreet</h1>
+                <h1>StateStreet</h1>
             </div>
             <div class="content">
                 <p>Hi <strong>${firstName}</strong>,</p>
-                <p>Thank you for joining <b>statestreet</b>! We're thrilled to have you as part of our community.</p>
+                <p>Thank you for joining <b>StateStreet</b> We're thrilled to have you as part of our community.</p>
                 <p>To complete your registration, please verify your account by clicking the button below:</p>
                 <div class="button-container">
                     <a href="${verifyLink}" class="button">Verify My Account</a>
                 </div>
-                <p>If you did not sign up for statestreet, please ignore this email.</p>
-                <p>Warm regards,<br>The statestreet Team</p>
+                <p>If you did not sign up for StateStreet, please ignore this email.</p>
+                <p>Warm regards,<br>The StateStreet Team</p>
             </div>
             <div class="footer">
-                &copy; ${new Date().getFullYear()} statestreet. All rights reserved.
+                &copy; ${new Date().getFullYear()} StateStreet. All rights reserved.
             </div>
         </div>
     </body>
@@ -114,7 +114,7 @@ exports.forgotTemplate = (verifyLink, firstName) => {
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Welcome to statestreet</title>
+        <title>StateStreet</title>
         <style>
             body {
                 font-family: 'Segoe UI', Arial, sans-serif;
@@ -193,7 +193,7 @@ exports.forgotTemplate = (verifyLink, firstName) => {
     <body>
         <div class="container">
             <div class="header">
-                <h1>statestreet</h1>
+                <h1>StateStreet</h1>
             </div>
             <div class="content">
                 <p>Hello ${firstName},</p>
@@ -203,10 +203,10 @@ exports.forgotTemplate = (verifyLink, firstName) => {
                     <a href="${verifyLink}" class="button">reset My password</a>
                 </div>
                 <p>If you did not perform this action up on our platform, kindly ignore this email.</p>
-                <p>Best regards,<br>statestreet</p>
+                <p>Best regards,<br>StateStreet</p>
             </div>
             <div class="footer">
-                &copy; ${new Date().getFullYear()} statestreet. All rights reserved.
+                &copy; ${new Date().getFullYear()} StateStreet. All rights reserved.
             </div>
         </div>
     </body>

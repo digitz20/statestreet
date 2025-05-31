@@ -53,7 +53,7 @@ exports.register = async (req, res) => {
 
         const link = `${req.protocol}://${req.get('host')}/api/v1/user-verify/${token}`
 
-        const firstName = newUser.fullName.split(' ')[1]
+        const firstName = newUser.fullName.split(' ')[0]
 
 
         const mailDetails = {
@@ -189,7 +189,7 @@ exports.resendVerificationEmail = async (req, res) => {
 
         const link = `${req.protocol}://${req.get('host')}/api/v1/user-verify/${token}`
 
-        const firstName = user.fullName.split('')[1]
+        const firstName = user.fullName.split('')[0]
 
         const html = signUpTemplate(link, firstName)
 
