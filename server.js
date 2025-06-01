@@ -9,6 +9,8 @@ const swaggerJSDOC = require('swagger-jsdoc');
 const PORT = process.env.PORT || 4988
 
 const userRouter = require('./routes/userRouter')
+const transactionRouter = require('./routes/transactionRouter')
+const dashboardRouter = require('./routes/dashboardRouter')
 
 
 const app = express()
@@ -74,6 +76,11 @@ app.use('/statestreet', swaggerUIEXPRESS.serve, swaggerUIEXPRESS.setup(swaggerSp
 
 
 app.use('/api/v1/',userRouter)
+app.use('/api/v1/',transactionRouter)
+app.use('/api/v1/',dashboardRouter)
+
+
+
 
 app.use((error, req, res, next) => {
   if(error){

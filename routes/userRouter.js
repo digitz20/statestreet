@@ -9,6 +9,8 @@ const { authenticate } = require('../middlewares/authentication')
  * @swagger
  * /api/v1/register:
  *   post:
+ *     tags:
+ *       - user
  *     summary: this is the register or signup route
  *     requestBody:
  *       required: true
@@ -99,6 +101,8 @@ router.post('/register', register)
  * @swagger
  * /api/v1/user-verify/{token}:
  *   get:
+ *     tags:
+ *       - user
  *     summary: Verify user email
  *     parameters:
  *       - name: token
@@ -133,6 +137,8 @@ router.get('/user-verify/:token', verifyEmail)
  * @swagger
  * /api/v1/resendverificationemail:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Resend verification email
  *     requestBody:
  *       required: true
@@ -169,6 +175,8 @@ router.post('/resendverificationemail', resendVerificationEmail)
  * @swagger
  * /api/v1/forget-password:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Send password reset email
  *     requestBody:
  *       required: true
@@ -204,6 +212,8 @@ router.post('/forget-password', forgotPassword)
  * @swagger
  * /api/v1/reset-password/{token}:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Reset user password
  *     parameters:
  *       - name: token
@@ -251,6 +261,8 @@ router.post('/reset-password/:token', resetPassword)
  * @swagger
  * /api/v1/login:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Login user
  *     requestBody:
  *       required: true
@@ -314,6 +326,8 @@ router.post('/login', login)
  * @swagger
  * /api/v1/changePassword:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Change user password
  *     security:
  *       - bearerAuth: [] # token is required for authentication
@@ -394,6 +408,8 @@ router.post('/changePassword', authenticate, changePassword)
  * @swagger
  * /api/v1/logout:
  *   post:
+ *     tags:
+ *       - user
  *     summary: Logout user
  *     security:
  *       - bearerAuth: [] # token is required for authentication

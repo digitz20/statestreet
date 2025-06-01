@@ -1,4 +1,4 @@
-const userModel = require('../model/userModel')
+const userModel = require('../model/user')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 // const jwt = require('jsonwebtoken')
@@ -391,3 +391,5 @@ exports.logout = async (req, res) => {
         res.status(500).json({ message: 'Error logging out user', error: error.message });
     }
 };
+
+
