@@ -1,8 +1,10 @@
-const mongoose = require('mongoose')
+// model/dashboard.js
+
+const mongoose = require('mongoose');
 
 const dashboardSchema = new mongoose.Schema({
     username: {
-        type: String,  
+        type: String,
     },
     balance: {
         type: Number,
@@ -15,11 +17,9 @@ const dashboardSchema = new mongoose.Schema({
     image: {
         imageUrl: {
             type: String,
-            required: true
         },
         publicId: {
             type: String,
-            required: true
         }
     },
     user: {
@@ -30,11 +30,9 @@ const dashboardSchema = new mongoose.Schema({
     transaction: [{
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Transactions',
-        required: true,
-    }], 
+    }]
+}, { timestamps: true });
 
-},{timestamps: true})
+const dashboardModel = mongoose.model('dashboard', dashboardSchema);
 
-const dashboardModel = mongoose.model('dashboard', dashboardSchema) 
-
-module.exports = dashboardModel
+module.exports = dashboardModel;

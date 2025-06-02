@@ -1,12 +1,13 @@
 const router = require('express').Router()
 const multer = require('multer');
 
-const { createProfile, updateProfile,deleteProfile, getProfile} = require('../controller/dashboardController')
+const { createProfile, updateProfile,deleteProfile,
+    getProfile} = require('../controller/dashboardController')
 const upload = require('../utils/multer')
 
 /**
  * @swagger
- * /createProfile/{id}:
+ * /api/v1/createProfile/{id}:
  *   post:
  *     summary: Create a user dashboard profile with image upload
  *     tags:
@@ -48,7 +49,7 @@ router.post('/createProfile/:id', upload.single('image'), createProfile);
 
 /**
  * @swagger
- * /updateProfile/{id}:
+ * /api/v1/updateProfile/{id}:
  *   put:
  *     summary: Update a user dashboard profile (fields and/or image)
  *     tags:
@@ -97,7 +98,7 @@ router.put('/updateProfile/:id', upload.single('image'), updateProfile);
 
 /**
  * @swagger
- * /deleteProfile/{id}:
+ * /api/v1/deleteProfile/{id}:
  *   delete:
  *     summary: Delete a user dashboard profile
  *     tags:
@@ -124,7 +125,7 @@ router.delete('/deleteProfile/:id', deleteProfile);
 
 /**
  * @swagger
- * /getProfile/{id}:
+ * /api/v1/getProfile/{id}:
  *   get:
  *     summary: Get a user dashboard profile
  *     tags:
@@ -157,5 +158,8 @@ router.delete('/deleteProfile/:id', deleteProfile);
  */
 
 router.get('/getProfile/:id', getProfile);
+
+
+
 
 module.exports = router

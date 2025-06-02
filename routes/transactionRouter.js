@@ -1,6 +1,10 @@
 const router = require('express').Router();
+const multer = require('multer')
 
-const { createTransaction } = require('../controller/transactionController');
+const { createTransaction, withdraw, createDeposit } = require('../controller/transactionController');
+const upload = require('../utils/multer')
+
+
 
 /**
  * @swagger
@@ -50,7 +54,7 @@ const { createTransaction } = require('../controller/transactionController');
 
 /**
  * @swagger
- * /transaction/{id}:
+ * /api/v1/transaction/{id}:
  *   post:
  *     summary: Create a new transaction for a user
  *     tags:
@@ -107,5 +111,131 @@ const { createTransaction } = require('../controller/transactionController');
  */
 
 router.post('/transaction/:id', createTransaction);
+
+
+/**
+ * @swagger
+ * components:
+ *   schemas:
+ *     Transactions:
+ *       type: object
+ *       properties:
+ *         depositWallet:
+ *           type: string
+ *           enum: [bitcoin, ethereum, litecoin, dogecoin, ripple, stellar, monero, tron, eos, cardano, solana, tezos, matic, avax]
+ *           description: Wallet type for deposit (cryptocurrency)
+ *         withdrawWallet:
+ *           type: string
+ *           enum: [bitcoin, ethereum, litecoin, dogecoin, ripple, stellar, monero, tron, eos, cardano, solana, tezos, matic, avax]
+ *           description: Wallet type for withdrawal (cryptocurrency)
+ */
+
+
+
+/**
+ * @swagger
+ * /api/v1/createDeposit/{id}:
+ *   post:
+ *     summary: Initiate a deposit for a user, with optional payment proof image upload
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               depositAmount:
+ *                 type: number
+ *                 description: Amount to deposit
+ *               depositWallet:
+ *                 type: string
+ *                 enum: [bitcoin, ethereum, litecoin, dogecoin, ripple, stellar, monero, tron, eos, cardano, solana, tezos, matic, avax]
+ *                 description: Wallet to deposit into (must be one of the supported cryptocurrencies)
+ *               paymentProof:
+ *                 type: string
+ *                 format: binary
+ *                 description: Image file as proof of payment (optional)
+ *     responses:
+ *       201:
+ *         description: Deposit initiated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 newDeposit:
+ *                   $ref: '#/components/schemas/Dashboard'
+ *       400:
+ *         description: Deposit amount and wallet are required
+ *       404:
+ *         description: User or dashboard not found
+ *       500:
+ *         description: Error initiating deposit
+ */
+
+router.post('/createDeposit/:id', upload.single('paymentProof'), createDeposit);
+
+/**
+ * @swagger
+ * /api/v1/withdraw/{id}:
+ *   post:
+ *     summary: Initiate a withdrawal for a user
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               withdrawWallet:
+ *                 type: string
+ *                 enum: [bitcoin, ethereum, litecoin, dogecoin, ripple, stellar, monero, tron, eos, cardano, solana, tezos, matic, avax]
+ *                 description: Wallet to withdraw from (must be one of the supported cryptocurrencies)
+ *               withdrawAmount:
+ *                 type: number
+ *                 description: Amount to withdraw
+ *               withdrawAddress:
+ *                 type: string
+ *                 description: Address to send withdrawal to
+ *     responses:
+ *       201:
+ *         description: Withdraw initiated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 newWithdraw:
+ *                   $ref: '#/components/schemas/Dashboard'
+ *       400:
+ *         description: Withdraw amount and address are required
+ *       404:
+ *         description: User or dashboard not found
+ *       500:
+ *         description: Error initiating withdraw
+ */
+router.post('/withdraw/:id', upload.none(), withdraw);
 
 module.exports = router;

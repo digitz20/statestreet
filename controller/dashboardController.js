@@ -26,12 +26,15 @@ exports.createProfile = async (req, res) => {
 
         // Upload image to Cloudinary
         const result = await cloudinary.uploader.upload(req.file.path, {
-            folder: 'profile_images', // Optional: organize uploads in a folder
+            folder: 'uploads',
             resource_type: 'image'
         });
 
-        // Save image URL or public_id to user and dashboard
-        user.image = result.secure_url; // or result.public_id if you prefer
+        // Save image as object with publicId and imageUrl
+        user.image = {
+            publicId: result.public_id,
+            imageUrl: result.secure_url
+        };
         await user.save();
 
         const dashboard = new dashboardModel({
@@ -40,7 +43,7 @@ exports.createProfile = async (req, res) => {
             totalDeposit: user.totalDeposit,
             image: user.image,
             user: user._id,
-            transaction: user.transaction,  // Assuming user has a transaction array
+            transaction: user.transaction || [],
         });
 
         await dashboard.save();
@@ -52,7 +55,6 @@ exports.createProfile = async (req, res) => {
         res.status(500).json({ message: 'Error creating profile', error: error.message });
     }
 };
-
 
 exports.getDashboard = async (req, res) => {
     try {
@@ -72,11 +74,6 @@ exports.getDashboard = async (req, res) => {
     }
 };
 
-
-/**
- * Update Profile Controller
- * Allows updating user fields and uploading a new profile image.
- */
 exports.updateProfile = async (req, res) => {
     try {
         const { id } = req.params;
@@ -93,16 +90,14 @@ exports.updateProfile = async (req, res) => {
 
         // If a new image is uploaded, upload to Cloudinary and update
         if (req.file) {
-            // Optionally: Delete old image from Cloudinary if you store public_id
-            // if (user.imagePublicId) {
-            //     await cloudinary.uploader.destroy(user.imagePublicId);
-            // }
             const result = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'profile_images',
+                folder: 'uploads',
                 resource_type: 'image'
             });
-            user.image = result.secure_url;
-            // user.imagePublicId = result.public_id; // If you want to store public_id for deletion
+            user.image = {
+                publicId: result.public_id,
+                imageUrl: result.secure_url
+            };
         }
 
         await user.save();
@@ -124,10 +119,6 @@ exports.updateProfile = async (req, res) => {
     }
 };
 
-/**
- * Delete Profile Controller
- * Deletes the dashboard and optionally the user and profile image.
- */
 exports.deleteProfile = async (req, res) => {
     try {
         const { id } = req.params;
@@ -137,8 +128,8 @@ exports.deleteProfile = async (req, res) => {
         }
 
         // Optionally: Delete profile image from Cloudinary if you store public_id
-        // if (user.imagePublicId) {
-        //     await cloudinary.uploader.destroy(user.imagePublicId);
+        // if (user.image && user.image.publicId) {
+        //     await cloudinary.uploader.destroy(user.image.publicId);
         // }
 
         // Delete dashboard
@@ -154,7 +145,6 @@ exports.deleteProfile = async (req, res) => {
     }
 };
 
-
 exports.getProfile = async(req, res) => {
     try {
         const { id } = req.params;
@@ -167,11 +157,8 @@ exports.getProfile = async(req, res) => {
             return res.status(404).json({ message: 'Dashboard not found' });
         }
         res.status(200).json({message: 'profile gotten successfully', user, dashboard });
-
-
-        
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error getting profile', error: error.message });
     }
-}
+};

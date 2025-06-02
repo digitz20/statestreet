@@ -7,7 +7,7 @@ const { authenticate } = require('../middlewares/authentication')
 
 /**
  * @swagger
- * /api/v1/register:
+ * /apv1i//register:
  *   post:
  *     tags:
  *       - user

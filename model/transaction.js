@@ -1,35 +1,55 @@
+// model/transaction.js
 
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-  amount: {
-    type: Number,
-    required: true,
-  },
-  type: {
-    type: String,
-    required: true,
-    enum: ['deposit', 'withdrawal','assigned'], // Adjust as needed
-  },
-  date: {
-    type: Date,
-    required: true,
-    default: Date.now,
-  },
-  paymentType: {
-    type: String,
-    required: true,
-    // enum: ['cash', 'card', 'bank', 'other'], // Adjust as needed
-  },
-  status: {
-    type: String,
-    required: true,
-    enum: ['pending', 'verified', 'declined'], // Adjust as needed
-  },
-});
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Users',
+        required: true,
+    },
+    type: {
+        type: String,
+        enum: ['deposit', 'withdrawal'],
+        required: true,
+    },
+    amount: {
+        type: Number,
+        required: true,
+    },
+    wallet: {
+        type: String,
+        enum: [
+            'bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar',
+            'monero', 'tron', 'eos', 'cardano', 'solana', 'tezos', 'matic', 'avax'
+        ],
+        required: true,
+    },
+    address: {
+        type: String, // For withdrawAddress or depositWallet address
+        required: function() {
+            return this.type === 'withdrawal';
+        }
+    },
+    paymentProof: {
+        imageUrl: {
+            type: String,
+        },
+        publicId: {
+            type: String,
+        }
+    },
+    status: {
+        type: String,
+        enum: ['pending', 'completed', 'failed'],
+        default: 'pending',
+    },
+    date: {
+        type: Date,
+        default: Date.now,
+    }
+}, { timestamps: true });
 
-
-const transactionModel = mongoose.model('transactions', transactionSchema);  
-
+const transactionModel = mongoose.model('Transactions', transactionSchema);
 
 module.exports = transactionModel;

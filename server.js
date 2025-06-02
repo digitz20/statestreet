@@ -6,6 +6,7 @@ const swaggerUIEXPRESS = require('swagger-ui-express');
 const swaggerJSDOC = require('swagger-jsdoc');
 
 
+
 const PORT = process.env.PORT || 4988
 
 const userRouter = require('./routes/userRouter')
@@ -18,6 +19,7 @@ const app = express()
 app.use(cors({origin: "*"}));
 
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
 
 
