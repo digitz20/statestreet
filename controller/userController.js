@@ -35,15 +35,10 @@ exports.register = async (req, res) => {
             return res.status(400).json({message: `user with email: ${email} already exists`})
         }
 
-        const salt = await bcrypt.genSalt(10)
-        const hashedPassword = await bcrypt.hash(password, salt)
-
-     
-
         const newUser = new userModel({
             fullName,
             email,
-            password: hashedPassword,
+            password: password,
             username
             
         })
@@ -51,7 +46,7 @@ exports.register = async (req, res) => {
 
         const token = await jwt.sign({ userId: newUser._id}, process.env.JWT_SECRET, { expiresIn: '2day'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/user-verify/${token}`
+        const link = `${process.env.FRONTEND_URL}/api/v1/user-verify/${token}`
 
         const firstName = newUser.fullName.split(' ')[0]
 
@@ -187,7 +182,7 @@ exports.resendVerificationEmail = async (req, res) => {
 
         const token = await jwt.sign({ userId: user._id}, process.env.JWT_SECRET, { expiresIn: '2h'})
 
-        const link = `${req.protocol}://${req.get('host')}/api/v1/user-verify/${token}`
+        const link = `${process.env.FRONTEND_URL}/api/v1/user-verify/${token}`
 
         const firstName = user.fullName.split('')[0]
 
@@ -232,7 +227,7 @@ exports.forgotPassword = async (req, res) => {
       };
   
       const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '1hour' });
-      const link = `${req.protocol}://${req.get('host')}/api/v1/reset-password/${token}`; // consumed post link
+      const link = `${process.env.FRONTEND_URL}/reset-password/${token}`; // consumed post link
       const firstName = user.fullName.split(' ')[0];
   
       const mailOptions = {
@@ -284,9 +279,7 @@ exports.resetPassword = async (req, res) => {
         })
       };
   
-      const saltedRound = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, saltedRound);
-      user.password = hashedPassword;
+      user.password = password;
       await user.save();
   
       res.status(200).json({
@@ -343,16 +336,7 @@ exports.changePassword = async (req, res) => {
             return res.status(404).json({ message: 'user not found' });
         }
 
-        const isPasswordCorrect = await bcrypt.compare(oldPassword, user.password);
-
-        if (!isPasswordCorrect) {
-            return res.status(400).json({ message: 'invalid credentials' });
-        }
-
-        const salt = await bcrypt.genSalt(10);
-        const hashedPassword = await bcrypt.hash(newPassword, salt);
-
-        user.password = hashedPassword;
+        user.password = newPassword;
 
         await user.save();
 
@@ -391,5 +375,3 @@ exports.logout = async (req, res) => {
         res.status(500).json({ message: 'Error logging out user', error: error.message });
     }
 };
-
-
