@@ -12,18 +12,22 @@ import {
   Typography,
   FormControl, // New import
   InputLabel, // New import
-  Select, // New import
-  MenuItem, // New import
-  Checkbox, // New import
-  FormControlLabel, // New import
+  Select,
+  MenuItem,
+  Checkbox,
+  FormControlLabel,
+  SelectChangeEvent, // <--- Make sure this is imported
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
 interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void; // Updated to handle select and textarea
-  onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // New for checkbox
+  // This will now only handle standard input changes (TextFields)
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  // New prop specifically for Material-UI Select changes
+  onSelectChange: (event: SelectChangeEvent<string>) => void; // <--- Add this new prop
+  onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   formData: any;
   error?: string;
   loading?: boolean;
@@ -33,11 +37,13 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formType,
   onSubmit,
   onInputChange,
-  onCheckboxChange, // New prop
+  onSelectChange, // <--- Add this new prop here
+  onCheckboxChange,
   formData,
   error,
   loading,
 }) => {
+  // ... rest of the component
   const isRegister = formType === 'register';
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
@@ -94,30 +100,29 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     </Select>
                   </FormControl>
 
-                  <FormControl fullWidth sx={fieldSx}>
-                    <InputLabel id="country-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Country</InputLabel>
-                    <Select
-                      labelId="country-label"
-                      id="country"
-                      name="country"
-                      value={formData.country || ''}
-                      label="Country"
-                      onChange={onInputChange}
-                      required
-                      sx={{
-                        color: 'white',
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.7)' },
-                      }}
-                    >
-                      {countries.map((country) => (
-                        <MenuItem key={country} value={country}>{country}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
+<FormControl fullWidth sx={fieldSx}>
+  <InputLabel id="account-type-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Account Type</InputLabel>
+  <Select
+    labelId="account-type-label"
+    id="accountType"
+    name="accountType"
+    value={formData.accountType || ''}
+    label="Account Type"
+    onChange={onSelectChange} // <--- Change this line
+    required
+    sx={{
+      color: 'white',
+      '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
+      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
+      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
+      '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.7)' },
+    }}
+  >
+    {accountTypes.map((type) => (
+      <MenuItem key={type} value={type}>{type}</MenuItem>
+    ))}
+  </Select>
+</FormControl>
                   <FormControl fullWidth sx={fieldSx}>
                     <InputLabel id="currency-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Currency</InputLabel>
                     <Select

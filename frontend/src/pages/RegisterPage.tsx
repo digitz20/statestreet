@@ -2,7 +2,9 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
+import { SelectChangeEvent } from '@mui/material'; // <--- Make sure this is imported
 
+// ... rest of the file
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -20,10 +22,15 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { // <--- Update type here
+  const { name, value } = e.target;
+  setFormData({ ...formData, [name]: value });
+};
 
+const handleSelectChange = (e: SelectChangeEvent<string>) => { // <--- Add this new function
+  const { name, value } = e.target;
+  setFormData({ ...formData, [name]: value });
+};
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.checked });
   };
@@ -81,7 +88,8 @@ const RegisterPage: React.FC = () => {
       formType="register"
       onSubmit={handleSubmit}
       onInputChange={handleInputChange}
-      onCheckboxChange={handleCheckboxChange} // Pass new handler
+      onSelectChange={handleSelectChange} // <--- Pass the new handler here
+      onCheckboxChange={handleCheckboxChange}
       formData={formData}
       loading={loading}
       error={error}

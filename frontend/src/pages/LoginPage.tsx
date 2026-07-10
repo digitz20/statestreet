@@ -12,9 +12,9 @@ const LoginPage: React.FC = () => {
   const [error, setError] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { // <--- Update type here
+  setFormData({ ...formData, [e.target.name]: e.target.value });
+};
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
