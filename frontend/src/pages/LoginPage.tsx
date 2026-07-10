@@ -21,7 +21,7 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     setError(undefined);
     try {
-      const response = await authService.login(formData.email, formData.password);
+      const response = await authService.login({ email: formData.email, password: formData.password }); // <--- Corrected call
       if (response.status >= 200 && response.status < 300) {
         navigate('/dashboard');
       }
