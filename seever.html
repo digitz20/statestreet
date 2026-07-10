@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Stake Crash Multiplier Verifier & Client Seed Finder</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #181a20;
+      color: #f2f2f2;
+      margin: 0;
+      padding: 0;
+      min-height: 100vh;
+    }
+    .container {
+      max-width: 440px;
+      margin: 40px auto;
+      background: #23272f;
+      border-radius: 10px;
+      padding: 32px 24px 24px 24px;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 24px;
+      color: #ffbe3b;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      margin-bottom: 4px;
+      font-weight: bold;
+    }
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      padding: 8px 10px;
+      border-radius: 5px;
+      border: 1px solid #444;
+      background: #1a1c22;
+      color: #f2f2f2;
+      font-size: 1em;
+      margin-bottom: 8px;
+      box-sizing: border-box;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #ffbe3b;
+      color: #181a20;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.1em;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 18px;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #ffd86b;
+    }
+    #result, #findResult {
+      margin-top: 24px;
+      text-align: center;
+      font-size: 1.15em;
+      min-height: 1.5em;
+    }
+    #findResult {
+      color: #00e676;
+      word-break: break-all;
+    }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      color: #888;
+      font-size: 0.95em;
+    }
+    .section {
+      margin-top: 36px;
+      border-top: 1px solid #333;
+      padding-top: 18px;
+    }
+    .progress-bar {
+      width: 100%;
+      background: #333;
+      border-radius: 5px;
+      margin-top: 10px;
+      height: 18px;
+      overflow: hidden;
+      display: none;
+    }
+    .progress-bar-inner {
+      height: 100%;
+      background: #ffbe3b;
+      width: 0%;
+      transition: width 0.2s;
+    }
+    @media (max-width: 500px) {
+      .container {
+        padding: 16px 6px 18px 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Stake Crash Multiplier Verifier</h2>
+
+    <label for="serverSeed">Server Seed (revealed):</label>
+    <input type="text" id="serverSeed" placeholder="Enter revealed server seed" autocomplete="off">
+
+    <label for="clientSeed">Client Seed:</label>
+    <input type="text" id="clientSeed" placeholder="Enter client seed" autocomplete="off">
+
+    <label for="nonce">Nonce (Round Number):</label>
+    <input type="number" id="nonce" min="0" placeholder="e.g. 1">
+
+    <button onclick="verifyCrash()">Verify Crash</button>
+
+    <div id="result"></div>
+
+    <div class="section">
+      <h2 style="font-size:1.1em;color:#ffbe3b;">Find Client Seed for Target Multiplier</h2>
+      <label for="targetMultiplier">Target Multiplier (e.g. 15):</label>
+      <input type="number" id="targetMultiplier" min="1" step="0.01" placeholder="e.g. 15">
+
+      <label for="tolerance">Tolerance (e.g. 0.01):</label>
+      <input type="number" id="tolerance" min="0.001" step="0.001" value="0.01">
+
+      <label for="maxAttempts">Max Attempts:</label>
+      <input type="number" id="maxAttempts" min="1000" step="1000" value="100000">
+
+      <button onclick="findClientSeed()">Find Client Seed</button>
+      <div class="progress-bar" id="progressBar">
+        <div class="progress-bar-inner" id="progressBarInner"></div>
+      </div>
+      <div id="findResult"></div>
+    </div>
+  </div>
+  <div class="footer">
+    &copy; 2024 Stake Crash Verifier &mdash; Provably Fair Verification Tool
+  </div>
+
+  <script>
+    /**
+     * Verifies the Stake Crash multiplier for given seeds and nonce.
+     * Uses HMAC-SHA256 as per Stake's provably fair algorithm.
+     */
+    async function verifyCrash() {
+      const serverSeed = document.getElementById("serverSeed").value.trim();
+      const clientSeed = document.getElementById("clientSeed").value.trim();
+      const nonce = parseInt(document.getElementById("nonce").value, 10);
+      const resultElem = document.getElementById("result");
+
+      if (!serverSeed || !clientSeed || isNaN(nonce)) {
+        resultElem.style.color = "#ff5252";
+        resultElem.innerText = "Please fill all fields correctly.";
+        return;
+      }
+
+      try {
+        const message = `${clientSeed}:${nonce}`;
+        const encoder = new TextEncoder();
+        const key = await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(serverSeed),
+          { name: "HMAC", hash: "SHA-256" },
+          false,
+          ["sign"]
+        );
+        const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
+        const hashArray = Array.from(new Uint8Array(signature));
+        const hmac = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // Check for instant crash (divisible by 33)
+        if (BigInt('0x' + hmac) % 33n === 0n) {
+          resultElem.style.color = "#ff5252";
+          resultElem.innerText = "Crash Multiplier: 1.00x (Instant Crash)";
+          return;
+        }
+
+        // Calculate multiplier
+        const h = BigInt('0x' + hmac.slice(0, 13));
+        const e = 2n ** 52n;
+        const multiplier = Number((100n * e) / (e - h)) / 100;
+        const rounded = Math.floor(multiplier * 100) / 100;
+
+        resultElem.style.color = "#00e676";
+        resultElem.innerText = `Crash Multiplier: ${rounded}x`;
+      } catch (err) {
+        resultElem.style.color = "#ff5252";
+        resultElem.innerText = "Error: " + (err.message || err);
+      }
+    }
+
+    /**
+     * Brute-force a client seed that produces a crash multiplier close to targetMultiplier
+     * for a given serverSeed and nonce.
+     */
+    async function findClientSeed() {
+      const serverSeed = document.getElementById("serverSeed").value.trim();
+      const nonce = parseInt(document.getElementById("nonce").value, 10);
+      const targetMultiplier = parseFloat(document.getElementById("targetMultiplier").value);
+      const tolerance = parseFloat(document.getElementById("tolerance").value);
+      const maxAttempts = parseInt(document.getElementById("maxAttempts").value, 10);
+      const findResult = document.getElementById("findResult");
+      const progressBar = document.getElementById("progressBar");
+      const progressBarInner = document.getElementById("progressBarInner");
+
+      findResult.style.color = "#00e676";
+      findResult.innerText = "";
+      progressBar.style.display = "block";
+      progressBarInner.style.width = "0%";
+
+      if (!serverSeed || isNaN(nonce) || isNaN(targetMultiplier) || isNaN(tolerance) || isNaN(maxAttempts)) {
+        findResult.style.color = "#ff5252";
+        findResult.innerText = "Please fill all fields correctly.";
+        progressBar.style.display = "none";
+        return;
+      }
+
+      function randomClientSeed(length = 16) {
+        const chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let result = '';
+        for (let i = 0; i < length; i++) {
+          result += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+        return result;
+      }
+
+      const encoder = new TextEncoder();
+      let found = false;
+
+      for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+        const clientSeed = randomClientSeed();
+        const message = `${clientSeed}:${nonce}`;
+        const key = await crypto.subtle.importKey(
+          "raw",
+          encoder.encode(serverSeed),
+          { name: "HMAC", hash: "SHA-256" },
+          false,
+          ["sign"]
+        );
+        const signature = await crypto.subtle.sign("HMAC", key, encoder.encode(message));
+        const hashArray = Array.from(new Uint8Array(signature));
+        const hmac = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+
+        // Check for instant crash
+        if (BigInt('0x' + hmac) % 33n === 0n) continue;
+
+        const h = BigInt('0x' + hmac.slice(0, 13));
+        const e = 2n ** 52n;
+        const multiplier = Number((100n * e) / (e - h)) / 100;
+        const rounded = Math.floor(multiplier * 100) / 100;
+
+        if (Math.abs(rounded - targetMultiplier) <= tolerance) {
+          findResult.style.color = "#00e676";
+          findResult.innerHTML = `<b>Found client seed:</b> <span style="color:#ffbe3b">${clientSeed}</span><br>
+            <b>Multiplier:</b> ${rounded}x<br>
+            <b>Attempts:</b> ${attempt}<br>
+            <b>Nonce:</b> ${nonce}`;
+          document.getElementById("clientSeed").value = clientSeed;
+          found = true;
+          break;
+        }
+
+        // Update progress bar every 1000 attempts
+        if (attempt % 1000 === 0 || attempt === maxAttempts) {
+          progressBarInner.style.width = ((attempt / maxAttempts) * 100).toFixed(1) + "%";
+        }
+
+        // Allow UI to update
+        if (attempt % 5000 === 0) {
+          await new Promise(r => setTimeout(r, 1));
+        }
+      }
+
+      if (!found) {
+        findResult.style.color = "#ff5252";
+        findResult.innerText = `No client seed found within ${maxAttempts} attempts for multiplier ${targetMultiplier}x (tolerance ±${tolerance}).`;
+      }
+      progressBar.style.display = "none";
+    }
+  </script>
+</body>
+</html>
