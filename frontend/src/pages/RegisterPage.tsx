@@ -2,9 +2,8 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
-import { SelectChangeEvent } from '@mui/material'; // <--- Make sure this is imported
+import { type SelectChangeEvent } from '@mui/material'; // Corrected import
 
-// ... rest of the file
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -22,15 +21,19 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => { // <--- Update type here
-  const { name, value } = e.target;
-  setFormData({ ...formData, [name]: value });
-};
+  // Handler for TextField components
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
 
-const handleSelectChange = (e: SelectChangeEvent<string>) => { // <--- Add this new function
-  const { name, value } = e.target;
-  setFormData({ ...formData, [name]: value });
-};
+  // Handler for Material-UI Select components
+  const handleSelectChange = (e: SelectChangeEvent<string>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handler for Checkbox components
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.checked });
   };
@@ -88,8 +91,8 @@ const handleSelectChange = (e: SelectChangeEvent<string>) => { // <--- Add this 
       formType="register"
       onSubmit={handleSubmit}
       onInputChange={handleInputChange}
-      onSelectChange={handleSelectChange} // <--- Pass the new handler here
-      onCheckboxChange={handleCheckboxChange}
+      onSelectChange={handleSelectChange} // Pass the new handler
+      onCheckboxChange={handleCheckboxChange} // Pass new handler
       formData={formData}
       loading={loading}
       error={error}
