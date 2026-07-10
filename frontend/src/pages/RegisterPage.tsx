@@ -11,12 +11,21 @@ const RegisterPage: React.FC = () => {
     email: '',
     password: '',
     confirmPassword: '',
+    accountType: '', // New field
+    country: '',     // New field
+    currency: '',    // New field
+    termsAccepted: false, // New field
+    captcha: '',     // New field
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData({ ...formData, [e.target.name]: e.target.checked });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,6 +47,12 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
+    if (!formData.termsAccepted) {
+      setError('You must accept the Terms and Conditions.');
+      setLoading(false);
+      return;
+    }
+
     try {
       const response = await authService.register({
         fullName: formData.fullName,
@@ -45,6 +60,11 @@ const RegisterPage: React.FC = () => {
         email: formData.email,
         password: formData.password,
         confirmPassword: formData.confirmPassword,
+        accountType: formData.accountType, // Pass new field
+        country: formData.country,         // Pass new field
+        currency: formData.currency,       // Pass new field
+        termsAccepted: formData.termsAccepted, // Pass new field
+        captcha: formData.captcha,         // Pass new field
       });
       if (response.status >= 200 && response.status < 300) {
         navigate('/login');
@@ -61,6 +81,7 @@ const RegisterPage: React.FC = () => {
       formType="register"
       onSubmit={handleSubmit}
       onInputChange={handleInputChange}
+      onCheckboxChange={handleCheckboxChange} // Pass new handler
       formData={formData}
       loading={loading}
       error={error}

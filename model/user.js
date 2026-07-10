@@ -15,7 +15,24 @@ const userSchema = new mongoose.Schema({
     password : {
         type: String,
         required: true
-    }
+    },
+    accountType: {
+        type: String,
+        enum: ['Individual', 'Business'],
+        required: true,
+    },
+    country: {
+        type: String,
+        required: true,
+    },
+    currency: {
+        type: String,
+        required: true,
+    },
+    isVerified: {
+        type: Boolean,
+        default: false,
+    },
 
 },{timestamps: true})
 

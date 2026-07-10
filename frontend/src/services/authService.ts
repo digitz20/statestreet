@@ -18,8 +18,21 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+interface RegisterPayload {
+  fullName: string;
+  username: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  accountType: string;
+  country: string;
+  currency: string;
+  termsAccepted: boolean;
+  captcha: string;
+}
+
 const authService = {
-  register: async (payload: Record<string, unknown>) => api.post('/register', payload),
+  register: async (payload: RegisterPayload) => api.post('/register', payload),
   login: async (payload: Record<string, unknown>) => api.post('/login', payload),
   logout: async () => {
     localStorage.removeItem('user');

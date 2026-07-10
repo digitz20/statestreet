@@ -23,6 +23,26 @@ exports.registerSchema = Joi.object().keys({
         'any.only': 'Passwords do not match',
         'any.required': 'Confirm password is required',
     }).required(),
+    accountType: Joi.string().valid('Individual', 'Business').required().messages({
+        'any.required': 'Account type is required',
+        'any.only': 'Invalid account type',
+    }),
+    country: Joi.string().required().messages({
+        'any.required': 'Country is required',
+        'string.empty': 'Country cannot be empty',
+    }),
+    currency: Joi.string().required().messages({
+        'any.required': 'Currency is required',
+        'string.empty': 'Currency cannot be empty',
+    }),
+    termsAccepted: Joi.boolean().valid(true).required().messages({
+        'any.required': 'You must accept the terms and conditions',
+        'any.only': 'You must accept the terms and conditions',
+    }),
+    captcha: Joi.string().required().messages({
+        'any.required': 'Captcha is required',
+        'string.empty': 'Captcha cannot be empty',
+    }),
 });
 
 
