@@ -22,7 +22,7 @@ import { Link, useNavigate } from 'react-router-dom';
 interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void; // Updated to handle select
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => void; // Updated to handle select and textarea
   onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // New for checkbox
   formData: any;
   error?: string;
