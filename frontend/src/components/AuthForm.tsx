@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 import {
   Alert,
   Box,
-  Button,
   Card,
   CardContent,
-  IconButton,
   InputAdornment,
   Stack,
   TextField,
@@ -16,12 +14,16 @@ import {
   MenuItem,
   Checkbox,
   FormControlLabel,
-  type SelectChangeEvent, // Corrected import
+  type SelectChangeEvent,
+  Button, // Add Button here
+  IconButton, // Add IconButton here
 } from '@mui/material';
+// Remove these lines if they exist:
+// import Button from '@mui/material/Button';
+// import IconButton from '@mui/material/IconButton';
 import { Link, useNavigate } from 'react-router-dom';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-
 
 interface AuthFormProps {
   formType: 'login' | 'register';
