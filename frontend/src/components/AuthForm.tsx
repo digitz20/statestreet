@@ -199,7 +199,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="Guinea-Bissau">Guinea-Bissau</MenuItem>
                       <MenuItem value="Guyana">Guyana</MenuItem>
                       <MenuItem value="Haiti">Haiti</MenuItem>
-                      <MenuItem value="Heard Island And Mcdonald Islands">Heard Island And Mcdonald Islands</MenuItem>
+                      <MenuItem value="Heard Island and Mcdonald Islands">Heard Island and Mcdonald Islands</MenuItem>
                       <MenuItem value="Holy See (Vatican City State)">Holy See (Vatican City State)</MenuItem>
                       <MenuItem value="Honduras">Honduras</MenuItem>
                       <MenuItem value="Hong Kong">Hong Kong</MenuItem>
@@ -233,7 +233,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="Liechtenstein">Liechtenstein</MenuItem>
                       <MenuItem value="Lithuania">Lithuania</MenuItem>
                       <MenuItem value="Luxembourg">Luxembourg</MenuItem>
-                      <MenuItem value="Macau">Macau</MenuItem>
+                      <MenuItem value="Macao">Macao</MenuItem>
                       <MenuItem value="Macedonia, The Former Yugoslav Republic Of">Macedonia, The Former Yugoslav Republic Of</MenuItem>
                       <MenuItem value="Madagascar">Madagascar</MenuItem>
                       <MenuItem value="Malawi">Malawi</MenuItem>
@@ -313,6 +313,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="Suriname">Suriname</MenuItem>
                       <MenuItem value="Svalbard And Jan Mayen">Svalbard And Jan Mayen</MenuItem>
                       <MenuItem value="Swaziland">Swaziland</MenuItem>
+                      <MenuItem value="Sweden">Sweden</MenuItem>
+                      <MenuItem value="Switzerland">Switzerland</MenuItem>
                       <MenuItem value="Syrian Arab Republic">Syrian Arab Republic</MenuItem>
                       <MenuItem value="Taiwan, Province Of China">Taiwan, Province Of China</MenuItem>
                       <MenuItem value="Tajikistan">Tajikistan</MenuItem>
@@ -348,204 +350,21 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="Zimbabwe">Zimbabwe</MenuItem>
                     </Select>
                   </FormControl>
-                  <FormControl fullWidth sx={fieldSx}>
-                    <InputLabel id="currency-label">Currency</InputLabel>
-                    <Select
-                      labelId="currency-label"
-                      id="currency"
-                      name="currency"
-                      value={formData.currency || ''}
-                      label="Currency"
-                      onChange={onInputChange}
-                      required
-                      sx={{ color: 'white', '& .MuiSelect-icon': { color: 'white' } }}
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      <MenuItem value="USD">USD - United States Dollar</MenuItem>
-                      <MenuItem value="EUR">EUR - Euro</MenuItem>
-                      <MenuItem value="GBP">GBP - British Pound</MenuItem>
-                      <MenuItem value="JPY">JPY - Japanese Yen</MenuItem>
-                      <MenuItem value="CAD">CAD - Canadian Dollar</MenuItem>
-                      <MenuItem value="AUD">AUD - Australian Dollar</MenuItem>
-                      <MenuItem value="CHF">CHF - Swiss Franc</MenuItem>
-                      <MenuItem value="CNY">CNY - Chinese Yuan</MenuItem>
-                      <MenuItem value="INR">INR - Indian Rupee</MenuItem>
-                      <MenuItem value="BRL">BRL - Brazilian Real</MenuItem>
-                      <MenuItem value="ZAR">ZAR - South African Rand</MenuItem>
-                      <MenuItem value="NGN">NGN - Nigerian Naira</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    label="Password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    value={formData.password || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                            sx={{ color: 'white' }}
-                          >
-                            {showPassword ? <Typography>🙈</Typography> : <Typography>👁️</Typography>}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Confirm Password"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    value={formData.confirmPassword || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle confirm password visibility"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            edge="end"
-                            sx={{ color: 'white' }}
-                          >
-                            {showConfirmPassword ? <Typography>🙈</Typography> : <Typography>👁️</Typography>}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <FormControl fullWidth sx={fieldSx}>
-                    <InputLabel id="currency-label">Currency</InputLabel>
-                    <Select
-                      labelId="currency-label"
-                      id="currency"
-                      name="currency"
-                      value={formData.currency || ''}
-                      label="Currency"
-                      onChange={onInputChange}
-                      required
-                      sx={{ color: 'white', '& .MuiSelect-icon': { color: 'white' } }}
-                    >
-                      <MenuItem value="">
-                        <em>None</em>
-                      </MenuItem>
-                      <MenuItem value="USD">USD - United States Dollar</MenuItem>
-                      <MenuItem value="EUR">EUR - Euro</MenuItem>
-                      <MenuItem value="GBP">GBP - British Pound Sterling</MenuItem>
-                      <MenuItem value="JPY">JPY - Japanese Yen</MenuItem>
-                      <MenuItem value="CAD">CAD - Canadian Dollar</MenuItem>
-                      <MenuItem value="AUD">AUD - Australian Dollar</MenuItem>
-                      <MenuItem value="CHF">CHF - Swiss Franc</MenuItem>
-                      <MenuItem value="CNY">CNY - Chinese Yuan</MenuItem>
-                      <MenuItem value="SEK">SEK - Swedish Krona</MenuItem>
-                      <MenuItem value="NZD">NZD - New Zealand Dollar</MenuItem>
-                      <MenuItem value="MXN">MXN - Mexican Peso</MenuItem>
-                      <MenuItem value="SGD">SGD - Singapore Dollar</MenuItem>
-                      <MenuItem value="HKD">HKD - Hong Kong Dollar</MenuItem>
-                      <MenuItem value="NOK">NOK - Norwegian Krone</MenuItem>
-                      <MenuItem value="KRW">KRW - South Korean Won</MenuItem>
-                      <MenuItem value="TRY">TRY - Turkish Lira</MenuItem>
-                      <MenuItem value="RUB">RUB - Russian Ruble</MenuItem>
-                      <MenuItem value="INR">INR - Indian Rupee</MenuItem>
-                      <MenuItem value="BRL">BRL - Brazilian Real</MenuItem>
-                      <MenuItem value="ZAR">ZAR - South African Rand</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <TextField
-                    label="Email address"
-                    name="email"
-                    type="email"
-                    required
-                    fullWidth
-                    value={formData.email || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                  />
-                  <TextField
-                    label="Password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    value={formData.password || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                            sx={{ color: 'rgba(255,255,255,0.7)' }}
-                          >
-                            {showPassword ? '🙈' : '👁️'}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <TextField
-                    label="Confirm password"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    value={formData.confirmPassword || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle confirm password visibility"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            edge="end"
-                            sx={{ color: 'rgba(255,255,255,0.7)' }}
-                          >
-                            {showConfirmPassword ? '🙈' : '👁️'}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  <Typography variant="h6" sx={{ mt: 2, color: 'white', letterSpacing: 3, bgcolor: '#333', p: 1, borderRadius: 1, textAlign: 'center' }}>
-                    {captchaValue}
-                  </Typography>
-                  <TextField
-                    label="Enter Captcha"
-                    name="captcha"
-                    required
-                    fullWidth
-                    value={formData.captcha || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                  />
+                  <TextField label="Phone number" name="phoneNumber" required fullWidth value={formData.phoneNumber || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField label="Referral code (Optional)" name="referralCode" fullWidth value={formData.referralCode || ''} onChange={onInputChange} sx={fieldSx} />
                   <FormControlLabel
                     control={
                       <Checkbox
-                        name="termsAccepted"
-                        checked={formData.termsAccepted || false}
+                        checked={formData.agreeToTerms || false}
                         onChange={onCheckboxChange}
-                        required
-                        sx={{ color: 'rgba(255,255,255,0.7)' }}
+                        name="agreeToTerms"
+                        color="primary"
                       />
                     }
                     label={
-                      <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                      <Typography sx={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.9rem' }}>
                         I agree to the{' '}
-                        <Link to="/terms" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
+                        <Link to="/privacy-policy" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
                           Terms and Conditions
                         </Link>
                       </Typography>
@@ -555,84 +374,86 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 </>
               )}
               {!isRegister && (
-                <>
-                  <TextField
-                    label="email or username"
-                    name="loginIdentifier"
-                    required
-                    fullWidth
-                    value={formData.loginIdentifier || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                  />
-                  <TextField
-                    label="Password"
-                    name="password"
-                    type={showPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    value={formData.password || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton
-                            aria-label="toggle password visibility"
-                            onClick={() => setShowPassword(!showPassword)}
-                            edge="end"
-                            sx={{ color: 'rgba(255,255,255,0.7)' }}
-                          >
-                            {showPassword ? '🙈' : '👁️'}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                </>
+                <TextField label="Email" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
+              )}
+              <TextField
+                label="Password"
+                name="password"
+                type={showPassword ? 'text' : 'password'}
+                required
+                fullWidth
+                value={formData.password || ''}
+                onChange={onInputChange}
+                sx={fieldSx}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton
+                        onClick={() => setShowPassword(!showPassword)}
+                        edge="end"
+                        sx={{ color: 'rgba(255,255,255,0.7)' }}
+                      >
+                        {/* {showPassword ? <VisibilityOff /> : <Visibility />} */}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+              {isRegister && (
+                <TextField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  fullWidth
+                  value={formData.confirmPassword || ''}
+                  onChange={onInputChange}
+                  sx={fieldSx}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          edge="end"
+                          sx={{ color: 'rgba(255,255,255,0.7)' }}
+                        >
+                          {/* {showConfirmPassword ? <VisibilityOff /> : <Visibility />} */}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
               )}
               {error && (
-                <Alert severity="error" sx={{ mt: 2, mb: 1, bgcolor: 'rgba(255,0,0,0.2)', color: 'white' }}>
+                <Alert severity="error" sx={{ mt: 2, bgcolor: 'rgba(248,113,113,0.16)', color: '#fda4af' }}>
                   {error}
                 </Alert>
               )}
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                sx={{
-                  mt: 2,
-                  py: 1.5,
-                  borderRadius: 2,
-                  bgcolor: '#7dd3fc',
-                  color: '#030712',
-                  fontWeight: 700,
-                  '&:hover': { bgcolor: '#67b8e3' },
-                  textTransform: 'none',
-                  fontSize: '1.1rem',
-                }}
-                disabled={loading}
-              >
-                {isRegister ? 'Create Account' : 'Sign In'}
+              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.5, borderRadius: 999, bgcolor: '#7dd3fc', color: '#03111d', '&:hover': { bgcolor: '#bae6fd' } }} disabled={loading}>
+                {loading ? 'Loading...' : (isRegister ? 'Register' : 'Login')}
               </Button>
-
-                <Button
-                  fullWidth
-                  variant="outlined"
-                  sx={{ py: 1.5, fontSize: '1rem', mt: 2, color: '#7dd3fc', borderColor: '#7dd3fc', '&:hover': { borderColor: '#38bdf8', color: '#38bdf8' } }}
-                  onClick={() => navigate('/resend-verification')}
-                >
-                  Resend Verification Email
-                </Button>
-            </Box>
-            <Box sx={{ textAlign: 'center', mt: 2 }}>
-              <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>
-                {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
-                <Link to={isRegister ? '/login' : '/register'} style={{ color: '#7dd3fc', textDecoration: 'none' }}>
-                  {isRegister ? 'Sign In' : 'Sign Up'}
-                </Link>
-              </Typography>
+              {isRegister ? (
+                <Typography sx={{ mt: 2, textAlign: 'center', color: 'rgba(255,255,255,0.72)' }}>
+                  Already have an account?{' '}
+                  <Link to="/login" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
+                    Login
+                  </Link>
+                </Typography>
+              ) : (
+                <Typography sx={{ mt: 2, textAlign: 'center', color: 'rgba(255,255,255,0.72)' }}>
+                  Don't have an account?{' '}
+                  <Link to="/register" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
+                    Register
+                  </Link>
+                </Typography>
+              )}
+              {!isRegister && (
+                <Typography sx={{ mt: 1, textAlign: 'center' }}>
+                  <Link to="/forgot-password" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
+                    Forgot password?
+                  </Link>
+                </Typography>
+              )}
             </Box>
           </Stack>
         </CardContent>
@@ -641,18 +462,26 @@ const AuthForm: React.FC<AuthFormProps> = ({
   );
 };
 
-const fieldSx = {
-  mb: 2.5,
-  '& .MuiOutlinedInput-root': {
-    borderRadius: 2,
-    '& fieldset': { borderColor: 'rgba(255,255,255,0.16)' },
-    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-    '&.Mui-focused fieldset': { borderColor: '#7dd3fc' },
-  },
-  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
-  '& .MuiInputLabel-root.Mui-focused': { color: '#7dd3fc' },
-  '& .MuiInputBase-input': { color: 'white' },
-  '& .MuiFormHelperText-root': { color: 'rgba(255,255,255,0.5)' },
-};
-
 export default AuthForm;
+
+const fieldSx = {
+  mt: 2,
+  '& .MuiInputBase-root': {
+    color: 'white',
+    '& fieldset': {
+      borderColor: 'rgba(255,255,255,0.2)',
+    },
+    '&:hover fieldset': {
+      borderColor: 'rgba(255,255,255,0.4)',
+    },
+    '&.Mui-focused fieldset': {
+      borderColor: '#7dd3fc',
+    },
+  },
+  '& .MuiInputLabel-root': {
+    color: 'rgba(255,255,255,0.7)',
+    '&.Mui-focused': {
+      color: '#7dd3fc',
+    },
+  },
+};
