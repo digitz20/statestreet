@@ -18,23 +18,23 @@ const RegisterPage: React.FC = () => {
     termsAccepted: false, // New field
     captcha: '',     // New field
   });
+  
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
-  const [captchaValue, setCaptchaValue] = useState(''); // State for captcha value
   // Generate a new captcha value on component mount
   // Generate a new captcha value on component mount
-  React.useEffect(() => {
-    const generateCaptcha = () => {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
-      for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    };
-    setCaptchaValue(generateCaptcha());
-  }, []); // Empty dependency array means this runs once on mount
-  // Handler for TextField components
+  // React.useEffect(() => {
+  //   const generateCaptcha = () => {
+  //     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  //     let result = '';
+  //     for (let i = 0; i < 6; i++) {
+  //       result += chars.charAt(Math.floor(Math.random() * chars.length));
+  //     }
+  //     return result;
+  //   };
+  //   setCaptchaValue(generateCaptcha());
+  // }, []); // Empty dependency array means this runs once on mount
+  // // Handler for TextField components
 
   // Handler for TextField components
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
@@ -68,11 +68,11 @@ const RegisterPage: React.FC = () => {
     }
 
     // Captcha validation
-    if (formData.captcha.toLowerCase() !== captchaValue.toLowerCase()) {
-      setError('Incorrect captcha. Please try again.');
-      setLoading(false);
-      return;
-    }
+    // if (formData.captcha.toLowerCase() !== captchaValue.toLowerCase()) {
+    //   setError('Incorrect captcha. Please try again.');
+    //   setLoading(false);
+    //   return;
+    // }
 
     try {
       const response = await authService.register({
@@ -106,7 +106,7 @@ const RegisterPage: React.FC = () => {
       formData={formData}
       loading={loading}
       error={error}
-      captchaValue={captchaValue}
+      // captchaValue={captchaValue}
     />
   );
 }

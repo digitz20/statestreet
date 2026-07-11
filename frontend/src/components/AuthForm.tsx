@@ -6,7 +6,6 @@ import {
   Card,
   CardContent,
   InputAdornment,
-  Stack,
   TextField,
   Typography,
   Button,
@@ -29,7 +28,6 @@ export interface AuthFormProps {
   formData: any;
   error?: string;
   loading?: boolean;
-  captchaValue?: string;
 
 }
 
@@ -41,7 +39,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formData,
   error,
   loading,
-  captchaValue,
 
 }) => {
   const isRegister = formType === 'register';
