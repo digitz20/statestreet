@@ -39,10 +39,6 @@ exports.registerSchema = Joi.object().keys({
         'any.required': 'You must accept the terms and conditions',
         'any.only': 'You must accept the terms and conditions',
     }),
-    captcha: Joi.string().required().messages({
-        'any.required': 'Captcha is required',
-        'string.empty': 'Captcha cannot be empty',
-    }),
 });
 
 

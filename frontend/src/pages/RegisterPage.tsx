@@ -85,7 +85,6 @@ const RegisterPage: React.FC = () => {
         country: formData.country,         // Pass new field
         currency: formData.currency,       // Pass new field
         termsAccepted: formData.termsAccepted, // Pass new field
-        captcha: formData.captcha,         // Pass new field
       });
       if (response.status >= 200 && response.status < 300) {
         navigate('/login');

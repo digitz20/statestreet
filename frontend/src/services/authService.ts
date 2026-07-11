@@ -28,7 +28,6 @@ interface RegisterPayload {
   country: string;
   currency: string;
   termsAccepted: boolean;
-  captcha: string;
 }
 
 const authService = {
