@@ -29,6 +29,7 @@ export interface AuthFormProps {
   formData: any;
   error?: string;
   loading?: boolean;
+  captchaValue?: string;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -39,6 +40,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formData,
   error,
   loading,
+  captchaValue,
 }) => {
   const isRegister = formType === 'register';
   const navigate = useNavigate();
@@ -438,11 +440,23 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       ),
                     }}
                   />
+                  <Typography variant="h6" sx={{ mt: 2, color: 'white', letterSpacing: 3, bgcolor: '#333', p: 1, borderRadius: 1, textAlign: 'center' }}>
+                    {captchaValue}
+                  </Typography>
+                  <TextField
+                    label="Enter Captcha"
+                    name="captcha"
+                    required
+                    fullWidth
+                    value={formData.captcha || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                  />
                   <FormControlLabel
                     control={
                       <Checkbox
-                        name="agreeToTerms"
-                        checked={formData.agreeToTerms || false}
+                        name="termsAccepted"
+                        checked={formData.termsAccepted || false}
                         onChange={onCheckboxChange}
                         required
                         sx={{ color: 'rgba(255,255,255,0.7)' }}
