@@ -12,6 +12,7 @@ interface UserProfile {
   image?: string; // URL of the profile image
 }
 
+
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
