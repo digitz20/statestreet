@@ -123,15 +123,20 @@ const DashboardPage: React.FC = () => {
     setLoading(true);
     try {
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      if (!storedUser || !storedUser.token || !storedUser.data?._id) {
+      if (!storedUser || !storedUser.token || !storedUser._id) {
         navigate('/login');
         return;
       }
-      const userId = storedUser.data._id;
+      const userId = storedUser._id;
       const response = await dashboardService.getProfile(userId);
       setUser(response.user);
       setDashboard(response.dashboard);
     } catch (err: any) {
+      if (err.response?.status === 404) {
+        setShowProfileForm(true);
+        setLoading(false);
+        return;
+      }
       setError(err.response?.data?.message || 'Failed to load dashboard data.');
       if (err.response?.status === 401 || err.response?.status === 403) {
         await authService.logout();
