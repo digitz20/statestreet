@@ -6,6 +6,7 @@ import {
   Card,
   CardContent,
   InputAdornment,
+  Stack,
   TextField,
   Typography,
   Button,
@@ -28,6 +29,7 @@ export interface AuthFormProps {
   formData: any;
   error?: string;
   loading?: boolean;
+  captchaValue?: string;
 
 }
 
@@ -39,6 +41,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formData,
   error,
   loading,
+  captchaValue,
 
 }) => {
   const isRegister = formType === 'register';
@@ -51,7 +54,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
       <Box sx={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at top left, rgba(125,211,252,0.2), transparent 32%), linear-gradient(135deg, #030712 0%, #07111f 45%, #13233f 100%)', zIndex: 0 }} />
       <Card sx={{ width: '100%', maxWidth: 540, p: 1, borderRadius: 4, bgcolor: 'rgba(7, 14, 30, 0.82)', color: 'white', boxShadow: '0 30px 90px rgba(0,0,0,0.45)', backdropFilter: 'blur(18px)', position: 'relative', zIndex: 1 }}>
         <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-          <Typography variant="h6">AuthForm Content Placeholder</Typography>
+          <Stack spacing={2.5}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
               <Typography variant="overline" sx={{ color: '#7dd3fc' }}>StateStreet • secure access</Typography>
@@ -452,7 +455,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 </Typography>
               )}
             </Box>
-          
+          </Stack>
         </CardContent>
       </Card>
     </Box>
