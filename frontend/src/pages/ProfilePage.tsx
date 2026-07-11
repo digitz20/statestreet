@@ -22,6 +22,10 @@ const ProfilePage: React.FC = () => {
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState<boolean>(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+  const [isNewProfile, setIsNewProfile] = useState<boolean>(false); // New state to track if profile needs creation
+  const [isCreating, setIsCreating] = useState<boolean>(false);
+  const [createSuccess, setCreateSuccess] = useState<string | null>(null);
+
 
   const navigate = useNavigate(); // Initialize useNavigate
 
@@ -43,11 +47,26 @@ const ProfilePage: React.FC = () => {
     setError(null);
     try {
       const response = await axios.get(`${API_BASE_URL}/getProfile/${userId}`);
-      setProfile(response.data.dashboard); // Assuming dashboard contains profile info
-    } catch (err) {
+      if (response.data.dashboard) {
+        setProfile(response.data.dashboard); // Assuming dashboard contains profile info
+        setIsNewProfile(false); // Profile exists, so not a new profile
+      } else {
+        // If no dashboard data, assume profile needs to be created
+        setProfile(null);
+        setIsNewProfile(true);
+      }
+    } catch (err: any) {
       console.error('Error fetching profile:', err);
-      setError('Failed to fetch profile data.');
-      setProfile(null); // Clear profile if fetch fails
+      if (err.response && err.response.status === 404) {
+        // Specifically handle 404 as "profile not found, needs creation"
+        setError('No profile found. Please create your profile.');
+        setIsNewProfile(true);
+        setProfile(null);
+      } else {
+        setError('Failed to fetch profile data.');
+        setProfile(null); // Clear profile if fetch fails
+        setIsNewProfile(true); // Assume creation if fetch fails for other reasons too
+      }
     } finally {
       setLoading(false);
     }
@@ -64,7 +83,7 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleUpdateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (!userId) {
       setError('User ID is missing. Cannot update profile.');
@@ -105,6 +124,46 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleCreateProfile = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!userId) {
+      setError('User ID is missing. Cannot create profile.');
+      return;
+    }
+
+    setIsCreating(true);
+    setCreateSuccess(null);
+    setError(null);
+
+    const formData = new FormData();
+    formData.append('fullName', (event.target as any).fullName.value);
+    formData.append('balance', (event.target as any).balance.value || '0'); // Default to 0 if empty
+    formData.append('totalDeposit', (event.target as any).totalDeposit.value || '0'); // Default to 0 if empty
+
+    if (selectedImage) {
+      formData.append('image', selectedImage);
+    }
+
+    try {
+      const response = await axios.post(`${API_BASE_URL}/createProfile/${userId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      console.log('Profile created successfully:', response.data);
+      setCreateSuccess('Profile created successfully!');
+      setSelectedImage(null);
+      setPreviewImage(null);
+      setIsNewProfile(false); // Profile is now created
+      fetchProfile(); // Fetch the newly created profile
+    } catch (err) {
+      console.error('Error creating profile:', err);
+      setError('Failed to create profile. Please try again.');
+    } finally {
+      setIsCreating(false);
+    }
+  };
+
   const handleDeleteProfile = async () => {
     setOpenDeleteDialog(false); // Close dialog immediately
     if (!userId) {
@@ -137,29 +196,15 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  // If no profile is found and not loading, offer to create one (future implementation)
-  if (!profile && !loading && !error) {
-    return (
-      <Box sx={{ p: 3 }}>
-        <Typography variant="h5" gutterBottom>No Profile Found</Typography>
-        <Typography>It looks like you don't have a profile yet. You can create one here.</Typography>
-        {/* Future: Add a form/button to create profile using createProfile endpoint */}
-        {/* For now, the update form will act as a create if no profile exists, but it's not ideal */}
-        <Button variant="contained" onClick={() => setProfile({ fullName: '', balance: 0, totalDeposit: 0 })}>
-          Start Creating Profile
-        </Button>
-      </Box>
-    );
-  }
-
   return (
     <Box sx={{ p: 3 }}>
-      <Typography variant="h4" gutterBottom>Profile Page</Typography>
+      <Typography variant="h4" gutterBottom>{isNewProfile ? 'Create Your Profile' : 'Profile Page'}</Typography>
 
       {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
       {updateSuccess && <Alert severity="success" sx={{ mb: 2 }}>{updateSuccess}</Alert>}
+      {createSuccess && <Alert severity="success" sx={{ mb: 2 }}>{createSuccess}</Alert>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={isNewProfile ? handleCreateProfile : handleUpdateProfile}>
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, maxWidth: 400 }}>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Avatar
@@ -189,6 +234,7 @@ const ProfilePage: React.FC = () => {
             fullWidth
             margin="normal"
             variant="outlined"
+            required
           />
           <TextField
             label="Balance"
@@ -213,21 +259,23 @@ const ProfilePage: React.FC = () => {
             type="submit"
             variant="contained"
             color="primary"
-            disabled={isUpdating}
+            disabled={isUpdating || isCreating}
             sx={{ mt: 2 }}
           >
-            {isUpdating ? <CircularProgress size={24} /> : 'Update Profile'}
+            {isCreating ? <CircularProgress size={24} /> : (isNewProfile ? 'Create Profile' : (isUpdating ? <CircularProgress size={24} /> : 'Update Profile'))}
           </Button>
 
-          <Button
-            variant="outlined"
-            color="error"
-            onClick={() => setOpenDeleteDialog(true)}
-            disabled={isDeleting}
-            sx={{ mt: 2 }}
-          >
-            {isDeleting ? <CircularProgress size={24} /> : 'Delete Profile'}
-          </Button>
+          {!isNewProfile && ( // Only show delete button if profile exists
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={() => setOpenDeleteDialog(true)}
+              disabled={isDeleting}
+              sx={{ mt: 2 }}
+            >
+              {isDeleting ? <CircularProgress size={24} /> : 'Delete Profile'}
+            </Button>
+          )}
         </Box>
       </form>
 
