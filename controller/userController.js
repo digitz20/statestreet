@@ -162,8 +162,8 @@ exports.verifyEmail = async (req, res) => {
         if(error instanceof jwt.JsonWebTokenError) {
             return res.status(401).json({message: 'verification link expired'})
         }
+        return res.status(500).json({message: 'error verifying user:' , error:error.message})
     }
-    res.status(500).json({message: 'error verifying user:' , error:error.message})
 }
 
 
