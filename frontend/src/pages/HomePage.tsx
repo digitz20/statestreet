@@ -754,10 +754,14 @@ const marketNewsHeadlines = [
           </Box>
           <Paper elevation={0} sx={{ mt: 3, p: 2.5, borderRadius: 3, bgcolor: 'rgba(2, 6, 23, 0.96)', border: '1px solid rgba(125, 211, 252, 0.16)' }}>
             <Typography variant="overline" sx={{ color: '#7dd3fc' }}>Market update</Typography>
-            <Typography sx={{ color: 'white', fontWeight: 700, mt: 1 }}>{marketNewsHeadlines[currentNewsIndex].title}</Typography>
-            <Typography sx={{ color: 'rgba(255,255,255,0.72)', mt: 1 }}>
-              {marketNewsHeadlines[currentNewsIndex].description}
-            </Typography>
+            {marketNewsHeadlines[currentNewsIndex] && (
+              <>
+                <Typography sx={{ color: 'white', fontWeight: 700, mt: 1 }}>{marketNewsHeadlines[currentNewsIndex].title}</Typography>
+                <Typography sx={{ color: 'rgba(255,255,255,0.72)', mt: 1 }}>
+                  {marketNewsHeadlines[currentNewsIndex].description}
+                </Typography>
+              </>
+            )}
           </Paper>
         </Paper>
 
