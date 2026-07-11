@@ -82,9 +82,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value="premium">Premium</MenuItem>
-                      <MenuItem value="pro">Pro</MenuItem>
-                      <MenuItem value="classic">Classic</MenuItem>
+                      <MenuItem value="Individual">Individual</MenuItem>
+                      <MenuItem value="Business">Business</MenuItem>
                     </Select>
                   </FormControl>
                   <FormControl fullWidth sx={fieldSx}>
@@ -310,8 +309,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="Suriname">Suriname</MenuItem>
                       <MenuItem value="Svalbard And Jan Mayen">Svalbard And Jan Mayen</MenuItem>
                       <MenuItem value="Swaziland">Swaziland</MenuItem>
-                      <MenuItem value="Sweden">Sweden</MenuItem>
-                      <MenuItem value="Switzerland">Switzerland</MenuItem>
                       <MenuItem value="Syrian Arab Republic">Syrian Arab Republic</MenuItem>
                       <MenuItem value="Taiwan, Province Of China">Taiwan, Province Of China</MenuItem>
                       <MenuItem value="Tajikistan">Tajikistan</MenuItem>
@@ -362,42 +359,62 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       <MenuItem value="">
                         <em>None</em>
                       </MenuItem>
-                      <MenuItem value="USD">USD (United States Dollar)</MenuItem>
-                      <MenuItem value="EUR">EUR (Euro)</MenuItem>
-                      <MenuItem value="GBP">GBP (British Pound)</MenuItem>
-                      <MenuItem value="JPY">JPY (Japanese Yen)</MenuItem>
-                      <MenuItem value="CAD">CAD (Canadian Dollar)</MenuItem>
-                      <MenuItem value="AUD">AUD (Australian Dollar)</MenuItem>
-                      <MenuItem value="CHF">CHF (Swiss Franc)</MenuItem>
-                      <MenuItem value="CNY">CNY (Chinese Yuan)</MenuItem>
-                      <MenuItem value="INR">INR (Indian Rupee)</MenuItem>
-                      <MenuItem value="BRL">BRL (Brazilian Real)</MenuItem>
+                      <MenuItem value="USD">USD - United States Dollar</MenuItem>
+                      <MenuItem value="EUR">EUR - Euro</MenuItem>
+                      <MenuItem value="GBP">GBP - British Pound Sterling</MenuItem>
+                      <MenuItem value="JPY">JPY - Japanese Yen</MenuItem>
+                      <MenuItem value="CAD">CAD - Canadian Dollar</MenuItem>
+                      <MenuItem value="AUD">AUD - Australian Dollar</MenuItem>
+                      <MenuItem value="CHF">CHF - Swiss Franc</MenuItem>
+                      <MenuItem value="CNY">CNY - Chinese Yuan</MenuItem>
+                      <MenuItem value="SEK">SEK - Swedish Krona</MenuItem>
+                      <MenuItem value="NZD">NZD - New Zealand Dollar</MenuItem>
+                      <MenuItem value="MXN">MXN - Mexican Peso</MenuItem>
+                      <MenuItem value="SGD">SGD - Singapore Dollar</MenuItem>
+                      <MenuItem value="HKD">HKD - Hong Kong Dollar</MenuItem>
+                      <MenuItem value="NOK">NOK - Norwegian Krone</MenuItem>
+                      <MenuItem value="KRW">KRW - South Korean Won</MenuItem>
+                      <MenuItem value="TRY">TRY - Turkish Lira</MenuItem>
+                      <MenuItem value="RUB">RUB - Russian Ruble</MenuItem>
+                      <MenuItem value="INR">INR - Indian Rupee</MenuItem>
+                      <MenuItem value="BRL">BRL - Brazilian Real</MenuItem>
+                      <MenuItem value="ZAR">ZAR - South African Rand</MenuItem>
                     </Select>
                   </FormControl>
-                </>
-              )}
-              <TextField label="Email" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
-              <TextField
-                label="Password"
-                name="password"
-                type={showPassword ? 'text' : 'password'}
-                required
-                fullWidth
-                value={formData.password || ''}
-                onChange={onInputChange}
-                sx={fieldSx}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                        {showPassword ? 'Hide' : 'Show'}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-              {isRegister && (
-                <>
+                  <TextField
+                    label="Email address"
+                    name="email"
+                    type="email"
+                    required
+                    fullWidth
+                    value={formData.email || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                  />
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    fullWidth
+                    value={formData.password || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            sx={{ color: 'rgba(255,255,255,0.7)' }}
+                          >
+                            {showPassword ? '🙈' : '👁️'}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
                   <TextField
                     label="Confirm password"
                     name="confirmPassword"
@@ -410,62 +427,102 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     InputProps={{
                       endAdornment: (
                         <InputAdornment position="end">
-                          <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                            {showConfirmPassword ? 'Hide' : 'Show'}
+                          <IconButton
+                            aria-label="toggle confirm password visibility"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                            sx={{ color: 'rgba(255,255,255,0.7)' }}
+                          >
+                            {showConfirmPassword ? '🙈' : '👁️'}
                           </IconButton>
                         </InputAdornment>
                       ),
                     }}
                   />
-                  {/* Captcha Placeholder */}
-                  <Box sx={{ my: 2, p: 2, border: '1px dashed rgba(255,255,255,0.3)', borderRadius: 1, color: 'rgba(255,255,255,0.7)' }}>
-                    <Typography variant="body2" sx={{ mb: 1 }}>
-                      Please enter the following words: <strong style={{ color: '#7dd3fc', fontSize: '1.2em' }}>{captchaValue}</strong>
-                    </Typography>
-                    <TextField
-                      label="Enter the words you see"
-                      name="captcha"
-                      fullWidth
-                      value={formData.captcha || ''}
-                      onChange={onInputChange}
-                      sx={{ mt: 1, ...fieldSx }}
-                    />
-                  </Box>
-                  {/* Terms and Conditions Checkbox */}
                   <FormControlLabel
                     control={
                       <Checkbox
-                        name="termsAccepted"
-                        checked={formData.termsAccepted || false}
+                        name="agreeToTerms"
+                        checked={formData.agreeToTerms || false}
                         onChange={onCheckboxChange}
-                        sx={{ color: '#7dd3fc' }}
+                        required
+                        sx={{ color: 'rgba(255,255,255,0.7)' }}
                       />
                     }
                     label={
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.74)' }}>
-                        I accept the <Link to="/terms" style={{ color: '#7dd3fc' }}>Terms and Conditions</Link>.
+                      <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                        I agree to the{' '}
+                        <Link to="/terms" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
+                          Terms and Conditions
+                        </Link>
                       </Typography>
                     }
                     sx={{ mt: 1, mb: 2 }}
                   />
                 </>
               )}
-              {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
-              <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999, bgcolor: '#7dd3fc', color: '#03111d', '&:hover': { bgcolor: '#bae6fd' } }} disabled={loading}>
-                {loading ? 'Please wait...' : isRegister ? 'Create account' : 'Sign in'}
-              </Button>
-            </Box>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.74)' }}>
-              {isRegister ? (
-                <>Already have an account? <Link to="/login" style={{ color: '#7dd3fc' }}>Sign in</Link></>
-              ) : (
+              {!isRegister && (
                 <>
-                  <Link to="/forgot-password" style={{ color: '#7dd3fc' }}>Forgot password?</Link>
-                  {' • '}
-                  <Link to="/register" style={{ color: '#7dd3fc' }}>Create account</Link>
+                  <TextField label="Email address" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    fullWidth
+                    value={formData.password || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            sx={{ color: 'rgba(255,255,255,0.7)' }}
+                          >
+                            {showPassword ? '🙈' : '👁️'}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
                 </>
               )}
-            </Typography>
+              {error && (
+                <Alert severity="error" sx={{ mt: 2, mb: 1, bgcolor: 'rgba(255,0,0,0.2)', color: 'white' }}>
+                  {error}
+                </Alert>
+              )}
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{
+                  mt: 2,
+                  py: 1.5,
+                  borderRadius: 2,
+                  bgcolor: '#7dd3fc',
+                  color: '#030712',
+                  fontWeight: 700,
+                  '&:hover': { bgcolor: '#67b8e3' },
+                  textTransform: 'none',
+                  fontSize: '1.1rem',
+                }}
+                disabled={loading}
+              >
+                {isRegister ? 'Create Account' : 'Sign In'}
+              </Button>
+            </Box>
+            <Box sx={{ textAlign: 'center', mt: 2 }}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>
+                {isRegister ? 'Already have an account?' : "Don't have an account?"}{' '}
+                <Link to={isRegister ? '/login' : '/register'} style={{ color: '#7dd3fc', textDecoration: 'none' }}>
+                  {isRegister ? 'Sign In' : 'Sign Up'}
+                </Link>
+              </Typography>
+            </Box>
           </Stack>
         </CardContent>
       </Card>
@@ -474,14 +531,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
 };
 
 const fieldSx = {
-  mb: 1.5,
-  input: { color: 'white' },
-  label: { color: 'rgba(255,255,255,0.7)' },
+  mb: 2.5,
   '& .MuiOutlinedInput-root': {
-    '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
-    '&:hover fieldset': { borderColor: '#7dd3fc' },
+    borderRadius: 2,
+    '& fieldset': { borderColor: 'rgba(255,255,255,0.16)' },
+    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
     '&.Mui-focused fieldset': { borderColor: '#7dd3fc' },
   },
+  '& .MuiInputLabel-root': { color: 'rgba(255,255,255,0.7)' },
+  '& .MuiInputLabel-root.Mui-focused': { color: '#7dd3fc' },
+  '& .MuiInputBase-input': { color: 'white' },
+  '& .MuiFormHelperText-root': { color: 'rgba(255,255,255,0.5)' },
 };
 
 export default AuthForm;
