@@ -531,7 +531,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 {isRegister ? 'Create Account' : 'Sign In'}
               </Button>
 
-              {error && error.includes('account not verified') && (
                 <Button
                   fullWidth
                   variant="outlined"
@@ -540,7 +539,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 >
                   Resend Verification Email
                 </Button>
-              )}
             </Box>
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>
