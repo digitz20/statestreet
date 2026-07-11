@@ -69,13 +69,13 @@ exports.loginSchema = Joi.object({
         'any.required': 'invalid credentials',
         'string.empty': 'password cannot be empty',
     }),
-}).when(Joi.object({ email: Joi.exist().not(Joi.empty()) }).unknown(), {
+}).when(Joi.object({ email: Joi.exist() }).unknown(), {
     then: Joi.object({
         username: Joi.forbidden().messages({
             'any.unknown': 'Username is not allowed when email is provided',
         }),
     }),
-}).when(Joi.object({ username: Joi.exist().not(Joi.empty()) }).unknown(), {
+}).when(Joi.object({ username: Joi.exist() }).unknown(), {
     then: Joi.object({
         email: Joi.forbidden().messages({
             'any.unknown': 'Email is not allowed when username is provided',
