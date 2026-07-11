@@ -129,8 +129,11 @@ const DashboardPage: React.FC = () => {
       }
       const userId = storedUser.data._id;
       const response = await dashboardService.getProfile(userId);
+      console.log('Dashboard API Response:', response);
       setUser(response.user);
       setDashboard(response.dashboard);
+      console.log('User state after set:', response.user);
+      console.log('Dashboard state after set:', response.dashboard);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to load dashboard data.');
       if (err.response?.status === 401 || err.response?.status === 403) {
