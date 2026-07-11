@@ -737,7 +737,7 @@ const marketNewsHeadlines = [
               </TableHead>
               <TableBody>
                 {payouts.map((row) => (
-                  <TableRow key={row.user}>
+                  <TableRow key={row.user + row.date}>
                     <TableCell sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.12)' }}>{row.user}</TableCell>
                     <TableCell sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.12)' }}>{row.method}</TableCell>
                     <TableCell sx={{ color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.12)' }}>{row.amount}</TableCell>
