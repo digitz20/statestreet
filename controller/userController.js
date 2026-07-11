@@ -77,6 +77,7 @@ exports.register = async (req, res) => {
 
         const newDashboard = new dashboardModel({
             user: newUser._id,
+            username: newUser.username, // Add this line
             accountBalance: 0,
             totalProfitLoss: 0,
             todayProfitLoss: 0,
