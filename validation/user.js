@@ -65,7 +65,11 @@ exports.loginSchema = Joi.object().keys({
         'any.required': 'invalid credentials',
         'string.empty': 'password cannot be empty',
     }).required(),
-        username: Joi.string().min(3).optional(),
+    username: Joi.string().when('email', {
+        is: Joi.exist(),
+        then: Joi.string().allow(''),
+        otherwise: Joi.string().min(3).required(),
+    }),
 }).or('email', 'username') 
     
 
