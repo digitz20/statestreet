@@ -19,6 +19,7 @@ import {
   MenuItem,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
+import RefreshIcon from '@mui/icons-material/Refresh';
 
 
 export interface AuthFormProps {
@@ -30,6 +31,7 @@ export interface AuthFormProps {
   error?: string;
   loading?: boolean;
   captchaValue?: string;
+  onRefreshCaptcha?: () => void;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -41,6 +43,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   error,
   loading,
   captchaValue,
+  onRefreshCaptcha,
 }) => {
   const isRegister = formType === 'register';
   const navigate = useNavigate();
@@ -440,9 +443,16 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       ),
                     }}
                   />
-                  <Typography variant="h6" sx={{ mt: 2, color: 'white', letterSpacing: 3, bgcolor: '#333', p: 1, borderRadius: 1, textAlign: 'center' }}>
-                    {captchaValue}
-                  </Typography>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mt: 2 }}>
+                    <Typography variant="h6" sx={{ color: 'white', letterSpacing: 3, bgcolor: '#333', p: 1, borderRadius: 1, textAlign: 'center', flexGrow: 1 }}>
+                      {captchaValue}
+                    </Typography>
+                    {onRefreshCaptcha && (
+                      <IconButton onClick={onRefreshCaptcha} sx={{ color: '#7dd3fc' }} aria-label="Refresh Captcha">
+                        <RefreshIcon />
+                      </IconButton>
+                    )}
+                  </Box>
                   <TextField
                     label="Enter Captcha"
                     name="captcha"

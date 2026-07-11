@@ -21,19 +21,24 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const [captchaValue, setCaptchaValue] = useState(''); // State for captcha value
-  // Generate a new captcha value on component mount
+
+  const generateCaptcha = () => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < 6; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  };
+
   // Generate a new captcha value on component mount
   React.useEffect(() => {
-    const generateCaptcha = () => {
-      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-      let result = '';
-      for (let i = 0; i < 6; i++) {
-        result += chars.charAt(Math.floor(Math.random() * chars.length));
-      }
-      return result;
-    };
     setCaptchaValue(generateCaptcha());
   }, []); // Empty dependency array means this runs once on mount
+
+  const handleRefreshCaptcha = () => {
+    setCaptchaValue(generateCaptcha());
+  };
   // Handler for TextField components
 
   // Handler for TextField components
@@ -107,6 +112,7 @@ const RegisterPage: React.FC = () => {
       loading={loading}
       error={error}
       captchaValue={captchaValue}
+      onRefreshCaptcha={handleRefreshCaptcha}
     />
   );
 }
