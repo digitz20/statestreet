@@ -128,9 +128,16 @@ const DashboardPage: React.FC = () => {
         return;
       }
                 const userId = storedUser.data._id;
-                console.log("Stored User from localStorage:", storedUser); // Add this line
-                console.log("User ID being used for getProfile:", userId); // Add this line
+                console.log("Stored User from localStorage:", storedUser);
+                console.log("User ID being used for getProfile:", userId);
                 const response = await dashboardService.getProfile(userId);
+                console.log("FULL API RESPONSE:", response); // Add this line
+                console.log("FULL API RESPONSE (JSON stringified):", JSON.stringify(response, null, 2)); // Add this line
+                // Also add the typeof and object logs you requested
+                console.log("Type of response.user:", typeof response.user);
+                console.log("Type of response.dashboard:", typeof response.dashboard);
+                console.log("response.user object:", response.user);
+                console.log("response.dashboard object:", response.dashboard);
       setUser(response.user);
       setDashboard(response.dashboard);
     } catch (err: any) {
