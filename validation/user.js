@@ -57,11 +57,11 @@ exports.registerSchema = Joi.object().keys({
 
 
 exports.loginSchema = Joi.object({
-    email: Joi.string().trim().email().empty('').optional().messages({
+    email: Joi.string().trim().email().empty('').messages({
         'string.email': 'Invalid email format',
         'string.empty': 'Email cannot be empty',
     }),
-    username: Joi.string().trim().min(3).empty('').optional().messages({
+    username: Joi.string().trim().min(3).empty('').messages({
         'string.min': 'Username must be at least 3 characters long',
         'string.empty': 'Username cannot be empty',
     }),
@@ -69,8 +69,20 @@ exports.loginSchema = Joi.object({
         'any.required': 'invalid credentials',
         'string.empty': 'password cannot be empty',
     }),
-}).xor('email', 'username').messages({
-    'object.xor': 'Either email or username must be provided, but not both.',
+}).when(Joi.object({ email: Joi.exist().not(Joi.empty()) }).unknown(), {
+    then: Joi.object({
+        username: Joi.forbidden().messages({
+            'any.unknown': 'Username is not allowed when email is provided',
+        }),
+    }),
+}).when(Joi.object({ username: Joi.exist().not(Joi.empty()) }).unknown(), {
+    then: Joi.object({
+        email: Joi.forbidden().messages({
+            'any.unknown': 'Email is not allowed when username is provided',
+        }),
+    }),
+}).or('email', 'username').messages({
+    'object.or': 'Either email or username must be provided.',
 }); 
     
 

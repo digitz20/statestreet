@@ -104,14 +104,6 @@ exports.login = async (req, res) => {
 
         const {email, username, password} = validated
 
-        if(!email && !username) {
-            return res.status(400).json({message: 'please enter either email or username'})    
-        }
-
-        if(!password) {
-            return res.status(400).json({message: 'please enter your password'})    
-        }
-
         const user = await userModel.findOne({ $or: [{ email}, {username: username}]})
 
         if(user === null) {
@@ -127,7 +119,6 @@ exports.login = async (req, res) => {
         if(user.isVerified === false) {
             return res.status(400).json({message: 'account not verified, please check your email for link'})  
         }
-
 
         const token = await jwt.sign({userId: user._id}, process.env.JWT_SECRET, { expiresIn:'1day'})
 
@@ -151,6 +142,9 @@ exports.login = async (req, res) => {
 
     } catch (error) {
         console.log(error.message)
+        if (error.message.includes('email') || error.message.includes('username') || error.message.includes('password') || error.message.includes('Either email or username must be provided')) {
+            return res.status(400).json({ message: 'error logging user', error: error.message });
+        }
         res.status(500).json({message: 'error loging user' , error: error.message})
     }
 }
