@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
-import { type SelectChangeEvent } from '@mui/material'; // Corrected import
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -25,17 +24,6 @@ const RegisterPage: React.FC = () => {
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
-  };
-
-  // Handler for Material-UI Select components
-  const handleSelectChange = (e: SelectChangeEvent<string>) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  // Handler for Checkbox components
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.checked });
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -91,8 +79,6 @@ const RegisterPage: React.FC = () => {
       formType="register"
       onSubmit={handleSubmit}
       onInputChange={handleInputChange}
-      onSelectChange={handleSelectChange} // Pass the new handler
-      onCheckboxChange={handleCheckboxChange} // Pass new handler
       formData={formData}
       loading={loading}
       error={error}

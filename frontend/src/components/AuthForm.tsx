@@ -1,11 +1,22 @@
 import React, { useState } from 'react';
-import { Alert, Box, Button, Card, CardContent, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
+import {
+  Alert,
+  Box,
+  Card,
+  CardContent,
+  InputAdornment,
+  Stack,
+  TextField,
+  Typography,
+  Button,
+  IconButton,
+} from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
-interface AuthFormProps {
+export interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   formData: any;
   error?: string;
   loading?: boolean;

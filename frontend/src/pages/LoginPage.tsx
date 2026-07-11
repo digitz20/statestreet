@@ -37,8 +37,6 @@ const LoginPage: React.FC = () => {
       formType="login"
       onSubmit={handleSubmit}
       onInputChange={handleInputChange}
-      onSelectChange={() => {}} // Dummy function for LoginPage
-      onCheckboxChange={() => {}} // Dummy function for LoginPage
       formData={formData}
       loading={loading}
       error={error}
