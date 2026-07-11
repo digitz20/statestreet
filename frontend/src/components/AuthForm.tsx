@@ -70,6 +70,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 <>
                   <TextField label="Full name" name="fullName" required fullWidth value={formData.fullName || ''} onChange={onInputChange} sx={fieldSx} />
                   <TextField label="Username" name="username" required fullWidth value={formData.username || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField label="Email" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
                   <FormControl fullWidth sx={fieldSx}>
                     <InputLabel id="account-type-label">Account Type</InputLabel>
                     <Select
@@ -364,6 +365,83 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       </MenuItem>
                       <MenuItem value="USD">USD - United States Dollar</MenuItem>
                       <MenuItem value="EUR">EUR - Euro</MenuItem>
+                      <MenuItem value="GBP">GBP - British Pound</MenuItem>
+                      <MenuItem value="JPY">JPY - Japanese Yen</MenuItem>
+                      <MenuItem value="CAD">CAD - Canadian Dollar</MenuItem>
+                      <MenuItem value="AUD">AUD - Australian Dollar</MenuItem>
+                      <MenuItem value="CHF">CHF - Swiss Franc</MenuItem>
+                      <MenuItem value="CNY">CNY - Chinese Yuan</MenuItem>
+                      <MenuItem value="INR">INR - Indian Rupee</MenuItem>
+                      <MenuItem value="BRL">BRL - Brazilian Real</MenuItem>
+                      <MenuItem value="ZAR">ZAR - South African Rand</MenuItem>
+                      <MenuItem value="NGN">NGN - Nigerian Naira</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <TextField
+                    label="Password"
+                    name="password"
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    fullWidth
+                    value={formData.password || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle password visibility"
+                            onClick={() => setShowPassword(!showPassword)}
+                            edge="end"
+                            sx={{ color: 'white' }}
+                          >
+                            {showPassword ? <Typography>🙈</Typography> : <Typography>👁️</Typography>}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <TextField
+                    label="Confirm Password"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    fullWidth
+                    value={formData.confirmPassword || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton
+                            aria-label="toggle confirm password visibility"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            edge="end"
+                            sx={{ color: 'white' }}
+                          >
+                            {showConfirmPassword ? <Typography>🙈</Typography> : <Typography>👁️</Typography>}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  <FormControl fullWidth sx={fieldSx}>
+                    <InputLabel id="currency-label">Currency</InputLabel>
+                    <Select
+                      labelId="currency-label"
+                      id="currency"
+                      name="currency"
+                      value={formData.currency || ''}
+                      label="Currency"
+                      onChange={onInputChange}
+                      required
+                      sx={{ color: 'white', '& .MuiSelect-icon': { color: 'white' } }}
+                    >
+                      <MenuItem value="">
+                        <em>None</em>
+                      </MenuItem>
+                      <MenuItem value="USD">USD - United States Dollar</MenuItem>
+                      <MenuItem value="EUR">EUR - Euro</MenuItem>
                       <MenuItem value="GBP">GBP - British Pound Sterling</MenuItem>
                       <MenuItem value="JPY">JPY - Japanese Yen</MenuItem>
                       <MenuItem value="CAD">CAD - Canadian Dollar</MenuItem>
@@ -478,7 +556,15 @@ const AuthForm: React.FC<AuthFormProps> = ({
               )}
               {!isRegister && (
                 <>
-                  <TextField label="Email address" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField
+                    label="email or username"
+                    name="loginIdentifier"
+                    required
+                    fullWidth
+                    value={formData.loginIdentifier || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                  />
                   <TextField
                     label="Password"
                     name="password"

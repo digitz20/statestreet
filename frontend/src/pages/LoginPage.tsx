@@ -8,7 +8,7 @@ import { type SelectChangeEvent } from '@mui/material';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    email: '',
+    loginIdentifier: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
@@ -20,14 +20,17 @@ const LoginPage: React.FC = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-
-
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(undefined);
     try {
-      const response = await authService.login({ email: formData.email, password: formData.password }); // <--- Corrected call
+      const isEmail = formData.loginIdentifier.includes('@');
+      const payload = isEmail
+        ? { email: formData.loginIdentifier, password: formData.password }
+        : { username: formData.loginIdentifier, password: formData.password };
+
+      const response = await authService.login(payload);
       if (response.status >= 200 && response.status < 300) {
         navigate('/dashboard');
       }
