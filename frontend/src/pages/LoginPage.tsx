@@ -26,9 +26,10 @@ const LoginPage: React.FC = () => {
     setError(undefined);
     try {
       const isEmail = formData.loginIdentifier.includes('@');
+      const loginValue = formData.loginIdentifier.toLowerCase();
       const payload = isEmail
-        ? { email: formData.loginIdentifier, password: formData.password }
-        : { username: formData.loginIdentifier, password: formData.password };
+        ? { email: loginValue, password: formData.password }
+        : { username: loginValue, password: formData.password };
 
       const response = await authService.login(payload);
       if (response.status >= 200 && response.status < 300) {
