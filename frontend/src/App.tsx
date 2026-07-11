@@ -6,6 +6,7 @@ import LoginPage from './pages/LoginPage';
 import NotFound from './pages/NotFound';
 import RegisterPage from './pages/RegisterPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import ResendVerificationPage from './pages/ResendVerificationPage';
 import VerifyEmailPage from './pages/VerifyEmailPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPage from './pages/PrivacyPage';
@@ -28,6 +29,7 @@ function App() {
         <Route path="/sigup" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+        <Route path="/resend-verification" element={<ResendVerificationPage />} />
         <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy-policy" element={<PrivacyPage />} />

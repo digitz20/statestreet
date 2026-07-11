@@ -30,6 +30,7 @@ export interface AuthFormProps {
   error?: string;
   loading?: boolean;
   captchaValue?: string;
+
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -41,6 +42,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   error,
   loading,
   captchaValue,
+
 }) => {
   const isRegister = formType === 'register';
   const navigate = useNavigate();
@@ -508,6 +510,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   {error}
                 </Alert>
               )}
+
               <Button
                 type="submit"
                 fullWidth
@@ -527,6 +530,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
               >
                 {isRegister ? 'Create Account' : 'Sign In'}
               </Button>
+
+              {error && error.includes('account not verified') && (
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  sx={{ py: 1.5, fontSize: '1rem', mt: 2, color: '#7dd3fc', borderColor: '#7dd3fc', '&:hover': { borderColor: '#38bdf8', color: '#38bdf8' } }}
+                  onClick={() => navigate('/resend-verification')}
+                >
+                  Resend Verification Email
+                </Button>
+              )}
             </Box>
             <Box sx={{ textAlign: 'center', mt: 2 }}>
               <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>

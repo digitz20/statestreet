@@ -41,6 +41,7 @@ const authService = {
   forgotPassword: async (email: string) => api.post('/forget-password', { email }),
   resetPassword: async (token: string, payload: Record<string, unknown>) => api.post(`/reset-password/${token}`, payload),
   verifyEmail: async (token: string) => api.get(`/user-verify/${token}`),
+  resendVerificationEmail: async (email: string) => api.post('/resendverificationemail', { email }),
 };
 
 export default authService;

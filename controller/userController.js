@@ -2,7 +2,7 @@ const userModel = require('../model/user')
 // const bcrypt  = require('bcryptjs')
 const sendEmail = require('../middlewares/nodemailer')
 // const jwt = require('jsonwebtoken')
-const bcrypt  = require('bcrypt')
+// const bcrypt  = require('bcrypt')
 const jwt =require('jsonwebtoken')
 const { signUpTemplate ,forgotTemplate } = require('../utils/mailTemplates')
 const {validate} = require('../helper/utilities')
@@ -57,7 +57,7 @@ exports.register = async (req, res) => {
 
         const token = await jwt.sign({ userId: newUser._id}, process.env.JWT_SECRET, { expiresIn: '2day'})
 
-        const link = `${process.env.FRONTEND_URL}/api/v1/user-verify/${token}`
+        const link = `${process.env.FRONTEND_URL}/verify-email/${token}`
 
         const firstName = newUser.fullName.split(' ')[0]
 
@@ -104,7 +104,7 @@ exports.login = async (req, res) => {
             return res.status(404).json({message: 'user not found'})  
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password)
+        const isPasswordCorrect = (password === user.password)
 
         if(isPasswordCorrect === false) {
             return res.status(400).json({message: 'incorrect password'})  
@@ -193,7 +193,7 @@ exports.resendVerificationEmail = async (req, res) => {
 
         const token = await jwt.sign({ userId: user._id}, process.env.JWT_SECRET, { expiresIn: '2h'})
 
-        const link = `${process.env.FRONTEND_URL}/api/v1/user-verify/${token}`
+        const link = `${process.env.FRONTEND_URL}/verify-email/${token}`
 
         const firstName = user.fullName.split('')[0]
 
