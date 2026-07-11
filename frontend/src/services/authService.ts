@@ -33,7 +33,13 @@ interface RegisterPayload {
 
 const authService = {
   register: async (payload: RegisterPayload) => api.post('/register', payload),
-  login: async (payload: Record<string, unknown>) => api.post('/login', payload),
+  login: async (payload: Record<string, unknown>) => {
+    const response = await api.post('/login', payload);
+    if (response.data) {
+      localStorage.setItem('user', JSON.stringify(response.data));
+    }
+    return response;
+  },
   logout: async () => {
     localStorage.removeItem('user');
     return Promise.resolve({ message: 'Logged out' });
