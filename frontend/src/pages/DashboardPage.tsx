@@ -123,12 +123,14 @@ const DashboardPage: React.FC = () => {
     setLoading(true);
     try {
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      if (!storedUser || !storedUser.token || !storedUser._id) {
+      if (!storedUser || !storedUser.token || !storedUser.data?._id) {
         navigate('/login');
         return;
       }
-      const userId = storedUser._id;
-      const response = await dashboardService.getProfile(userId);
+                const userId = storedUser.data._id;
+                console.log("Stored User from localStorage:", storedUser); // Add this line
+                console.log("User ID being used for getProfile:", userId); // Add this line
+                const response = await dashboardService.getProfile(userId);
       setUser(response.user);
       setDashboard(response.dashboard);
     } catch (err: any) {

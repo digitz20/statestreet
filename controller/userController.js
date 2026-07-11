@@ -145,6 +145,8 @@ exports.login = async (req, res) => {
             await dashboard.save();
         }
 
+        console.log("Backend Login - User object:", user); // Add this line
+        console.log("Backend Login - Response data (user._id, token):", { _id: user._id, token }); // Add this line
         res.status(200).json({message: 'login successful', data: user, token})
 
     } catch (error) {
