@@ -413,41 +413,19 @@ const marketNewsHeadlines = [
   useEffect(() => {
     const countries = ['Portugal', 'Singapore', 'Canada', 'United Arab Emirates', 'Germany', 'Brazil', 'Australia', 'South Africa', 'Italy', 'Sweden', 'Mexico'];
     const methods = ['Bank Transfer', 'PayPal', 'Neteller', 'Bitcoin', 'Wire Transfer', 'Ethereum', 'Wise'];
-    const predefinedMessages = [
-      'A fresh deposit has cleared and is now visible in the dashboard.',
-      'Live signal',
-      'Withdrawal alert',
-    ];
-
     const cycleNotification = () => {
-      const isPredefined = Math.random() > 0.5; // 50% chance for a predefined message
-      let item: NotificationItem; // Declare item here
-
-      if (isPredefined) {
-        const message = predefinedMessages[Math.floor(Math.random() * predefinedMessages.length)];
-        item = {
-          id: Date.now() + Math.floor(Math.random() * 1000),
-          country: 'System', // Or a generic location
-          amount: '', // No specific amount for these messages
-          method: 'Alert', // Or a generic method
-          type: 'deposited', // Default type, can be adjusted if needed
-          message: message,
-        };
-        setActiveNotification(item);
-      } else {
-        const country = countries[Math.floor(Math.random() * countries.length)];
-        const method = methods[Math.floor(Math.random() * methods.length)];
-        const amount = (Math.floor(Math.random() * 32000) + 6000).toLocaleString();
-        const type = Math.random() > 0.45 ? 'withdrawn' : 'deposited';
-        item = {
-          id: Date.now() + Math.floor(Math.random() * 1000),
-          country,
-          amount: `£${amount}`,
-          method,
-          type,
-        };
-        setActiveNotification(item);
-      }
+      const country = countries[Math.floor(Math.random() * countries.length)];
+      const method = methods[Math.floor(Math.random() * methods.length)];
+      const amount = (Math.floor(Math.random() * 32000) + 6000).toLocaleString();
+      const type = 'deposited'; // Always 'deposited' for investment simulation
+      const item: NotificationItem = {
+        id: Date.now() + Math.floor(Math.random() * 1000),
+        country,
+        amount: `£${amount}`,
+        method,
+        type,
+      };
+      setActiveNotification(item);
 
       window.setTimeout(() => {
         setActiveNotification(null);
