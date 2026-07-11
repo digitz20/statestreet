@@ -62,6 +62,9 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 <>
                   <TextField label="Full name" name="fullName" required fullWidth value={formData.fullName || ''} onChange={onInputChange} sx={fieldSx} />
                   <TextField label="Username" name="username" required fullWidth value={formData.username || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField label="Account Type" name="accountType" required fullWidth value={formData.accountType || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField label="Country" name="country" required fullWidth value={formData.country || ''} onChange={onInputChange} sx={fieldSx} />
+                  <TextField label="Currency" name="currency" required fullWidth value={formData.currency || ''} onChange={onInputChange} sx={fieldSx} />
                 </>
               )}
               <TextField label="Email" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
