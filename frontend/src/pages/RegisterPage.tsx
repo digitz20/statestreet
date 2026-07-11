@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
+import type { SelectChangeEvent } from '@mui/material';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const RegisterPage: React.FC = () => {
   // Handler for TextField components
 
   // Handler for TextField components
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };

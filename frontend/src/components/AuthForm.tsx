@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import type { SelectChangeEvent } from '@mui/material';
 import {
   Alert,
   Box,
@@ -22,7 +23,7 @@ import { Link, useNavigate } from 'react-router-dom';
 export interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, child?: React.ReactNode) => void;
   onCheckboxChange?: (event: React.ChangeEvent<HTMLInputElement>) => void; // Make it optional with '?'
   formData: any;
   error?: string;

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
 
+import type { SelectChangeEvent } from '@mui/material';
+
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
@@ -12,7 +14,7 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
