@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, TextField, Button, CircularProgress, Alert, Avatar } from '@mui/material';
+import { Box, Typography, TextField, Button, CircularProgress, Alert, Avatar, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
 
-// Assuming your backend API is running on localhost:5000
 const API_BASE_URL = 'https://added-desiree-webtool-a80f54c4.koyeb.app/api/v1';
 
 interface UserProfile {
@@ -12,7 +12,6 @@ interface UserProfile {
   image?: string; // URL of the profile image
 }
 
-
 const ProfilePage: React.FC = () => {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -21,6 +20,10 @@ const ProfilePage: React.FC = () => {
   const [previewImage, setPreviewImage] = useState<string | null>(null);
   const [isUpdating, setIsUpdating] = useState<boolean>(false);
   const [updateSuccess, setUpdateSuccess] = useState<string | null>(null);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState<boolean>(false);
+
+  const navigate = useNavigate(); // Initialize useNavigate
 
   // Get user ID from localStorage (as inferred from ProtectedRoute)
   const userString = localStorage.getItem('user');
@@ -44,6 +47,7 @@ const ProfilePage: React.FC = () => {
     } catch (err) {
       console.error('Error fetching profile:', err);
       setError('Failed to fetch profile data.');
+      setProfile(null); // Clear profile if fetch fails
     } finally {
       setLoading(false);
     }
@@ -101,6 +105,30 @@ const ProfilePage: React.FC = () => {
     }
   };
 
+  const handleDeleteProfile = async () => {
+    setOpenDeleteDialog(false); // Close dialog immediately
+    if (!userId) {
+      setError('User ID is missing. Cannot delete profile.');
+      return;
+    }
+
+    setIsDeleting(true);
+    setError(null);
+
+    try {
+      await axios.delete(`${API_BASE_URL}/deleteProfile/${userId}`);
+      console.log('Profile deleted successfully.');
+      alert('Profile deleted successfully!');
+      localStorage.removeItem('user'); // Clear user from local storage
+      navigate('/login'); // Redirect to login page after deletion
+    } catch (err) {
+      console.error('Error deleting profile:', err);
+      setError('Failed to delete profile. Please try again.');
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
@@ -109,11 +137,17 @@ const ProfilePage: React.FC = () => {
     );
   }
 
-  if (error && !profile) { // Only show error if no profile data could be loaded at all
+  // If no profile is found and not loading, offer to create one (future implementation)
+  if (!profile && !loading && !error) {
     return (
-      <Box sx={{ mt: 4 }}>
-        <Alert severity="error">{error}</Alert>
-        <Button onClick={fetchProfile} sx={{ mt: 2 }}>Retry</Button>
+      <Box sx={{ p: 3 }}>
+        <Typography variant="h5" gutterBottom>No Profile Found</Typography>
+        <Typography>It looks like you don't have a profile yet. You can create one here.</Typography>
+        {/* Future: Add a form/button to create profile using createProfile endpoint */}
+        {/* For now, the update form will act as a create if no profile exists, but it's not ideal */}
+        <Button variant="contained" onClick={() => setProfile({ fullName: '', balance: 0, totalDeposit: 0 })}>
+          Start Creating Profile
+        </Button>
       </Box>
     );
   }
@@ -160,7 +194,7 @@ const ProfilePage: React.FC = () => {
             label="Balance"
             name="balance"
             type="number"
-            defaultValue={profile?.balance || 0}
+            defaultValue={String(profile?.balance || 0)}
             fullWidth
             margin="normal"
             variant="outlined"
@@ -169,7 +203,7 @@ const ProfilePage: React.FC = () => {
             label="Total Deposit"
             name="totalDeposit"
             type="number"
-            defaultValue={profile?.totalDeposit || 0}
+            defaultValue={String(profile?.totalDeposit || 0)}
             fullWidth
             margin="normal"
             variant="outlined"
@@ -184,8 +218,38 @@ const ProfilePage: React.FC = () => {
           >
             {isUpdating ? <CircularProgress size={24} /> : 'Update Profile'}
           </Button>
+
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setOpenDeleteDialog(true)}
+            disabled={isDeleting}
+            sx={{ mt: 2 }}
+          >
+            {isDeleting ? <CircularProgress size={24} /> : 'Delete Profile'}
+          </Button>
         </Box>
       </form>
+
+      <Dialog
+        open={openDeleteDialog}
+        onClose={() => setOpenDeleteDialog(false)}
+        aria-labelledby="alert-dialog-title"
+        aria-describedby="alert-dialog-description"
+      >
+        <DialogTitle id="alert-dialog-title">{"Confirm Profile Deletion"}</DialogTitle>
+        <DialogContent>
+          <DialogContentText id="alert-dialog-description">
+            Are you sure you want to delete your profile? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDeleteDialog(false)}>Cancel</Button>
+          <Button onClick={handleDeleteProfile} color="error" autoFocus>
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Box>
   );
 };
