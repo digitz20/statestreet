@@ -59,7 +59,7 @@ exports.register = async (req, res) => {
 
         const token = await jwt.sign({ userId: newUser._id}, process.env.JWT_SECRET, { expiresIn: '2day'})
 
-        const link = `${process.env.FRONTEND_URL}/verify-email/${token}`
+        const link = `${process.env.FRONTEND_URL}/user-verify/${token}`
 
         const firstName = newUser.fullName.split(' ')[0]
 
@@ -195,7 +195,7 @@ exports.resendVerificationEmail = async (req, res) => {
 
         const token = await jwt.sign({ userId: user._id}, process.env.JWT_SECRET, { expiresIn: '2h'})
 
-        const link = `${process.env.FRONTEND_URL}/verify-email/${token}`
+        const link = `${process.env.FRONTEND_URL}/user-verify/${token}`
 
         const firstName = user.fullName.split('')[0]
 

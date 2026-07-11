@@ -30,7 +30,7 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         <Route path="/resend-verification" element={<ResendVerificationPage />} />
-        <Route path="/verify-email/:token" element={<VerifyEmailPage />} />
+        <Route path="/user-verify/:token" element={<VerifyEmailPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy-policy" element={<PrivacyPage />} />
         <Route path="/dashboard" element={<ProtectedRoute><DashboardPage /></ProtectedRoute>} />
