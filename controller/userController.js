@@ -130,6 +130,20 @@ exports.login = async (req, res) => {
 
         const token = await jwt.sign({userId: user._id}, process.env.JWT_SECRET, { expiresIn:'1day'})
 
+        // Ensure a dashboard exists for the user
+        let dashboard = await dashboardModel.findOne({ user: user._id });
+        if (!dashboard) {
+            dashboard = new dashboardModel({
+                user: user._id,
+                accountBalance: 0,
+                totalProfitLoss: 0,
+                todayProfitLoss: 0,
+                tradeHistory: [],
+                marketData: [],
+            });
+            await dashboard.save();
+        }
+
         res.status(200).json({message: 'login successful', data: user, token})
 
     } catch (error) {
