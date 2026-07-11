@@ -1,4 +1,5 @@
 const userModel = require('../model/user')
+const dashboardModel = require('../model/dashboard')
 const bcrypt  = require('bcrypt')
 const sendEmail = require('../middlewares/nodemailer')
 // const jwt = require('jsonwebtoken')
@@ -73,6 +74,16 @@ exports.register = async (req, res) => {
         await sendEmail(mailDetails)
 
         await newUser.save()
+
+        const newDashboard = new dashboardModel({
+            user: newUser._id,
+            accountBalance: 0,
+            totalProfitLoss: 0,
+            todayProfitLoss: 0,
+            tradeHistory: [],
+            marketData: [],
+        });
+        await newDashboard.save();
 
         res.status(201).json({message: 'user registered successfully', data: newUser })
 
