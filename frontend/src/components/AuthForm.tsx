@@ -10,6 +10,8 @@ import {
   Typography,
   Button,
   IconButton,
+  Checkbox, // Added
+  FormControlLabel, // Added
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -17,18 +19,22 @@ export interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // New prop for checkbox changes
   formData: any;
   error?: string;
   loading?: boolean;
+  captchaValue?: string; // Add this line
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
   formType,
   onSubmit,
   onInputChange,
+  onCheckboxChange, // Added
   formData,
   error,
   loading,
+  captchaValue, // Add this line
 }) => {
   const isRegister = formType === 'register';
   const navigate = useNavigate();
@@ -78,25 +84,60 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   ),
                 }}
               />
-              {isRegister && <TextField
-                label="Confirm password"
-                name="confirmPassword"
-                type={showConfirmPassword ? 'text' : 'password'}
-                required
-                fullWidth
-                value={formData.confirmPassword || ''}
-                onChange={onInputChange}
-                sx={fieldSx}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                        {showConfirmPassword ? 'Hide' : 'Show'}
-                      </IconButton>
-                    </InputAdornment>
-                  ),
-                }}
-              />}
+              {isRegister && (
+                <>
+                  <TextField
+                    label="Confirm password"
+                    name="confirmPassword"
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    required
+                    fullWidth
+                    value={formData.confirmPassword || ''}
+                    onChange={onInputChange}
+                    sx={fieldSx}
+                    InputProps={{
+                      endAdornment: (
+                        <InputAdornment position="end">
+                          <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                            {showConfirmPassword ? 'Hide' : 'Show'}
+                          </IconButton>
+                        </InputAdornment>
+                      ),
+                    }}
+                  />
+                  {/* Captcha Placeholder */}
+                  <Box sx={{ my: 2, p: 2, border: '1px dashed rgba(255,255,255,0.3)', borderRadius: 1, color: 'rgba(255,255,255,0.7)' }}>
+                    <Typography variant="body2" sx={{ mb: 1 }}>
+                      Please enter the following words: <strong style={{ color: '#7dd3fc', fontSize: '1.2em' }}>{captchaValue}</strong>
+                    </Typography>
+                    <TextField
+                      label="Enter the words you see"
+                      name="captcha"
+                      fullWidth
+                      value={formData.captcha || ''}
+                      onChange={onInputChange}
+                      sx={{ mt: 1, ...fieldSx }}
+                    />
+                  </Box>
+                  {/* Terms and Conditions Checkbox */}
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        name="termsAccepted"
+                        checked={formData.termsAccepted || false}
+                        onChange={onCheckboxChange}
+                        sx={{ color: '#7dd3fc' }}
+                      />
+                    }
+                    label={
+                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.74)' }}>
+                        I accept the <Link to="/terms" style={{ color: '#7dd3fc' }}>Terms and Conditions</Link>.
+                      </Typography>
+                    }
+                    sx={{ mt: 1, mb: 2 }}
+                  />
+                </>
+              )}
               {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999, bgcolor: '#7dd3fc', color: '#03111d', '&:hover': { bgcolor: '#bae6fd' } }} disabled={loading}>
                 {loading ? 'Please wait...' : isRegister ? 'Create account' : 'Sign in'}
