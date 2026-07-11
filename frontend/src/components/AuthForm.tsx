@@ -19,11 +19,11 @@ export interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // New prop for checkbox changes
+  onCheckboxChange?: (event: React.ChangeEvent<HTMLInputElement>) => void; // Make it optional with '?'
   formData: any;
   error?: string;
   loading?: boolean;
-  captchaValue?: string; // Add this line
+  captchaValue?: string;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
