@@ -61,9 +61,8 @@ exports.registerSchema = Joi.object().keys({
 
 
 exports.loginSchema = Joi.object().keys({
-    email: Joi.string().trim().email().required().messages({
+    email: Joi.string().trim().email().optional().messages({
         'string.email': 'Invalid email format',
-        'any.required': 'Email is required',
         'string.empty': 'Email cannot be empty',
     }),
     password: Joi.string().trim().messages({
