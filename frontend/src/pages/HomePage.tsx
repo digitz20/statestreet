@@ -40,13 +40,28 @@ const plans = [
   { name: 'Classic', blurb: '0.86 BTC', perks: defaultPerks },
 ];
 
+const getCurrentDate = () => {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, '0');
+  const day = String(today.getDate()).padStart(2, '0');
+  const year = today.getFullYear();
+  return `${month}/${day}/${year}`;
+};
+
+const randomUserIds = [
+  'User_12345', 'User_67890', 'User_11223', 'User_44556', 'User_77889', 'User_99001',
+  'User_23456', 'User_78901', 'User_22334', 'User_55667', 'User_88990', 'User_00112',
+];
+
+const randomMethods = ['Money Gram', 'Western Union', 'Neteller', 'PayPal', 'Bitcoin', 'Wire Transfer', 'Ethereum', 'Wise'];
+
 const payouts = [
-  { user: 'User_96549', method: 'Money Gram', amount: '£42,221', date: '10/7/2026' },
-  { user: 'User_52968', method: 'Western Union', amount: '£84,287', date: '10/7/2026' },
-  { user: 'User_43366', method: 'Neteller', amount: '£38,547', date: '10/7/2026' },
-  { user: 'User_63078', method: 'PayPal', amount: '£41,341', date: '10/7/2026' },
-  { user: 'User_38246', method: 'Bitcoin', amount: '£79,443', date: '10/7/2026' },
-  { user: 'User_79870', method: 'Neteller', amount: '£52,790', date: '10/7/2026' },
+  { user: randomUserIds[Math.floor(Math.random() * randomUserIds.length)], method: randomMethods[Math.floor(Math.random() * randomMethods.length)], amount: `£${(Math.floor(Math.random() * 80000) + 10000).toLocaleString()}`, date: getCurrentDate() },
+  { user: randomUserIds[Math.floor(Math.random() * randomUserIds.length)], method: randomMethods[Math.floor(Math.random() * randomMethods.length)], amount: `£${(Math.floor(Math.random() * 80000) + 10000).toLocaleString()}`, date: getCurrentDate() },
+  { user: randomUserIds[Math.floor(Math.random() * randomUserIds.length)], method: randomMethods[Math.floor(Math.random() * randomMethods.length)], amount: `£${(Math.floor(Math.random() * 80000) + 10000).toLocaleString()}`, date: getCurrentDate() },
+  { user: randomUserIds[Math.floor(Math.random() * randomUserIds.length)], method: randomMethods[Math.floor(Math.random() * randomMethods.length)], amount: `£${(Math.floor(Math.random() * 80000) + 10000).toLocaleString()}`, date: getCurrentDate() },
+  { user: randomUserIds[Math.floor(Math.random() * randomUserIds.length)], method: randomMethods[Math.floor(Math.random() * randomMethods.length)], amount: `£${(Math.floor(Math.random() * 80000) + 10000).toLocaleString()}`, date: getCurrentDate() },
+  { user: randomUserIds[Math.floor(Math.random() * randomUserIds.length)], method: randomMethods[Math.floor(Math.random() * randomMethods.length)], amount: `£${(Math.floor(Math.random() * 80000) + 10000).toLocaleString()}`, date: getCurrentDate() },
 ];
 
 const faqs = [
