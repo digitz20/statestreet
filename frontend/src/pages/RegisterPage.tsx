@@ -106,7 +106,6 @@ const RegisterPage: React.FC = () => {
       formData={formData}
       loading={loading}
       error={error}
-      captchaValue={captchaValue} // Add this line
     />
   );
 }

@@ -29,7 +29,6 @@ export interface AuthFormProps {
   formData: any;
   error?: string;
   loading?: boolean;
-  captchaValue?: string;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
@@ -40,7 +39,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formData,
   error,
   loading,
-  captchaValue, // Add this line
 }) => {
   const isRegister = formType === 'register';
   const navigate = useNavigate();
