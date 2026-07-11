@@ -56,21 +56,30 @@ exports.registerSchema = Joi.object().keys({
 
 
 
-exports.loginSchema = Joi.object().keys({
-    email: Joi.string().trim().email().optional().messages({
-        'string.email': 'Invalid email format',
-        'string.empty': 'Email cannot be empty',
+exports.loginSchema = Joi.alternatives().try(
+    Joi.object().keys({
+        email: Joi.string().trim().email().required().messages({
+            'string.email': 'Invalid email format',
+            'any.required': 'Email is required',
+            'string.empty': 'Email cannot be empty',
+        }),
+        password: Joi.string().trim().messages({
+            'any.required': 'invalid credentials',
+            'string.empty': 'password cannot be empty',
+        }).required(),
     }),
-    password: Joi.string().trim().messages({
-        'any.required': 'invalid credentials',
-        'string.empty': 'password cannot be empty',
-    }).required(),
-    username: Joi.string().when('email', {
-        is: Joi.string().min(1),
-        then: Joi.string().allow(''),
-        otherwise: Joi.string().min(3).required(),
-    }),
-}).or('email', 'username') 
+    Joi.object().keys({
+        username: Joi.string().min(3).required().messages({
+            'string.min': 'Username must be at least 3 characters long',
+            'any.required': 'Username is required',
+            'string.empty': 'Username cannot be empty',
+        }),
+        password: Joi.string().trim().messages({
+            'any.required': 'invalid credentials',
+            'string.empty': 'password cannot be empty',
+        }).required(),
+    })
+); 
     
 
 
