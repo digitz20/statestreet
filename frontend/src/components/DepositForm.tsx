@@ -8,6 +8,7 @@ interface DepositFormProps {
   onClose: () => void;
 }
 
+
 const wallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'monero', 'tron', 'eos', 'cardano', 'solana', 'tezos', 'matic', 'avax'];
 
 const DepositForm: React.FC<DepositFormProps> = ({ userId, onDepositSuccess, onClose }) => {
