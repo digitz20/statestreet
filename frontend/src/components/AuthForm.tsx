@@ -1,51 +1,20 @@
 import React, { useState } from 'react';
-import {
-  Alert,
-  Box,
-  Card,
-  CardContent,
-  InputAdornment,
-  Stack,
-  TextField,
-  Typography,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Checkbox,
-  FormControlLabel,
-  type SelectChangeEvent,
-  Button, // Add Button here
-  IconButton, // Add IconButton here
-} from '@mui/material';
-// Remove these lines if they exist:
-// import Button from '@mui/material/Button';
-// import IconButton from '@mui/material/IconButton';
+import { Alert, Box, Button, Card, CardContent, IconButton, InputAdornment, Stack, TextField, Typography } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
 
 interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
-  // This handler is for TextField components (HTMLInputElement or HTMLTextAreaElement)
-  onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
-  // This handler is specifically for Material-UI Select components
-  onSelectChange: (event: SelectChangeEvent<string>) => void;
-  // This handler is for Checkbox components
-  onCheckboxChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  onInputChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
   formData: any;
   error?: string;
   loading?: boolean;
 }
 
-
 const AuthForm: React.FC<AuthFormProps> = ({
   formType,
   onSubmit,
   onInputChange,
-  onSelectChange, // New prop
-  onCheckboxChange, // New prop
   formData,
   error,
   loading,
@@ -53,13 +22,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const isRegister = formType === 'register';
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // Corrected useState
-
-  // Placeholder data for dropdowns
-  const accountTypes = ['Individual', 'Business'];
-  const countries = ['United States', 'Canada', 'United Kingdom', 'Australia', 'Germany', 'Nigeria'];
-  const currencies = ['USD', 'EUR', 'GBP', 'CAD', 'AUD', 'NGN'];
-
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, py: 4, position: 'relative', overflow: 'hidden' }}>
@@ -69,8 +32,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
           <Stack spacing={2.5}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Box>
-                <Typography variant="overline" sx={{ color: '#7dd3fc' }}>StateStreet • secure access</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 700 }}>{isRegister ? 'Create your account' : 'Welcome back'}</Typography>
+              <Typography variant="overline" sx={{ color: '#7dd3fc' }}>StateStreet • secure access</Typography>
+              <Typography variant="h4" sx={{ fontWeight: 700 }}>{isRegister ? 'Create your account' : 'Welcome back'}</Typography>
                 <Typography sx={{ color: 'rgba(255,255,255,0.72)', mt: 1 }}>{isRegister ? 'Open a premium workspace and connect your profile to the live dashboard flow.' : 'Sign in to continue managing profile updates, deposits, and withdrawals.'}</Typography>
               </Box>
               <IconButton onClick={() => navigate('/')} sx={{ color: 'white', border: '1px solid rgba(255,255,255,0.16)' }} aria-label="Back home">
@@ -82,80 +45,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
                 <>
                   <TextField label="Full name" name="fullName" required fullWidth value={formData.fullName || ''} onChange={onInputChange} sx={fieldSx} />
                   <TextField label="Username" name="username" required fullWidth value={formData.username || ''} onChange={onInputChange} sx={fieldSx} />
-                  { /* New fields for registration */ }
-                  <FormControl fullWidth sx={fieldSx}>
-                    <InputLabel id="account-type-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Account Type</InputLabel>
-                    <Select
-                      labelId="account-type-label"
-                      id="accountType"
-                      name="accountType"
-                      value={formData.accountType || ''}
-                      label="Account Type"
-                      onChange={onSelectChange} // Corrected handler
-                      required
-                      sx={{
-                        color: 'white',
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.7)' }, // Dropdown arrow color
-                      }}
-                    >
-                      {accountTypes.map((type) => (
-                        <MenuItem key={type} value={type}>{type}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-
-                  <FormControl fullWidth sx={fieldSx}>
-                    <InputLabel id="country-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Country</InputLabel>
-                    <Select
-                      labelId="country-label"
-                      id="country"
-                      name="country"
-                      value={formData.country || ''}
-                      label="Country"
-                      onChange={onSelectChange} // Corrected handler
-                      required
-                      sx={{
-                        color: 'white',
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.7)' },
-                      }}
-                    >
-                      {countries.map((country) => (
-                        <MenuItem key={country} value={country}>{country}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-
-
-                  <FormControl fullWidth sx={fieldSx}>
-                    <InputLabel id="currency-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Currency</InputLabel>
-                    <Select
-                      labelId="currency-label"
-                      id="currency"
-                      name="currency"
-                      value={formData.currency || ''}
-                      label="Currency"
-                      onChange={onSelectChange} // Corrected handler
-                      required
-                      sx={{
-                        color: 'white',
-                        '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '& .MuiSvgIcon-root': { color: 'rgba(255,255,255,0.7)' },
-                      }}
-                    >
-                      {currencies.map((currency) => (
-                        <MenuItem key={currency} value={currency}>{currency}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
                 </>
               )}
               <TextField label="Email" name="email" type="email" required fullWidth value={formData.email || ''} onChange={onInputChange} sx={fieldSx} />
@@ -172,55 +61,31 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   endAdornment: (
                     <InputAdornment position="end">
                       <IconButton onClick={() => setShowPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                        {showPassword ? <VisibilityOff /> : <Visibility />}
+                        {showPassword ? 'Hide' : 'Show'}
                       </IconButton>
                     </InputAdornment>
                   ),
                 }}
               />
-              {isRegister && (
-                <>
-                  <TextField
-                    label="Confirm password"
-                    name="confirmPassword"
-                    type={showConfirmPassword ? 'text' : 'password'}
-                    required
-                    fullWidth
-                    value={formData.confirmPassword || ''}
-                    onChange={onInputChange}
-                    sx={fieldSx}
-                    InputProps={{
-                      endAdornment: (
-                        <InputAdornment position="end">
-                          <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
-                            {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
-                          </IconButton>
-                        </InputAdornment>
-                      ),
-                    }}
-                  />
-                  { /* Terms and Conditions Checkbox */ }
-                  <FormControlLabel
-                    control={
-                      <Checkbox
-                        name="termsAccepted"
-                        checked={formData.termsAccepted || false}
-                        onChange={onCheckboxChange} // Corrected handler
-                        required
-                        sx={{ color: '#7dd3fc' }}
-                      />
-                    }
-                    label={
-                      <Typography sx={{ color: 'rgba(255,255,255,0.74)' }}>
-                        I agree to the <Link to="/privacy-policy" style={{ color: '#7dd3fc' }}>Terms and Conditions</Link>
-                      </Typography>
-                    }
-                    sx={{ mb: 1.5 }}
-                  />
-                  { /* Captcha Placeholder */ }
-                  <TextField label="Captcha" name="captcha" required fullWidth value={formData.captcha || ''} onChange={onInputChange} sx={fieldSx} />
-                </>
-              )}
+              {isRegister && <TextField
+                label="Confirm password"
+                name="confirmPassword"
+                type={showConfirmPassword ? 'text' : 'password'}
+                required
+                fullWidth
+                value={formData.confirmPassword || ''}
+                onChange={onInputChange}
+                sx={fieldSx}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <IconButton onClick={() => setShowConfirmPassword((prev) => !prev)} edge="end" sx={{ color: 'rgba(255,255,255,0.8)' }}>
+                        {showConfirmPassword ? 'Hide' : 'Show'}
+                      </IconButton>
+                    </InputAdornment>
+                  ),
+                }}
+              />}
               {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
               <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999, bgcolor: '#7dd3fc', color: '#03111d', '&:hover': { bgcolor: '#bae6fd' } }} disabled={loading}>
                 {loading ? 'Please wait...' : isRegister ? 'Create account' : 'Sign in'}
@@ -244,7 +109,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
   );
 };
 
-
 const fieldSx = {
   mb: 1.5,
   input: { color: 'white' },
@@ -255,6 +119,5 @@ const fieldSx = {
     '&.Mui-focused fieldset': { borderColor: '#7dd3fc' },
   },
 };
-
 
 export default AuthForm;
