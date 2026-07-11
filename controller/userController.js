@@ -1,5 +1,5 @@
 const userModel = require('../model/user')
-// const bcrypt  = require('bcryptjs')
+const bcrypt  = require('bcrypt')
 const sendEmail = require('../middlewares/nodemailer')
 // const jwt = require('jsonwebtoken')
 // const bcrypt  = require('bcrypt')
@@ -44,10 +44,12 @@ exports.register = async (req, res) => {
             return res.status(400).json({message: `user with email: ${email} already exists`})
         }
 
+        const hashedPassword = await bcrypt.hash(password, 10)
+
         const newUser = new userModel({
             fullName,
             email,
-            password: password,
+            password: hashedPassword,
             username,
             accountType,
             country,
@@ -67,7 +69,7 @@ exports.register = async (req, res) => {
             email: newUser.email,
             html : signUpTemplate(link, firstName)
         }
-
+        console.log('Generated verification link:', link);
         await sendEmail(mailDetails)
 
         await newUser.save()
@@ -104,7 +106,7 @@ exports.login = async (req, res) => {
             return res.status(404).json({message: 'user not found'})  
         }
 
-        const isPasswordCorrect = (password === user.password)
+        const isPasswordCorrect = await bcrypt.compare(password, user.password)
 
         if(isPasswordCorrect === false) {
             return res.status(400).json({message: 'incorrect password'})  
