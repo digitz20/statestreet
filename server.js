@@ -33,7 +33,7 @@ const swaggerDefinition = {
     description: 'This is a swagger documentation for the web application statestreet',
     license: {
       name: 
-      'Base_URL: https://statestreet.onrender.com',
+      'Base_URL: https://added-desiree-webtool-a80f54c4.koyeb.app/',
     },
   },
   "components": {
@@ -53,7 +53,7 @@ security: [
 ],
   servers: [
     {
-      url: 'https://statestreet.onrender.com',
+      url: 'https://added-desiree-webtool-a80f54c4.koyeb.app/',
       description: 'Production server',
     },
     {

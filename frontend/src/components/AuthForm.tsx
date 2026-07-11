@@ -45,18 +45,24 @@ const AuthForm: React.FC<AuthFormProps> = ({
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
+  const handleClickShowPassword = () => setShowPassword((show) => !show);
+  const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
+  const handleClickShowConfirmPassword = () => setShowConfirmPassword((show) => !show);
+  const handleMouseDownConfirmPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+  };
+
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2, py: 4, position: 'relative', overflow: 'hidden' }}>
-      <Card sx={{ width: '100%', maxWidth: 400, p: 3, boxShadow: 3, borderRadius: 2, bgcolor: 'rgba(0,0,0,0.7)' }}>
+      <Card sx={{ width: '100%', maxWidth: 400, bgcolor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)', boxShadow: '0 4px 30px rgba(0,0,0,0.1)', color: 'white' }}>
         <CardContent>
-          <Typography variant="h5" component="h1" gutterBottom align="center" color="white">
+          <Typography variant="h4" component="h1" gutterBottom align="center" sx={{ color: '#7dd3fc' }}>
             {isRegister ? 'Register' : 'Login'}
           </Typography>
-          {error && (
-            <Alert severity="error" sx={{ mb: 2 }}>
-              {error}
-            </Alert>
-          )}
+          {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
           <Stack component="form" onSubmit={onSubmit} spacing={2}>
             <TextField
               label="Email"
@@ -64,9 +70,11 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type="email"
               value={formData.email}
               onChange={onInputChange}
-              fullWidth
               required
+              fullWidth
               sx={fieldSx}
+              InputProps={{ style: { color: 'white' } }}
+              InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
             />
             <TextField
               label="Password"
@@ -74,14 +82,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
               type={showPassword ? 'text' : 'password'}
               value={formData.password}
               onChange={onInputChange}
-              fullWidth
               required
+              fullWidth
               sx={fieldSx}
               InputProps={{
+                style: { color: 'white' },
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onClick={() => setShowPassword(!showPassword)}
+                      aria-label="toggle password visibility"
+                      onClick={handleClickShowPassword}
+                      onMouseDown={handleMouseDownPassword}
                       edge="end"
                       sx={{ color: 'rgba(255,255,255,0.7)' }}
                     >
@@ -90,6 +101,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   </InputAdornment>
                 ),
               }}
+              InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
             />
             {isRegister && (
               <>
@@ -99,14 +111,17 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   type={showConfirmPassword ? 'text' : 'password'}
                   value={formData.confirmPassword}
                   onChange={onInputChange}
-                  fullWidth
                   required
+                  fullWidth
                   sx={fieldSx}
                   InputProps={{
+                    style: { color: 'white' },
                     endAdornment: (
                       <InputAdornment position="end">
                         <IconButton
-                          onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                          aria-label="toggle confirm password visibility"
+                          onClick={handleClickShowConfirmPassword}
+                          onMouseDown={handleMouseDownConfirmPassword}
                           edge="end"
                           sx={{ color: 'rgba(255,255,255,0.7)' }}
                         >
@@ -115,55 +130,53 @@ const AuthForm: React.FC<AuthFormProps> = ({
                       </InputAdornment>
                     ),
                   }}
+                  InputLabelProps={{ style: { color: 'rgba(255,255,255,0.7)' } }}
                 />
                 <FormControl fullWidth sx={fieldSx}>
                   <InputLabel id="role-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Role</InputLabel>
                   <Select
                     labelId="role-label"
+                    id="role"
                     name="role"
                     value={formData.role}
                     label="Role"
                     onChange={onInputChange}
                     required
-                    sx={{ color: 'white', '& .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.2)' } }}
+                    sx={{ color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.2)' }, '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' }, '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.4)' }, '.MuiSvgIcon-root': { color: 'white' } }}
+                    MenuProps={{ PaperProps: { sx: { bgcolor: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(10px)', border: '1px solid rgba(255,255,255,0.1)' } } }}
                   >
-                    <MenuItem value="user">User</MenuItem>
-                    <MenuItem value="admin">Admin</MenuItem>
+                    <MenuItem value="user" sx={{ color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } }}>User</MenuItem>
+                    <MenuItem value="admin" sx={{ color: 'white', '&:hover': { bgcolor: 'rgba(255,255,255,0.1)' } }}>Admin</MenuItem>
                   </Select>
                 </FormControl>
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      name="agreeToTerms"
-                      checked={formData.agreeToTerms}
-                      onChange={onCheckboxChange}
-                      required
-                      sx={{ color: 'rgba(255,255,255,0.7)' }}
-                    />
-                  }
-                  label={<Typography variant="body2" color="rgba(255,255,255,0.7)">I agree to the terms and conditions</Typography>}
-                />
               </>
+            )}
+            {!isRegister && (
+              <FormControlLabel
+                control={<Checkbox name="rememberMe" checked={formData.rememberMe} onChange={onCheckboxChange} sx={{ color: 'rgba(255,255,255,0.7)', '&.Mui-checked': { color: '#7dd3fc' } }} />}
+                label={<Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>Remember me</Typography>}
+              />
             )}
             <Button
               type="submit"
               fullWidth
               variant="contained"
-              sx={{ mt: 3, mb: 2, py: 1.5, bgcolor: '#7dd3fc', '&:hover': { bgcolor: '#38bdf8' } }}
+              sx={{ mt: 3, mb: 2, bgcolor: '#7dd3fc', '&:hover': { bgcolor: '#38bdf8' } }}
               disabled={loading}
             >
               {loading ? 'Loading...' : (isRegister ? 'Register' : 'Login')}
             </Button>
-            <Stack direction="row" justifyContent="center" spacing={1}>
-              <Typography variant="body2" color="rgba(255,255,255,0.7)">
-                {isRegister ? 'Already have an account?' : "Don't have an account?"}
-              </Typography>
-              <Link to={isRegister ? '/login' : '/register'} style={{ textDecoration: 'none' }}>
-                <Typography variant="body2" color="#7dd3fc" sx={{ '&:hover': { textDecoration: 'underline' } }}>
-                  {isRegister ? 'Login' : 'Register'}
-                </Typography>
-              </Link>
-            </Stack>
+            <Typography variant="body2" align="center" sx={{ color: 'rgba(255,255,255,0.7)' }}>
+              {isRegister ? (
+                <>
+                  Already have an account? <Link to="/login" style={{ color: '#7dd3fc', textDecoration: 'none' }}>Login</Link>
+                </>
+              ) : (
+                <>
+                  Don't have an account? <Link to="/register" style={{ color: '#7dd3fc', textDecoration: 'none' }}>Register</Link>
+                </>
+              )}
+            </Typography>
           </Stack>
         </CardContent>
       </Card>
