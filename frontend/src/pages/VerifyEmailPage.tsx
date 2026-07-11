@@ -1,19 +1,23 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, CircularProgress, Stack, Typography, Alert } from '@mui/material';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useNavigate } from 'react-router-dom';
 import authService from '../services/authService';
 
 const VerifyEmailPage: React.FC = () => {
   const { token } = useParams();
+  const navigate = useNavigate();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('Verifying your account...');
 
   useEffect(() => {
     const verify = async () => {
       try {
-        const response = await authService.verifyEmail(token || '');
+        await authService.verifyEmail(token || '');
         setStatus('success');
-        setMessage(response.data?.message || 'Email verified successfully.');
+        setMessage('Congratulations, your email has been verified!');
+        setTimeout(() => {
+          navigate('/login');
+        }, 3000); // Redirect after 3 seconds
       } catch (err: any) {
         setStatus('error');
         setMessage(err.response?.data?.message || 'Verification failed.');
@@ -21,7 +25,7 @@ const VerifyEmailPage: React.FC = () => {
     };
 
     verify();
-  }, [token]);
+  }, [token, navigate]);
 
   return (
     <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', px: 2 }}>
