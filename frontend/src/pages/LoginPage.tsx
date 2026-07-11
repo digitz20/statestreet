@@ -8,7 +8,8 @@ import { type SelectChangeEvent } from '@mui/material';
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    loginIdentifier: '',
+    email: '',
+    username: '',
     password: '',
   });
   const [loading, setLoading] = useState(false);
@@ -25,11 +26,11 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     setError(undefined);
     try {
-      const isEmail = formData.loginIdentifier.includes('@');
-      const loginValue = formData.loginIdentifier.toLowerCase();
-      const payload = isEmail
-        ? { email: loginValue, password: formData.password }
-        : { username: loginValue, password: formData.password };
+      const payload = {
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      };
 
       const response = await authService.login(payload);
       if (response.status >= 200 && response.status < 300) {
