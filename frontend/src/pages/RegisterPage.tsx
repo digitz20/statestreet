@@ -62,6 +62,7 @@ const RegisterPage: React.FC = () => {
       }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed');
+      console.error('Registration error details:', err.response?.data);
     } finally {
       setLoading(false);
     }
