@@ -407,7 +407,7 @@ const DashboardPage: React.FC = () => {
       {/* Existing Modals */}
       <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
         <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: { xs: '90%', sm: 480 }, borderRadius: 4 }}>
-          {user?._id && <ProfileForm userId={user._id} currentProfile={dashboard ? { fullName: user.fullName, balance: dashboard.balance, totalDeposit: dashboard.totalDeposit, image: dashboard.image?.imageUrl } : undefined} onProfileUpdated={fetchDashboardData} onClose={() => setShowProfileForm(false)} />}
+          {user?._id && <ProfileForm userId={user._id} currentProfile={dashboard ? { fullName: user.fullName, balance: dashboard.balance, totalDeposit: dashboard.totalDeposit, image: dashboard.image?.imageUrl } : null} onProfileUpdated={fetchDashboardData} onClose={() => setShowProfileForm(false)} />}
         </Box>
       </Modal>
 

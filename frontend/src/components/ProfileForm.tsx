@@ -4,12 +4,12 @@ import dashboardService from '../services/dashboardService';
 
 interface ProfileFormProps {
   userId: string;
-  currentProfile?: {
+  currentProfile: {
     fullName: string;
     balance: number;
     totalDeposit: number;
     image?: string;
-  };
+  } | null;
   onProfileUpdated: () => void;
   onClose: () => void;
 }
