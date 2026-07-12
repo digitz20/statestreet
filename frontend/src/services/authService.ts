@@ -27,7 +27,7 @@ interface RegisterPayload {
   accountType: string;
   country: string;
   currency: string;
-  termsAccepted: boolean;
+
 }
 
 const authService = {

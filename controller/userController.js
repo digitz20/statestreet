@@ -24,20 +24,13 @@ exports.register = async (req, res) => {
             return res.status(400).json({ error: validationError.message });
         }
         
-        const {fullName, username, email, password, confirmPassword, accountType, country, currency, termsAccepted, captcha} = validated
+        const {fullName, username, email, password, confirmPassword, accountType, country, currency} = validated
 
         if(password !== confirmPassword) {
             return res.status(400).json({message: 'passwords do not match'})
         }
 
-        if(!termsAccepted) {
-            return res.status(400).json({message: 'You must accept the terms and conditions'})
-        }
 
-        // Basic captcha check (replace with actual captcha verification service)
-        if (!captcha || captcha.length === 0) {
-            return res.status(400).json({message: 'Captcha is required'})
-        }
 
         const user = await userModel.findOne({ email: email.toLowerCase()})
 

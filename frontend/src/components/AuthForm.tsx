@@ -10,23 +10,19 @@ import {
   Typography,
   Button,
   IconButton,
-  Checkbox,
-  FormControlLabel,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
 import { Link, useNavigate } from 'react-router-dom';
-import Visibility from '@mui/icons-material/Visibility';
-import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 
 export interface AuthFormProps {
   formType: 'login' | 'register';
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => void;
   onInputChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, child?: React.ReactNode) => void;
-  onCheckboxChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   formData: any;
   error?: string;
   loading?: boolean;
@@ -36,7 +32,6 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formType,
   onSubmit,
   onInputChange,
-  onCheckboxChange,
   formData,
   error,
   loading,
@@ -94,6 +89,8 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     </MenuItem>
                     <MenuItem value="Individual">Individual</MenuItem>
                     <MenuItem value="Business">Business</MenuItem>
+                    <MenuItem value="premium classic">Premium Classic</MenuItem>
+                    <MenuItem value="pto">PTO</MenuItem>
                   </Select>
                 </FormControl>
                 <FormControl fullWidth sx={fieldSx}>
@@ -356,43 +353,66 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     <MenuItem value="Zimbabwe">Zimbabwe</MenuItem>
                   </Select>
                 </FormControl>
-                <TextField label="Phone number" name="phoneNumber" required fullWidth value={formData.phoneNumber || ''} onChange={onInputChange} sx={fieldSx} />
-                <TextField label="Referral code (Optional)" name="referralCode" fullWidth value={formData.referralCode || ''} onChange={onInputChange} sx={fieldSx} />
-                <FormControlLabel
-                  control={
-                    <Checkbox
-                      checked={formData.agreeToTerms || false}
-                      onChange={onCheckboxChange}
-                      name="agreeToTerms"
-                      color="primary"
-                    />
-                  }
-                  label={
-                    <Typography sx={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.9rem' }}>
-                      I agree to the{' '}
-                      <Link to="/privacy-policy" style={{ color: '#7dd3fc', textDecoration: 'none' }}>
-                        Terms and Conditions
-                      </Link>
-                    </Typography>
-                  }
-                  sx={{ mt: 1, mb: 2 }}
+                <Box>
+                  <TextField
+                  label="Password"
+                  name="password"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  fullWidth
+                  value={formData.password || ''}
+                  onChange={onInputChange}
+                  sx={fieldSx}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          sx={{ color: 'rgba(255,255,255,0.7)' }}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
                 />
+                </Box>
+
+                <TextField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  fullWidth
+                  value={formData.confirmPassword || ''}
+                  onChange={onInputChange}
+                  sx={fieldSx}
+                  InputProps={{
+                    endAdornment: (
+                      <InputAdornment position="end">
+                        <IconButton
+                          aria-label="toggle password visibility"
+                          onClick={() => setShowPassword(!showPassword)}
+                          edge="end"
+                          sx={{ color: 'rgba(255,255,255,0.7)' }}
+                        >
+                          {showPassword ? <VisibilityOff /> : <Visibility />}
+                        </IconButton>
+                      </InputAdornment>
+                    ),
+                  }}
+                />
+                
+
+
               </>
             )}
             {!isRegister && (
               <>
                 <TextField
-                  label="Email"
-                  name="email"
-                  type="email"
-                  required
-                  fullWidth
-                  value={formData.email || ''}
-                  onChange={onInputChange}
-                  sx={fieldSx}
-                />
-                <TextField
-                  label="Username"
+                  label="Username or Email"
                   name="username"
                   required
                   fullWidth

@@ -15,26 +15,11 @@ const RegisterPage: React.FC = () => {
     accountType: '', // New field
     country: '',     // New field
     currency: '',    // New field
-    termsAccepted: false, // New field
-    captcha: '',     // New field
   });
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
-  // Generate a new captcha value on component mount
-  // Generate a new captcha value on component mount
-  // React.useEffect(() => {
-  //   const generateCaptcha = () => {
-  //     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  //     let result = '';
-  //     for (let i = 0; i < 6; i++) {
-  //       result += chars.charAt(Math.floor(Math.random() * chars.length));
-  //     }
-  //     return result;
-  //   };
-  //   setCaptchaValue(generateCaptcha());
-  // }, []); // Empty dependency array means this runs once on mount
-  // // Handler for TextField components
+
 
   // Handler for TextField components
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
@@ -42,11 +27,7 @@ const RegisterPage: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handler for Checkbox components
-  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, checked } = e.target;
-    setFormData({ ...formData, [name]: checked });
-  };
+
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -61,18 +42,9 @@ const RegisterPage: React.FC = () => {
       return;
     }
 
-    if (!formData.termsAccepted) {
-      setError('You must accept the Terms and Conditions.');
-      setLoading(false);
-      return;
-    }
 
-    // Captcha validation
-    // if (formData.captcha.toLowerCase() !== captchaValue.toLowerCase()) {
-    //   setError('Incorrect captcha. Please try again.');
-    //   setLoading(false);
-    //   return;
-    // }
+
+
 
     try {
       const response = await authService.register({
@@ -84,7 +56,6 @@ const RegisterPage: React.FC = () => {
         accountType: formData.accountType, // Pass new field
         country: formData.country,         // Pass new field
         currency: formData.currency,       // Pass new field
-        termsAccepted: formData.termsAccepted, // Pass new field
       });
       if (response.status >= 200 && response.status < 300) {
         navigate('/login');
@@ -101,11 +72,9 @@ const RegisterPage: React.FC = () => {
       formType="register"
       onSubmit={handleSubmit}
       onInputChange={handleInputChange}
-      onCheckboxChange={handleCheckboxChange} // Pass the new handler
       formData={formData}
       loading={loading}
       error={error}
-      // captchaValue={captchaValue}
     />
   );
 }

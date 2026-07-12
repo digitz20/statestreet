@@ -16,6 +16,11 @@ const LoginPage: React.FC = () => {
 
   const [error, setError] = useState<string | undefined>(undefined);
 
+  const isEmail = (input: string): boolean => {
+    // A simple regex for email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(input);
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -26,11 +31,18 @@ const LoginPage: React.FC = () => {
     setLoading(true);
     setError(undefined);
     try {
-      const payload = {
-        email: formData.email,
-        username: formData.username,
-        password: formData.password,
-      };
+      let payload: { password: string; email?: string; username?: string; };
+      if (isEmail(formData.username)) {
+        payload = {
+          email: formData.username,
+          password: formData.password,
+        };
+      } else {
+        payload = {
+          username: formData.username,
+          password: formData.password,
+        };
+      }
 
       const response = await authService.login(payload);
       if (response.status >= 200 && response.status < 300) {
