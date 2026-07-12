@@ -97,6 +97,7 @@ const RegisterPage: React.FC = () => {
         onResendVerification={handleResendVerification}
         registeredEmail={registeredEmail}
         showResendButton={true}
+        showSubmitButton={false}
       >
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>Verification Email Sent!</Typography>
         <Typography sx={{ color: 'rgba(255,255,255,0.72)', mb: 3 }}>
@@ -111,6 +112,15 @@ const RegisterPage: React.FC = () => {
           onClick={() => window.open(`https://mail.google.com/mail/u/0/#inbox`, '_blank')}
         >
           Go to Gmail
+        </Button>
+        <Button
+          fullWidth
+          variant="text"
+          onClick={handleResendVerification}
+          sx={{ mb: 2, color: '#7dd3fc' }}
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : `Resend Verification Email to ${registeredEmail}`}
         </Button>
         <Button
           variant="text"
@@ -132,10 +142,23 @@ const RegisterPage: React.FC = () => {
       formData={formData}
       loading={loading}
       error={error}
-      onResendVerification={handleResendVerification} // Pass resend handler
-      registeredEmail={registeredEmail} // Pass registered email
-      showResendButton={true} // Indicate that resend button should be shown
-    />
+      onResendVerification={handleResendVerification}
+      registeredEmail={registeredEmail}
+      showResendButton={registeredEmail !== ''}
+    >
+      {/* Resend button for any verification errors */}
+      {registeredEmail && (
+        <Button
+          fullWidth
+          variant="text"
+          onClick={handleResendVerification}
+          sx={{ mb: 2, color: '#7dd3fc' }}
+          disabled={loading}
+        >
+          {loading ? 'Loading...' : `Resend Verification Email to ${registeredEmail}`}
+        </Button>
+      )}
+    </AuthForm>
   );
 }
 

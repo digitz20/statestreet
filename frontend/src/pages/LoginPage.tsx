@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
 
-import { type SelectChangeEvent } from '@mui/material';
+import { type SelectChangeEvent, Button } from '@mui/material';
 
 const LoginPage: React.FC = () => {
   const navigate = useNavigate();
@@ -72,9 +72,9 @@ const LoginPage: React.FC = () => {
     } catch (err: any) {
       const errorMessage = err.response?.data?.message || 'Login failed';
       setError(errorMessage);
-      if (errorMessage.includes('Account not verified')) { // Assuming this specific error message from backend
+      if (errorMessage.includes('Account not verified')) { 
         setShowResendButton(true);
-        setRegisteredEmail(formData.username); // Use the entered username/email for resend
+        setRegisteredEmail(formData.username); 
       }
     } finally {
       setLoading(false);
@@ -92,7 +92,20 @@ const LoginPage: React.FC = () => {
       onResendVerification={handleResendVerification}
       registeredEmail={registeredEmail}
       showResendButton={showResendButton}
-    />
+    >
+      {/* Resend button directly in LoginPage to guarantee visibility */}
+      {showResendButton && registeredEmail && (
+        <Button
+          fullWidth
+          variant="text"
+          onClick={handleResendVerification}
+          sx={{ mb: 2, color: '#7dd3fc' }}
+          disabled={loading}
+        >
+          Resend Verification Email to {registeredEmail}
+        </Button>
+      )}
+    </AuthForm>
   );
 };
 

@@ -29,6 +29,7 @@ export interface AuthFormProps {
   onResendVerification?: () => void;
   registeredEmail?: string;
   showResendButton?: boolean;
+  showSubmitButton?: boolean;
   children?: React.ReactNode;
 }
 
@@ -39,9 +40,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
   formData,
   error,
   loading,
-  onResendVerification,
-  registeredEmail,
-  showResendButton,
+  children,
 }) => {
   const isRegister = formType === 'register';
   const navigate = useNavigate();
@@ -484,17 +483,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
             <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2, py: 1.5, borderRadius: 2 }} disabled={loading}>
               {loading ? 'Loading...' : (isRegister ? 'Register' : 'Login')}
             </Button>
-            {showResendButton && registeredEmail && (
-              <Button
-                fullWidth
-                variant="text"
-                onClick={onResendVerification}
-                sx={{ mb: 2, color: '#7dd3fc' }}
-                disabled={loading}
-              >
-                Resend Verification Email to {registeredEmail}
-              </Button>
-            )}
+            {children}
             <Box sx={{ display: 'flex', justifyContent: 'center', width: '100%' }}>
               <Typography sx={{ color: 'rgba(255,255,255,0.72)', fontSize: '0.9rem' }}>
                 {isRegister ? 'Already have an account?' : 'Don\'t have an account?'}
