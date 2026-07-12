@@ -26,6 +26,10 @@ export interface AuthFormProps {
   formData: any;
   error?: string;
   loading?: boolean;
+  onResendVerification?: () => void;
+  registeredEmail?: string;
+  showResendButton?: boolean;
+  children?: React.ReactNode;
 }
 
 const AuthForm: React.FC<AuthFormProps> = ({
