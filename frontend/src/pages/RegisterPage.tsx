@@ -21,7 +21,6 @@ const RegisterPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | undefined>(undefined);
   const [registrationSuccess, setRegistrationSuccess] = useState(false);
-  const [registeredEmail, setRegisteredEmail] = useState('');
 
   // Handler for TextField components
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
@@ -29,19 +28,8 @@ const RegisterPage: React.FC = () => {
     setFormData({ ...formData, [name]: value });
   };
 
-  const handleResendVerification = async () => {
-    setLoading(true);
-    setError(undefined);
-    try {
-      await authService.resendVerificationEmail(registeredEmail);
-      // Optionally, show a success message for resend
-      alert('Verification email re-sent successfully!');
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to resend verification email.');
-      console.error('Resend verification error details:', err.response?.data);
-    } finally {
-      setLoading(false);
-    }
+  const handleResendVerification = () => {
+    navigate('/resend-verification');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -74,7 +62,6 @@ const RegisterPage: React.FC = () => {
         currency: formData.currency,       // Pass new field
       });
       if (response.status >= 200 && response.status < 300) {
-        setRegisteredEmail(formData.email);
         setRegistrationSuccess(true);
       }
     } catch (err: any) {
@@ -94,14 +81,11 @@ const RegisterPage: React.FC = () => {
         formData={{}} // No form data needed
         loading={loading}
         error={undefined}
-        onResendVerification={handleResendVerification}
-        registeredEmail={registeredEmail}
-        showResendButton={true}
         showSubmitButton={false}
       >
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>Verification Email Sent!</Typography>
         <Typography sx={{ color: 'rgba(255,255,255,0.72)', mb: 3 }}>
-          A verification email has been sent to <strong style={{ color: '#7dd3fc' }}>{registeredEmail}</strong>.
+          A verification email has been sent to your email address.
           Please check your inbox (and spam folder) to verify your account.
         </Typography>
         <Button
@@ -112,15 +96,6 @@ const RegisterPage: React.FC = () => {
           onClick={() => window.open(`https://mail.google.com/mail/u/0/#inbox`, '_blank')}
         >
           Go to Gmail
-        </Button>
-        <Button
-          fullWidth
-          variant="text"
-          onClick={handleResendVerification}
-          sx={{ mb: 2, color: '#7dd3fc' }}
-          disabled={loading}
-        >
-          {loading ? 'Loading...' : `Resend Verification Email to ${registeredEmail}`}
         </Button>
         <Button
           variant="text"
@@ -142,9 +117,6 @@ const RegisterPage: React.FC = () => {
       formData={formData}
       loading={loading}
       error={error}
-      onResendVerification={handleResendVerification}
-      registeredEmail={registeredEmail}
-      showResendButton={registeredEmail !== ''}
     >
       {/* Always visible resend verification button */}
       <Button
