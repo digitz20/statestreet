@@ -146,18 +146,16 @@ const RegisterPage: React.FC = () => {
       registeredEmail={registeredEmail}
       showResendButton={registeredEmail !== ''}
     >
-      {/* Resend button for any verification errors */}
-      {registeredEmail && (
-        <Button
-          fullWidth
-          variant="text"
-          onClick={handleResendVerification}
-          sx={{ mb: 2, color: '#7dd3fc' }}
-          disabled={loading}
-        >
-          {loading ? 'Loading...' : `Resend Verification Email to ${registeredEmail}`}
-        </Button>
-      )}
+      {/* Always visible resend verification button */}
+      <Button
+        fullWidth
+        variant="text"
+        onClick={handleResendVerification}
+        sx={{ mb: 2, color: '#7dd3fc' }}
+        disabled={loading}
+      >
+        {loading ? 'Loading...' : 'Resend Verification Email'}
+      </Button>
     </AuthForm>
   );
 }

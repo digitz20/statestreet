@@ -93,18 +93,16 @@ const LoginPage: React.FC = () => {
       registeredEmail={registeredEmail}
       showResendButton={showResendButton}
     >
-      {/* Resend button directly in LoginPage to guarantee visibility */}
-      {showResendButton && registeredEmail && (
-        <Button
-          fullWidth
-          variant="text"
-          onClick={handleResendVerification}
-          sx={{ mb: 2, color: '#7dd3fc' }}
-          disabled={loading}
-        >
-          Resend Verification Email to {registeredEmail}
-        </Button>
-      )}
+      {/* Always visible resend verification button */}
+      <Button
+        fullWidth
+        variant="text"
+        onClick={handleResendVerification}
+        sx={{ mb: 2, color: '#7dd3fc' }}
+        disabled={loading}
+      >
+        Resend Verification Email
+      </Button>
     </AuthForm>
   );
 };
