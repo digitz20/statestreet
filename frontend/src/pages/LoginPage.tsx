@@ -15,6 +15,8 @@ const LoginPage: React.FC = () => {
   const [loading, setLoading] = useState(false);
 
   const [error, setError] = useState<string | undefined>(undefined);
+  const [showResendButton, setShowResendButton] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
 
   const isEmail = (input: string): boolean => {
     // A simple regex for email validation
@@ -24,12 +26,31 @@ const LoginPage: React.FC = () => {
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<string>, _child?: React.ReactNode) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
+    // Reset resend button visibility when input changes
+    setShowResendButton(false);
+    setRegisteredEmail('');
+  };
+
+  const handleResendVerification = async () => {
+    setLoading(true);
+    setError(undefined);
+    try {
+      await authService.resendVerificationEmail(registeredEmail);
+      alert('Verification email re-sent successfully!');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to resend verification email.');
+      console.error('Resend verification error details:', err.response?.data);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(undefined);
+    setShowResendButton(false);
+    setRegisteredEmail('');
     try {
       let payload: { password: string; email?: string; username?: string; };
       if (isEmail(formData.username)) {
@@ -49,7 +70,12 @@ const LoginPage: React.FC = () => {
         navigate('/dashboard');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      const errorMessage = err.response?.data?.message || 'Login failed';
+      setError(errorMessage);
+      if (errorMessage.includes('Account not verified')) { // Assuming this specific error message from backend
+        setShowResendButton(true);
+        setRegisteredEmail(formData.username); // Use the entered username/email for resend
+      }
     } finally {
       setLoading(false);
     }
@@ -63,7 +89,9 @@ const LoginPage: React.FC = () => {
       formData={formData}
       loading={loading}
       error={error}
-
+      onResendVerification={handleResendVerification}
+      registeredEmail={registeredEmail}
+      showResendButton={showResendButton}
     />
   );
 };

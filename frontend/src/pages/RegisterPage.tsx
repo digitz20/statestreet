@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthForm from '../components/AuthForm';
 import authService from '../services/authService';
 import type { SelectChangeEvent } from '@mui/material';
-import { Typography, Button, CircularProgress } from '@mui/material';
+import { Typography, Button } from '@mui/material';
 
 const RegisterPage: React.FC = () => {
   const navigate = useNavigate();
@@ -92,8 +92,11 @@ const RegisterPage: React.FC = () => {
         onSubmit={() => {}} // No submission needed on success screen
         onInputChange={() => {}} // No input changes needed
         formData={{}} // No form data needed
-        loading={false}
+        loading={loading}
         error={undefined}
+        onResendVerification={handleResendVerification}
+        registeredEmail={registeredEmail}
+        showResendButton={true}
       >
         <Typography variant="h5" sx={{ fontWeight: 700, mb: 2 }}>Verification Email Sent!</Typography>
         <Typography sx={{ color: 'rgba(255,255,255,0.72)', mb: 3 }}>
@@ -108,15 +111,6 @@ const RegisterPage: React.FC = () => {
           onClick={() => window.open(`https://mail.google.com/mail/u/0/#inbox`, '_blank')}
         >
           Go to Gmail
-        </Button>
-        <Button
-          variant="outlined"
-          fullWidth
-          sx={{ py: 1.5, color: 'white', borderColor: 'rgba(255,255,255,0.3)' }}
-          onClick={handleResendVerification}
-          disabled={loading}
-        >
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Resend Verification Email'}
         </Button>
         <Button
           variant="text"
