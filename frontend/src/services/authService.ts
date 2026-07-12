@@ -34,6 +34,7 @@ const authService = {
   register: async (payload: RegisterPayload) => api.post('/register', payload),
   login: async (payload: Record<string, unknown>) => {
     const response = await api.post('/login', payload);
+    console.log('Login API response.data:', response.data); // Add this line
     if (response.data) {
       localStorage.setItem('user', JSON.stringify(response.data));
     }
