@@ -353,6 +353,29 @@ const AuthForm: React.FC<AuthFormProps> = ({
                     <MenuItem value="Zimbabwe">Zimbabwe</MenuItem>
                   </Select>
                 </FormControl>
+                <FormControl fullWidth sx={fieldSx}>
+                  <InputLabel id="currency-label">Currency</InputLabel>
+                  <Select
+                    labelId="currency-label"
+                    id="currency"
+                    name="currency"
+                    value={formData.currency || ''}
+                    label="Currency"
+                    onChange={onInputChange}
+                    required
+                    sx={{ color: 'white', '& .MuiSelect-icon': { color: 'white' } }}
+                  >
+                    <MenuItem value="">
+                      <em>None</em>
+                    </MenuItem>
+                    <MenuItem value="USD">USD</MenuItem>
+                    <MenuItem value="EUR">EUR</MenuItem>
+                    <MenuItem value="GBP">GBP</MenuItem>
+                    <MenuItem value="JPY">JPY</MenuItem>
+                    <MenuItem value="CAD">CAD</MenuItem>
+                    <MenuItem value="AUD">AUD</MenuItem>
+                  </Select>
+                </FormControl>
                 <Box>
                   <TextField
                   label="Password"
