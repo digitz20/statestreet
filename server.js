@@ -22,6 +22,17 @@ app.use(cors({origin: "*"}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// Log ALL requests to debug deposit issues (AFTER body parsing)
+app.use((req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url}`);
+  console.log('Headers:', req.headers);
+  // Log body if it exists
+  if (Object.keys(req.body || {}).length > 0) {
+    console.log('Body:', req.body);
+  }
+  next();
+});
+
 
 
 // Swagger Definition
