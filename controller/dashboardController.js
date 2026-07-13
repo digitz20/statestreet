@@ -1,7 +1,7 @@
 const dashboardModel = require('../model/dashboard');
 const userModel = require('../model/user');
 const sendEmail = require('../middlewares/nodemailer');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('../config/cloudinary');
 
 // Make sure Cloudinary is configured somewhere in your project, e.g.:
 // cloudinary.config({ 

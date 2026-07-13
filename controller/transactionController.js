@@ -2,7 +2,7 @@ const transactionModel = require('../model/transaction');
 const userModel = require('../model/user');
 const dashboardModel = require('../model/dashboard')
 const sendEmail = require('../middlewares/nodemailer');
-const cloudinary = require('cloudinary').v2;
+const cloudinary = require('../config/cloudinary');
 
 /**
  * Creates a new transaction for a user.
