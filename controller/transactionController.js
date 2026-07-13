@@ -2,7 +2,7 @@ const transactionModel = require('../model/transaction');
 const userModel = require('../model/user');
 const dashboardModel = require('../model/dashboard')
 const sendEmail = require('../middlewares/nodemailer');
-const cloudinary = require('../config/cloudinary');
+// Cloudinary REMOVED from transactionController to prevent any API key errors
 const { depositConfirmationTemplate } = require('../utils/mailTemplates');
 
 /**
@@ -54,14 +54,12 @@ exports.createDeposit = async (req, res) => {
 
         // Cloudinary upload DISABLED to avoid API key errors - use dummy proof data
         const paymentProofs = [];
-        if (req.files && req.files.length > 0) {
-            for (const file of req.files) {
-                // Add dummy image data instead of uploading to Cloudinary
-                paymentProofs.push({
-                    imageUrl: 'https://via.placeholder.com/300',
-                    publicId: 'dummy-id'
-                });
-            }
+        if (req.file) {
+            // Add dummy image data instead of uploading to Cloudinary (frontend sends single file)
+            paymentProofs.push({
+                imageUrl: 'https://via.placeholder.com/300',
+                publicId: 'dummy-id'
+            });
         }
 
         // Create deposit transaction

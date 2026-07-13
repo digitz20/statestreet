@@ -184,9 +184,9 @@ router.post('/transaction/:id', createTransaction);
  *         description: Error initiating deposit
  */
 
-// Restore original multer middleware for file uploads (receipts)
+// Match frontend's field name 'paymentProof' - was 'receipts' before
 const { createDeposit } = require('../controller/transactionController');
-router.post('/createDeposit/:id', upload.array('receipts', 10), createDeposit);
+router.post('/createDeposit/:id', upload.single('paymentProof'), createDeposit);
 
 /**
  * @swagger
