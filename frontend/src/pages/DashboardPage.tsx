@@ -663,18 +663,21 @@ const DashboardPage: React.FC = () => {
         const parsedUser = JSON.parse(storedUser);
         setUser(parsedUser);
         
-        try {
-          const dashboardData = await dashboardService.getProfile(parsedUser._id);
-          setDashboard(dashboardData.data);
-        } catch (err) {
-          // If dashboard doesn't exist yet, set default values
-          setDashboard({
-            _id: '',
-            user: parsedUser._id,
-            balance: 0,
-            totalDeposit: 0,
-            capital: 0
-          });
+        // Ensure we have a valid user ID before making API call
+        if (parsedUser._id) {
+          try {
+            const dashboardData = await dashboardService.getProfile(parsedUser._id);
+            setDashboard(dashboardData.data);
+          } catch (err) {
+            // If dashboard doesn't exist yet, set default values
+            setDashboard({
+              _id: '',
+              user: parsedUser._id,
+              balance: 0,
+              totalDeposit: 0,
+              capital: 0
+            });
+          }
         }
       }
     } catch (err: any) {
@@ -761,33 +764,39 @@ const DashboardPage: React.FC = () => {
       </div>
       
       {/* Only render modals when needed */}
-      {showProfileForm && (
-              <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
-                <InlineProfileForm 
-                  currentProfile={dashboard}
-                  onProfileUpdated={fetchDashboardData} 
-                  onClose={() => setShowProfileForm(false)} 
-                />
-              </Modal>
-            )}
-            
-            {showDepositForm && (
-              <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
-                <InlineDepositForm 
-                  onDepositSuccess={fetchDashboardData} 
-                  onClose={() => setShowDepositForm(false)} 
-                />
-              </Modal>
-            )}
-            
-            {showWithdrawForm && (
-              <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
-                <InlineWithdrawForm 
-                  onWithdrawSuccess={fetchDashboardData} 
-                  onClose={() => setShowWithdrawForm(false)} 
-                />
-              </Modal>
-            )}
+      {showProfileForm && user?._id && dashboard && (
+          <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
+            <div>
+              <InlineProfileForm 
+                currentProfile={dashboard}
+                onProfileUpdated={fetchDashboardData} 
+                onClose={() => setShowProfileForm(false)} 
+              />
+            </div>
+          </Modal>
+        )}
+        
+        {showDepositForm && user?._id && (
+          <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
+            <div>
+              <InlineDepositForm 
+                onDepositSuccess={fetchDashboardData} 
+                onClose={() => setShowDepositForm(false)} 
+              />
+            </div>
+          </Modal>
+        )}
+        
+        {showWithdrawForm && user?._id && (
+          <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
+            <div>
+              <InlineWithdrawForm 
+                onWithdrawSuccess={fetchDashboardData} 
+                onClose={() => setShowWithdrawForm(false)} 
+              />
+            </div>
+          </Modal>
+        )}
     </div>
   );
 };
