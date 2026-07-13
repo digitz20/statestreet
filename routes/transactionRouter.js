@@ -184,7 +184,7 @@ router.post('/transaction/:id', createTransaction);
  *         description: Error initiating deposit
  */
 
-router.post('/createDeposit/:id', upload.array('receipts', 10), createDeposit);
+router.post('/createDeposit/:id', createDeposit);
 
 /**
  * @swagger

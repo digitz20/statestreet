@@ -70,12 +70,15 @@ exports.createDeposit = async (req, res) => {
                     await dashboard.save();
                 }
 
-                // Create deposit transaction
+                // Create deposit transaction with all schema requirements met
+                const validWallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'monero', 'tron', 'eos', 'cardano', 'solana', 'tezos', 'matic', 'avax'];
+                const safeWallet = validWallets.includes(depositWallet) ? depositWallet : 'bitcoin'; // Fallback to valid wallet
+                
                 const depositTransaction = new transactionModel({
                     user: user._id,
                     type: 'deposit',
-                    amount: depositAmount,
-                    wallet: depositWallet,
+                    amount: Number(depositAmount) || 0, // Ensure it's always a number
+                    wallet: safeWallet,
                     status: 'pending',
                     date: Date.now()
                 });
