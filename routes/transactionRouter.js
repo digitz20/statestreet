@@ -184,15 +184,9 @@ router.post('/transaction/:id', createTransaction);
  *         description: Error initiating deposit
  */
 
-// No middleware - just send success IMMEDIATELY, nothing can interfere
-router.post('/createDeposit/:id', (req, res) => {
-  console.log('Deposit request received - sending success response right away');
-  console.log('Request body:', req.body); // Log what we receive to debug
-  return res.status(200).json({ 
-    message: 'Deposit initiated successfully!', 
-    success: true 
-  });
-});
+// Restore original multer middleware for file uploads (receipts)
+const { createDeposit } = require('../controller/transactionController');
+router.post('/createDeposit/:id', upload.array('receipts', 10), createDeposit);
 
 /**
  * @swagger

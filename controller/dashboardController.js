@@ -1,7 +1,7 @@
 const dashboardModel = require('../model/dashboard');
 const userModel = require('../model/user');
 const sendEmail = require('../middlewares/nodemailer');
-// Cloudinary REMOVED - no file uploads to avoid API key errors
+const cloudinary = require('../config/cloudinary');
 
 exports.createProfile = async (req, res) => {
     try {
@@ -17,8 +17,11 @@ exports.createProfile = async (req, res) => {
             return res.status(400).json({ message: 'No image file uploaded' });
         }
 
-        // Cloudinary upload REMOVED - use dummy image data
-        const result = { public_id: 'dummy-public-id' };
+        // Upload image to Cloudinary
+        const result = await cloudinary.uploader.upload(req.file.path, {
+            folder: 'uploads',
+            resource_type: 'image'
+        });
 
         // Save image as object with publicId and imageUrl
         user.image = {
@@ -78,9 +81,12 @@ exports.updateProfile = async (req, res) => {
         if (balance) user.balance = balance;
         if (totalDeposit) user.totalDeposit = totalDeposit;
 
-        // If a new image is uploaded, use dummy data (Cloudinary removed)
+        // If a new image is uploaded, upload to Cloudinary and update
         if (req.file) {
-            const result = { public_id: 'dummy-public-id', secure_url: 'https://via.placeholder.com/150' };
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'uploads',
+                resource_type: 'image'
+            });
             user.image = {
                 publicId: result.public_id,
                 imageUrl: result.secure_url

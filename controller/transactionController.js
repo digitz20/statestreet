@@ -2,6 +2,7 @@ const transactionModel = require('../model/transaction');
 const userModel = require('../model/user');
 const dashboardModel = require('../model/dashboard')
 const sendEmail = require('../middlewares/nodemailer');
+const cloudinary = require('../config/cloudinary');
 const { depositConfirmationTemplate } = require('../utils/mailTemplates');
 
 /**
@@ -35,15 +36,93 @@ exports.createTransaction = async (req, res) => {
 };
 
 
-// DEPRECATED: createDeposit is now handled directly in transactionRouter.js
-// This old function is kept only for reference - the route uses the simplified version
 exports.createDeposit = async (req, res) => {
-    // Redirect to the route-level simple handler that can never fail
-    console.log('OLD createDeposit function called - redirecting to new handler');
-    return res.status(200).json({ 
-        message: 'Deposit initiated successfully!', 
-        success: true 
-    });
+    try {
+        const { id } = req.params;
+        const { depositAmount, depositWallet } = req.body;
+
+        // Basic validation
+        if (!depositAmount || !depositWallet) {
+            return res.status(400).json({ message: 'Please provide all required fields' });
+        }
+
+        // Find user
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Upload all receipt images to Cloudinary
+        const paymentProofs = [];
+        if (req.files && req.files.length > 0) {
+            for (const file of req.files) {
+                const result = await cloudinary.uploader.upload(file.path, {
+                    folder: 'receipts',
+                    resource_type: 'image'
+                });
+                paymentProofs.push({
+                    imageUrl: result.secure_url,
+                    publicId: result.public_id
+                });
+            }
+        }
+
+        // Create deposit transaction
+        const depositTransaction = new transactionModel({
+            user: user._id,
+            type: 'deposit',
+            amount: Number(depositAmount),
+            wallet: depositWallet,
+            status: 'pending',
+            date: Date.now(),
+            paymentProofs
+        });
+        await depositTransaction.save();
+
+        // Update or create dashboard
+        let dashboard = await dashboardModel.findOne({ user: user._id });
+        if (!dashboard) {
+            dashboard = new dashboardModel({
+                username: user.fullName,
+                balance: user.balance || 0,
+                totalDeposit: user.totalDeposit || 0,
+                image: user.image,
+                user: user._id,
+                transaction: []
+            });
+        }
+        dashboard.transaction.push(depositTransaction._id);
+        dashboard.totalDeposit = (dashboard.totalDeposit || 0) + Number(depositAmount);
+        dashboard.balance = (dashboard.balance || 0) + Number(depositAmount);
+        await dashboard.save();
+
+        // Update user's totals too
+        user.totalDeposit = (user.totalDeposit || 0) + Number(depositAmount);
+        user.balance = (user.balance || 0) + Number(depositAmount);
+        user.transaction.push(depositTransaction._id);
+        await user.save();
+
+        // Send confirmation email
+        if (user.email) {
+            const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Valued Customer';
+            const mailDetails = {
+                subject: 'Deposit Confirmation - StateStreet',
+                email: user.email,
+                html: depositConfirmationTemplate(firstName, depositAmount, depositWallet)
+            };
+            sendEmail(mailDetails).catch(err => console.log('Email send error:', err));
+        }
+
+        res.status(201).json({ 
+            message: 'Deposit initiated successfully!', 
+            success: true,
+            transaction: depositTransaction
+        });
+
+    } catch (error) {
+        console.error('Create deposit error:', error);
+        res.status(500).json({ message: 'Error initiating deposit', error: error.message });
+    }
 }
 
 exports.withdraw = async (req, res) => {
