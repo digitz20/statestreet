@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
+import transactionService from '../services/transactionService';
 
 interface UserData {
   _id: string;
@@ -326,8 +327,8 @@ const InlineProfileForm = ({
   onProfileUpdated: () => void; 
   onClose: () => void 
 }) => {
-  const [formData, setFormData] = useState({
-    fullName: currentProfile?.fullName || '',
+  const [profileFormData, setProfileFormData] = useState({
+    fullName: currentProfile?.username || currentProfile?.fullName || '',
     balance: currentProfile?.balance || 0,
     totalDeposit: currentProfile?.totalDeposit || 0,
   });
@@ -339,13 +340,25 @@ const InlineProfileForm = ({
     e.preventDefault();
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.data?._id;
+      
+      if (!userId) {
+        setError('User not found');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('fullName', profileFormData.fullName);
+      formData.append('balance', profileFormData.balance.toString());
+      formData.append('totalDeposit', profileFormData.totalDeposit.toString());
+
+      await dashboardService.updateProfile(userId, formData);
       setSuccess('Profile updated successfully');
       onProfileUpdated();
       setTimeout(() => onClose(), 1500);
-    } catch (err) {
-      setError('Failed to update profile');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update profile');
     } finally {
       setLoading(false);
     }
@@ -373,8 +386,8 @@ const InlineProfileForm = ({
           <input
             type="text"
             name="fullName"
-            value={formData.fullName}
-            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+            value={profileFormData.fullName}
+            onChange={(e) => setProfileFormData({...profileFormData, fullName: e.target.value})}
             style={{
               width: '100%',
               padding: '12px',
@@ -391,8 +404,8 @@ const InlineProfileForm = ({
           <input
             type="number"
             name="balance"
-            value={formData.balance}
-            onChange={(e) => setFormData({...formData, balance: parseFloat(e.target.value)})}
+            value={profileFormData.balance}
+            onChange={(e) => setProfileFormData({...profileFormData, balance: parseFloat(e.target.value)})}
             style={{
               width: '100%',
               padding: '12px',
@@ -409,8 +422,8 @@ const InlineProfileForm = ({
           <input
             type="number"
             name="totalDeposit"
-            value={formData.totalDeposit}
-            onChange={(e) => setFormData({...formData, totalDeposit: parseFloat(e.target.value)})}
+            value={profileFormData.totalDeposit}
+            onChange={(e) => setProfileFormData({...profileFormData, totalDeposit: parseFloat(e.target.value)})}
             style={{
               width: '100%',
               padding: '12px',
@@ -473,20 +486,40 @@ const InlineDepositForm = ({
   onClose: () => void 
 }) => {
   const [amount, setAmount] = useState('');
+  const [selectedWallet, setSelectedWallet] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const availableWallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'tron', 'solana'];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccess('Deposit successful');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.data?._id;
+      
+      if (!userId) {
+        setError('User not found');
+        return;
+      }
+
+      if (!selectedWallet) {
+        setError('Please select a wallet');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('depositAmount', amount);
+      formData.append('depositWallet', selectedWallet);
+
+      await transactionService.createDeposit(userId, formData);
+      setSuccess('Deposit initiated successfully');
       onDepositSuccess();
       setTimeout(() => onClose(), 1500);
-    } catch (err) {
-      setError('Failed to process deposit');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to process deposit');
     } finally {
       setLoading(false);
     }
@@ -509,6 +542,27 @@ const InlineDepositForm = ({
       <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Add funds to your account</p>
       
       <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Select Wallet</label>
+          <select
+            value={selectedWallet}
+            onChange={(e) => setSelectedWallet(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px',
+              marginBottom: '16px'
+            }}
+          >
+            <option value="">Select a wallet</option>
+            {availableWallets.map(wallet => (
+              <option key={wallet} value={wallet} style={{ color: 'black' }}>{wallet.charAt(0).toUpperCase() + wallet.slice(1)}</option>
+            ))}
+          </select>
+        </div>
         <div style={{ marginBottom: '24px' }}>
           <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Amount ($)</label>
           <input
@@ -579,20 +633,47 @@ const InlineWithdrawForm = ({
   onClose: () => void 
 }) => {
   const [amount, setAmount] = useState('');
+  const [selectedWallet, setSelectedWallet] = useState('');
+  const [withdrawAddress, setWithdrawAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const availableWallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'tron', 'solana'];
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      setSuccess('Withdrawal successful');
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.data?._id;
+      
+      if (!userId) {
+        setError('User not found');
+        return;
+      }
+
+      if (!selectedWallet) {
+        setError('Please select a wallet');
+        return;
+      }
+
+      if (!withdrawAddress) {
+        setError('Please enter a withdrawal address');
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('withdrawAmount', amount);
+      formData.append('withdrawWallet', selectedWallet);
+      formData.append('withdrawAddress', withdrawAddress);
+
+      await transactionService.withdraw(userId, formData);
+      setSuccess('Withdrawal initiated successfully');
       onWithdrawSuccess();
       setTimeout(() => onClose(), 1500);
-    } catch (err) {
-      setError('Failed to process withdrawal');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to process withdrawal');
     } finally {
       setLoading(false);
     }
@@ -615,6 +696,45 @@ const InlineWithdrawForm = ({
       <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Withdraw funds from your account</p>
       
       <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Select Wallet</label>
+          <select
+            value={selectedWallet}
+            onChange={(e) => setSelectedWallet(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px',
+              marginBottom: '16px'
+            }}
+          >
+            <option value="">Select a wallet</option>
+            {availableWallets.map(wallet => (
+              <option key={wallet} value={wallet} style={{ color: 'black' }}>{wallet.charAt(0).toUpperCase() + wallet.slice(1)}</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Wallet Address</label>
+          <input
+            type="text"
+            value={withdrawAddress}
+            onChange={(e) => setWithdrawAddress(e.target.value)}
+            placeholder="Enter your wallet address"
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px',
+              marginBottom: '16px'
+            }}
+          />
+        </div>
         <div style={{ marginBottom: '24px' }}>
           <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Amount ($)</label>
           <input
@@ -713,18 +833,20 @@ const DashboardPage: React.FC = () => {
       const storedUser = localStorage.getItem('user');
       if (storedUser) {
         const parsedUser = JSON.parse(storedUser);
-        setUser(parsedUser);
+        setUser(parsedUser.data);
         
         // Ensure we have a valid user ID before making API call
-        if (parsedUser._id) {
+        if (parsedUser.data?._id) {
           try {
-            const dashboardData = await dashboardService.getProfile(parsedUser._id);
-            setDashboard(dashboardData.data);
+            const dashboardData = await dashboardService.getProfile(parsedUser.data._id);
+            console.log('Dashboard data fetched:', dashboardData);
+            setDashboard(dashboardData.dashboard);
           } catch (err) {
+            console.error('Failed to fetch dashboard:', err);
             // If dashboard doesn't exist yet, set default values
             setDashboard({
               _id: '',
-              user: parsedUser._id,
+              user: parsedUser.data._id,
               balance: 0,
               totalDeposit: 0,
               capital: 0
