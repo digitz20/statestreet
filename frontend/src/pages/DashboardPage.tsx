@@ -61,6 +61,7 @@ const DashboardPage: React.FC = () => {
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [assetType, setAssetType] = useState<'NONE' | 'FOREX' | 'CRYPTO' | 'STOCKS'>('NONE');
   const [selectedSymbol, setSelectedSymbol] = useState('');
   const [tradeAmount, setTradeAmount] = useState('');
@@ -138,7 +139,6 @@ const DashboardPage: React.FC = () => {
     );
   }
 
-  const [mobileOpen, setMobileOpen] = useState(false);
   const drawerWidth = 240;
 
   const handleLogout = async () => {
