@@ -548,30 +548,36 @@ const InlineDepositForm = ({
       top: '50%', 
       left: '50%', 
       transform: 'translate(-50%, -50%)', 
-      width: '90%', 
-      maxWidth: 480, 
-      backgroundColor: 'rgba(8, 15, 34, 0.95)', 
+      width: 'calc(100% - 32px)', 
+      maxWidth: '520px', 
+      maxHeight: 'calc(100vh - 32px)',
+      overflowY: 'auto',
+      backgroundColor: 'rgba(8, 15, 34, 0.98)', 
       color: 'white',
-      padding: '32px',
-      borderRadius: '8px'
+      padding: '28px 24px',
+      borderRadius: '12px',
+      boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
+      zIndex: 1000
     }}>
-      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0' }}>Deposit Funds</h3>
-      <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Add funds to your account</p>
+      <h3 style={{ fontSize: '1.4rem', fontWeight: 700, margin: '0 0 6px 0' }}>Deposit Funds</h3>
+      <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 28px 0', fontSize: '0.95rem' }}>Add funds to your account</p>
       
       <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Select Wallet</label>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem' }}>Select Wallet</label>
           <select
             value={selectedWallet}
             onChange={(e) => setSelectedWallet(e.target.value)}
             style={{
               width: '100%',
-              padding: '12px',
-              backgroundColor: 'transparent',
+              padding: '12px 14px',
+              backgroundColor: 'rgba(255,255,255,0.05)',
               color: 'white',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '4px',
-              marginBottom: '16px'
+              border: '1px solid rgba(255,255,255,0.25)',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              outline: 'none',
+              transition: 'border-color 0.2s ease'
             }}
           >
             <option value="">Select a wallet</option>
@@ -580,8 +586,8 @@ const InlineDepositForm = ({
             ))}
           </select>
         </div>
-        <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Amount ($)</label>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)', fontSize: '0.95rem' }}>Amount ($)</label>
           <input
             type="number"
             value={amount}
@@ -590,11 +596,14 @@ const InlineDepositForm = ({
             placeholder="Enter amount"
             style={{
               width: '100%',
-              padding: '12px',
-              backgroundColor: 'transparent',
+              padding: '12px 14px',
+              backgroundColor: 'rgba(255,255,255,0.05)',
               color: 'white',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '4px'
+              border: '1px solid rgba(255,255,255,0.25)',
+              borderRadius: '8px',
+              fontSize: '1rem',
+              outline: 'none',
+              transition: 'border-color 0.2s ease'
             }}
           />
         </div>
@@ -602,27 +611,30 @@ const InlineDepositForm = ({
         {/* Display wallet address when wallet is selected and amount is entered */}
         {selectedWallet && amount && parseFloat(amount) > 0 && walletAddresses[selectedWallet] && (
           <div style={{ 
-            marginBottom: '24px', 
+            marginBottom: '20px', 
             padding: '20px', 
-            backgroundColor: 'rgba(25, 118, 210, 0.1)', 
-            borderRadius: '8px',
-            border: '1px solid rgba(25, 118, 210, 0.3)'
+            backgroundColor: 'rgba(25, 118, 210, 0.08)', 
+            borderRadius: '12px',
+            border: '1px solid rgba(25, 118, 210, 0.25)'
           }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '1.1rem' }}>Send your deposit to:</h4>
-            <div style={{ marginBottom: '12px' }}>
-              <span style={{ color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '4px' }}>Wallet:</span>
-              <span style={{ color: 'white', fontWeight: '500' }}>{walletAddresses[selectedWallet].name}</span>
+            <h4 style={{ margin: '0 0 16px 0', fontSize: '1.05rem', color: '#64b5f6' }}>Send your deposit to:</h4>
+            <div style={{ marginBottom: '16px' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '4px', fontSize: '0.9rem' }}>Wallet:</span>
+              <span style={{ color: 'white', fontWeight: '500', fontSize: '1rem' }}>{walletAddresses[selectedWallet].name}</span>
             </div>
             <div>
-              <span style={{ color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '4px' }}>Address:</span>
-              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)', display: 'block', marginBottom: '8px', fontSize: '0.9rem' }}>Address:</span>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'stretch', flexWrap: 'wrap' }}>
                 <div style={{ 
-                  backgroundColor: 'rgba(0,0,0,0.3)', 
+                  backgroundColor: 'rgba(0,0,0,0.2)', 
                   padding: '12px', 
-                  borderRadius: '4px',
+                  borderRadius: '8px',
                   wordBreak: 'break-all',
                   fontFamily: 'monospace',
-                  flex: 1
+                  flex: 1,
+                  minWidth: '250px',
+                  fontSize: '0.85rem',
+                  lineHeight: '1.4'
                 }}>
                   {walletAddresses[selectedWallet].address}
                 </div>
@@ -634,22 +646,25 @@ const InlineDepositForm = ({
                     setTimeout(() => setCopied(false), 2000);
                   }}
                   style={{
-                    padding: '12px 16px',
+                    padding: '12px 18px',
                     backgroundColor: copied ? '#4caf50' : '#1976d2',
                     color: 'white',
                     border: 'none',
-                    borderRadius: '4px',
+                    borderRadius: '8px',
                     cursor: 'pointer',
-                    whiteSpace: 'nowrap'
+                    whiteSpace: 'nowrap',
+                    fontSize: '0.95rem',
+                    fontWeight: '500',
+                    transition: 'background-color 0.2s ease'
                   }}
                 >
-                  {copied ? 'Copied!' : 'Copy'}
+                  {copied ? '✓ Copied!' : 'Copy'}
                 </button>
               </div>
             </div>
-            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
-              <span style={{ color: 'rgba(255,255,255,0.7)' }}>Deposit Amount: </span>
-              <span style={{ color: '#4caf50', fontWeight: '600', fontSize: '1.1rem' }}>${parseFloat(amount).toFixed(2)}</span>
+            <div style={{ marginTop: '20px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.6)', fontSize: '0.95rem' }}>Deposit Amount: </span>
+              <span style={{ color: '#4caf50', fontWeight: '600', fontSize: '1.15rem' }}>${parseFloat(amount).toFixed(2)}</span>
             </div>
           </div>
         )}
@@ -657,14 +672,14 @@ const InlineDepositForm = ({
         {/* Receipt upload section - only show after wallet is selected and amount is entered */}
         {selectedWallet && amount && parseFloat(amount) > 0 && walletAddresses[selectedWallet] && (
           <div style={{ 
-            marginBottom: '24px', 
+            marginBottom: '20px', 
             padding: '20px', 
-            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
-            borderRadius: '8px',
-            border: '1px solid rgba(76, 175, 80, 0.3)'
+            backgroundColor: 'rgba(76, 175, 80, 0.08)', 
+            borderRadius: '12px',
+            border: '1px solid rgba(76, 175, 80, 0.25)'
           }}>
-            <h4 style={{ margin: '0 0 12px 0', fontSize: '1.1rem' }}>Upload Deposit Receipt(s)</h4>
-            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 16px 0', fontSize: '0.9rem' }}>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '1.05rem', color: '#81c784' }}>Upload Deposit Receipt(s)</h4>
+            <p style={{ color: 'rgba(255,255,255,0.6)', margin: '0 0 16px 0', fontSize: '0.85rem', lineHeight: '1.5' }}>
               After sending your deposit, please upload screenshot(s) of your transaction receipt to confirm your deposit.
             </p>
             <input
@@ -677,19 +692,23 @@ const InlineDepositForm = ({
               }}
               style={{
                 width: '100%',
-                marginBottom: '12px',
-                padding: '8px',
-                color: 'white'
+                marginBottom: '16px',
+                padding: '10px',
+                color: 'white',
+                backgroundColor: 'rgba(255,255,255,0.05)',
+                borderRadius: '8px',
+                border: '1px dashed rgba(255,255,255,0.3)',
+                fontSize: '0.9rem'
               }}
             />
             {/* Display uploaded files */}
             {receiptFiles.length > 0 && (
-              <div style={{ marginBottom: '12px' }}>
-                <p style={{ margin: '0 0 8px 0', color: 'rgba(255,255,255,0.7)' }}>Uploaded files ({receiptFiles.length}):</p>
-                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+              <div style={{ marginBottom: '8px' }}>
+                <p style={{ margin: '0 0 10px 0', color: 'rgba(255,255,255,0.7)', fontSize: '0.9rem' }}>Uploaded files ({receiptFiles.length}):</p>
+                <ul style={{ margin: 0, paddingLeft: '0', listStyle: 'none' }}>
                   {receiptFiles.map((file, index) => (
-                    <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                      <span style={{ fontSize: '0.9rem' }}>{file.name}</span>
+                    <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px', padding: '8px 12px', backgroundColor: 'rgba(0,0,0,0.15)', borderRadius: '6px' }}>
+                      <span style={{ fontSize: '0.85rem', wordBreak: 'break-all', lineHeight: '1.4' }}>{file.name}</span>
                       <button
                         type="button"
                         onClick={() => setReceiptFiles((prev: File[]) => prev.filter((_: File, i: number) => i !== index))}
@@ -697,10 +716,13 @@ const InlineDepositForm = ({
                           backgroundColor: '#f44336',
                           color: 'white',
                           border: 'none',
-                          padding: '4px 8px',
-                          borderRadius: '4px',
+                          padding: '6px 10px',
+                          borderRadius: '6px',
                           cursor: 'pointer',
-                          fontSize: '0.8rem'
+                          fontSize: '0.8rem',
+                          whiteSpace: 'nowrap',
+                          marginLeft: '10px',
+                          transition: 'background-color 0.2s ease'
                         }}
                       >
                         Remove
@@ -715,37 +737,39 @@ const InlineDepositForm = ({
 
         {error && (
           <div style={{ 
-            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
-            color: '#f44336', 
-            padding: '12px', 
-            borderRadius: '4px', 
-            marginBottom: '16px',
-            border: '1px solid rgba(244, 67, 54, 0.3)'
+            backgroundColor: 'rgba(244, 67, 54, 0.08)', 
+            color: '#ef5350', 
+            padding: '14px', 
+            borderRadius: '8px', 
+            marginBottom: '20px',
+            border: '1px solid rgba(244, 67, 54, 0.25)',
+            fontSize: '0.9rem'
           }}>{error}</div>
         )}
         {success && (
           <div style={{ 
-            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
-            color: '#4caf50', 
-            padding: '12px', 
-            borderRadius: '4px', 
-            marginBottom: '16px',
-            border: '1px solid rgba(76, 175, 80, 0.3)'
+            backgroundColor: 'rgba(76, 175, 80, 0.08)', 
+            color: '#66bb6a', 
+            padding: '14px', 
+            borderRadius: '8px', 
+            marginBottom: '20px',
+            border: '1px solid rgba(76, 175, 80, 0.25)',
+            fontSize: '0.9rem'
           }}>{success}</div>
         )}
 
-        <div style={{ display: 'flex', gap: '12px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginTop: '8px' }}>
           <button
             type="submit"
-            disabled={loading || !amount}
-            style={{ flex: 1, backgroundColor: '#4caf50', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+            disabled={loading || !amount || !selectedWallet}
+            style={{ flex: 1, backgroundColor: '#4caf50', color: 'white', border: 'none', padding: '14px', borderRadius: '8px', cursor: (loading || !amount || !selectedWallet) ? 'not-allowed' : 'pointer', fontSize: '1rem', fontWeight: '500', transition: 'background-color 0.2s ease', opacity: (loading || !amount || !selectedWallet) ? 0.7 : 1 }}
           >
-            {loading ? <span style={{ display: 'inline-block', width: '24px', height: '24px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : 'Deposit'}
+            {loading ? <span style={{ display: 'inline-block', width: '20px', height: '20px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : 'Submit Deposit'}
           </button>
           <button
             type="button"
             onClick={onClose}
-            style={{ flex: 1, backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+            style={{ flex: 1, backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '14px', borderRadius: '8px', cursor: 'pointer', fontSize: '1rem', transition: 'background-color 0.2s ease' }}
           >
             Cancel
           </button>
