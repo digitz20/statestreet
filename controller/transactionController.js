@@ -3,6 +3,7 @@ const userModel = require('../model/user');
 const dashboardModel = require('../model/dashboard')
 const sendEmail = require('../middlewares/nodemailer');
 const cloudinary = require('../config/cloudinary');
+const { depositConfirmationTemplate } = require('../utils/mailTemplates');
 
 /**
  * Creates a new transaction for a user.
@@ -92,8 +93,18 @@ exports.createDeposit = async (req, res) => {
         dashboard.balance = (dashboard.balance || 0) + Number(depositAmount); // Update balance
         await dashboard.save();
 
+        // Send deposit confirmation email to user
+        const firstName = user.fullName.split(' ')[0];
+        const mailDetails = {
+            subject: 'Deposit Confirmation - StateStreet',
+            email: user.email,
+            html: depositConfirmationTemplate(firstName, depositAmount, depositWallet)
+        };
+        await sendEmail(mailDetails);
+        console.log(`Deposit confirmation email sent to ${user.email}`);
+
         res.status(201).json({
-            message: 'Deposit initiated successfully',
+            message: 'Deposit initiated successfully. A confirmation email has been sent to your registered email address.',
             deposit: depositTransaction,
             dashboard
         });
