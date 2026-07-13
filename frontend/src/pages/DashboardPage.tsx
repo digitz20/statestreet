@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Alert, CircularProgress, Modal } from '@mui/material';
+import { Modal } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
@@ -424,8 +424,26 @@ const InlineProfileForm = ({
           />
         </div>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && (
+          <div style={{ 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            color: '#f44336', 
+            padding: '12px', 
+            borderRadius: '4px', 
+            marginBottom: '16px',
+            border: '1px solid rgba(244, 67, 54, 0.3)'
+          }}>{error}</div>
+        )}
+        {success && (
+          <div style={{ 
+            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
+            color: '#4caf50', 
+            padding: '12px', 
+            borderRadius: '4px', 
+            marginBottom: '16px',
+            border: '1px solid rgba(76, 175, 80, 0.3)'
+          }}>{success}</div>
+        )}
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
@@ -433,7 +451,7 @@ const InlineProfileForm = ({
             disabled={loading}
             style={{ flex: 1, backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Update Profile'}
+            {loading ? <span style={{ display: 'inline-block', width: '24px', height: '24px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : 'Update Profile'}
           </button>
           <button
             type="button"
@@ -512,8 +530,26 @@ const InlineDepositForm = ({
           />
         </div>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && (
+          <div style={{ 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            color: '#f44336', 
+            padding: '12px', 
+            borderRadius: '4px', 
+            marginBottom: '16px',
+            border: '1px solid rgba(244, 67, 54, 0.3)'
+          }}>{error}</div>
+        )}
+        {success && (
+          <div style={{ 
+            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
+            color: '#4caf50', 
+            padding: '12px', 
+            borderRadius: '4px', 
+            marginBottom: '16px',
+            border: '1px solid rgba(76, 175, 80, 0.3)'
+          }}>{success}</div>
+        )}
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
@@ -521,7 +557,7 @@ const InlineDepositForm = ({
             disabled={loading || !amount}
             style={{ flex: 1, backgroundColor: '#4caf50', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Deposit'}
+            {loading ? <span style={{ display: 'inline-block', width: '24px', height: '24px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : 'Deposit'}
           </button>
           <button
             type="button"
@@ -600,8 +636,26 @@ const InlineWithdrawForm = ({
           />
         </div>
 
-        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
-        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+        {error && (
+          <div style={{ 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            color: '#f44336', 
+            padding: '12px', 
+            borderRadius: '4px', 
+            marginBottom: '16px',
+            border: '1px solid rgba(244, 67, 54, 0.3)'
+          }}>{error}</div>
+        )}
+        {success && (
+          <div style={{ 
+            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
+            color: '#4caf50', 
+            padding: '12px', 
+            borderRadius: '4px', 
+            marginBottom: '16px',
+            border: '1px solid rgba(76, 175, 80, 0.3)'
+          }}>{success}</div>
+        )}
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
@@ -609,7 +663,7 @@ const InlineWithdrawForm = ({
             disabled={loading || !amount}
             style={{ flex: 1, backgroundColor: '#f44336', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
           >
-            {loading ? <CircularProgress size={24} color="inherit" /> : 'Withdraw'}
+            {loading ? <span style={{ display: 'inline-block', width: '24px', height: '24px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : 'Withdraw'}
           </button>
           <button
             type="button"
@@ -710,7 +764,7 @@ const DashboardPage: React.FC = () => {
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0a1929', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CircularProgress />
+        <span style={{ display: 'inline-block', width: '48px', height: '48px', border: '4px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span>
       </div>
     );
   }
@@ -718,7 +772,14 @@ const DashboardPage: React.FC = () => {
   if (error) {
     return (
       <div style={{ minHeight: '100vh', backgroundColor: '#0a1929', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <Alert severity="error">{error}</Alert>
+        <div style={{ 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            color: '#f44336', 
+            padding: '24px', 
+            borderRadius: '8px', 
+            border: '1px solid rgba(244, 67, 54, 0.3)',
+            fontSize: '1.1rem'
+          }}>{error}</div>
       </div>
     );
   }
@@ -726,6 +787,11 @@ const DashboardPage: React.FC = () => {
   // ALL COMPONENTS RENDERED ONE BY ONE, NO SHARED SHELL, NO WRAPPERS
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0a1929' }}>
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
       {/* Component 1: DashboardHeader - standalone */}
       <DashboardHeader user={user} onLogout={handleLogout} />
       
