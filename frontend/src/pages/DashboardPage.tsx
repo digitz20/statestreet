@@ -1,7 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Modal } from '@mui/material';
-import LogoutIcon from '@mui/icons-material/Logout';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
 
@@ -36,10 +34,10 @@ const DashboardHeader = ({ user, onLogout }: { user: UserData | null; onLogout: 
           </div>
           <button 
             onClick={onLogout} 
-            style={{ color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: '50%' }}
+            style={{ color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: '50%', fontSize: '20px' }}
             aria-label="Logout"
           >
-            <LogoutIcon />
+            🚪
           </button>
         </div>
       </div>
@@ -829,40 +827,82 @@ const DashboardPage: React.FC = () => {
         <MarketDataCard marketData={mockMarketData} />
       </div>
       
-      {/* Only render modals when needed */}
+      {/* Native HTML Modals - NO MUI */}
       {showProfileForm && user?._id && dashboard && (
-          <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
-            <div>
-              <InlineProfileForm 
-                currentProfile={dashboard}
-                onProfileUpdated={fetchDashboardData} 
-                onClose={() => setShowProfileForm(false)} 
-              />
-            </div>
-          </Modal>
-        )}
-        
-        {showDepositForm && user?._id && (
-          <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
-            <div>
-              <InlineDepositForm 
-                onDepositSuccess={fetchDashboardData} 
-                onClose={() => setShowDepositForm(false)} 
-              />
-            </div>
-          </Modal>
-        )}
-        
-        {showWithdrawForm && user?._id && (
-          <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
-            <div>
-              <InlineWithdrawForm 
-                onWithdrawSuccess={fetchDashboardData} 
-                onClose={() => setShowWithdrawForm(false)} 
-              />
-            </div>
-          </Modal>
-        )}
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            backgroundColor: 'rgba(0,0,0,0.7)', 
+            zIndex: 1000, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center' 
+          }}
+          onClick={() => setShowProfileForm(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <InlineProfileForm 
+              currentProfile={dashboard}
+              onProfileUpdated={fetchDashboardData} 
+              onClose={() => setShowProfileForm(false)} 
+            />
+          </div>
+        </div>
+      )}
+      
+      {showDepositForm && user?._id && (
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            backgroundColor: 'rgba(0,0,0,0.7)', 
+            zIndex: 1000, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center' 
+          }}
+          onClick={() => setShowDepositForm(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <InlineDepositForm 
+              onDepositSuccess={fetchDashboardData} 
+              onClose={() => setShowDepositForm(false)} 
+            />
+          </div>
+        </div>
+      )}
+      
+      {showWithdrawForm && user?._id && (
+        <div 
+          style={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            backgroundColor: 'rgba(0,0,0,0.7)', 
+            zIndex: 1000, 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'center' 
+          }}
+          onClick={() => setShowWithdrawForm(false)}
+        >
+          <div onClick={(e) => e.stopPropagation()}>
+            <InlineWithdrawForm 
+              onWithdrawSuccess={fetchDashboardData} 
+              onClose={() => setShowWithdrawForm(false)} 
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 };
