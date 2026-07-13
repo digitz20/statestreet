@@ -1,14 +1,8 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Alert, Box, CircularProgress, Typography, Grid, Paper, Button, FormControl, InputLabel, Select, MenuItem, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Modal,
-  Drawer, AppBar, Toolbar, IconButton, List, ListItem, ListItemIcon, ListItemText, Container
+  Alert, CircularProgress, Modal
 } from '@mui/material';
-import MenuIcon from '@mui/icons-material/Menu';
-import DashboardIcon from '@mui/icons-material/Dashboard';
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
-import PersonIcon from '@mui/icons-material/Person';
 import LogoutIcon from '@mui/icons-material/Logout';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
@@ -52,6 +46,310 @@ interface MarketData {
   changePercent: number;
 }
 
+// First standalone component: Header
+const DashboardHeader = ({ user, onLogout }: { user: UserData | null; onLogout: () => void }) => {
+  return (
+    <div style={{ borderBottom: '1px solid rgba(255,255,255,0.12)', padding: '16px 32px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h5 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', margin: 0 }}>StateStreet</h5>
+        <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+          <span style={{ color: '#4caf50', border: '1px solid #4caf50', padding: '6px 16px', borderRadius: '16px', fontSize: '0.875rem' }}>Secure session</span>
+          <div style={{ backgroundColor: '#7dd3fc', color: '#07131f', fontWeight: 700, width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {user?.fullName?.charAt(0) || user?.username?.charAt(0) || 'U'}
+          </div>
+          <button 
+            onClick={onLogout} 
+            style={{ color: 'white', background: 'none', border: 'none', cursor: 'pointer', padding: 8, borderRadius: '50%' }}
+            aria-label="Logout"
+          >
+            <LogoutIcon />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Second standalone component: WelcomeSection
+const WelcomeSection = ({ user }: { user: UserData | null }) => {
+  return (
+    <div style={{ marginBottom: '24px' }}>
+      <h2 style={{ fontSize: '2rem', fontWeight: 700, color: 'white', margin: '0 0 8px 0' }}>Dashboard overview</h2>
+      <p style={{ color: 'rgba(255,255,255,0.72)', margin: 0 }}>{user?.fullName || user?.username} • {user?.email || ''}</p>
+    </div>
+  );
+};
+
+// Third standalone component: AccountInfoCard
+const AccountInfoCard = ({ 
+  dashboard, 
+  onOpenDeposit, 
+  onOpenWithdraw, 
+  onOpenProfile 
+}: { 
+  dashboard: DashboardData | null;
+  onOpenDeposit: () => void;
+  onOpenWithdraw: () => void;
+  onOpenProfile: () => void;
+}) => {
+  return (
+    <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center' }}>
+        <div>
+          <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 8px 0' }}>Account Balance</h3>
+          <p style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 16px 0' }}>${dashboard?.balance?.toFixed(2)}</p>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            <button 
+              onClick={onOpenDeposit}
+              style={{ backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Deposit
+            </button>
+            <button 
+              onClick={onOpenWithdraw}
+              style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Withdraw
+            </button>
+            <button 
+              onClick={onOpenProfile}
+              style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              Profile
+            </button>
+          </div>
+        </div>
+        <div>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+            <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+              <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Total Deposit</p>
+              <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.totalDeposit?.toFixed(2)}</p>
+            </div>
+            <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+              <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Capital</p>
+              <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.capital?.toFixed(2) || '0.00'}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// Fourth standalone component: TradingCard
+const TradingCard = ({
+  assetType,
+  selectedSymbol,
+  tradeAmount,
+  tradeDuration,
+  onAssetTypeChange,
+  onSymbolChange,
+  onAmountChange,
+  onDurationChange,
+  onTrade
+}: {
+  assetType: string;
+  selectedSymbol: string;
+  tradeAmount: string;
+  tradeDuration: number;
+  onAssetTypeChange: (type: string) => void;
+  onSymbolChange: (symbol: string) => void;
+  onAmountChange: (amount: string) => void;
+  onDurationChange: (duration: number) => void;
+  onTrade: (type: 'BUY' | 'SELL') => void;
+}) => {
+  const getSymbolsForAssetType = () => {
+    switch (assetType) {
+      case 'FOREX': return ['EUR/USD', 'GBP/USD', 'USD/JPY'];
+      case 'CRYPTO': return ['BTC/USD', 'ETH/USD', 'SOL/USD'];
+      case 'STOCKS': return ['AAPL', 'MSFT', 'GOOGL'];
+      default: return [];
+    }
+  };
+
+  return (
+    <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0' }}>BUY / SELL</h3>
+      
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Select Asset Type</label>
+        <select
+          value={assetType}
+          onChange={(e) => {
+            onAssetTypeChange(e.target.value);
+            onSymbolChange('');
+          }}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: 'transparent',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '4px'
+          }}
+        >
+          <option value="NONE">NONE</option>
+          <option value="FOREX">FOREX</option>
+          <option value="CRYPTO">CRYPTO</option>
+          <option value="STOCKS">STOCKS</option>
+        </select>
+      </div>
+
+      {assetType !== 'NONE' && (
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Select {assetType} Symbol</label>
+          <select
+            value={selectedSymbol}
+            onChange={(e) => onSymbolChange(e.target.value)}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px'
+            }}
+          >
+            {getSymbolsForAssetType().map((symbol) => (
+              <option key={symbol} value={symbol}>{symbol}</option>
+            ))}
+          </select>
+        </div>
+      )}
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Amount ($)</label>
+        <input
+          type="number"
+          value={tradeAmount}
+          onChange={(e) => onAmountChange(e.target.value)}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: 'transparent',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '4px'
+          }}
+        />
+      </div>
+
+      <div style={{ marginBottom: '16px' }}>
+        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Duration (Seconds)</label>
+        <select
+          value={tradeDuration}
+          onChange={(e) => onDurationChange(Number(e.target.value))}
+          style={{
+            width: '100%',
+            padding: '12px',
+            backgroundColor: 'transparent',
+            color: 'white',
+            border: '1px solid rgba(255,255,255,0.3)',
+            borderRadius: '4px'
+          }}
+        >
+          <option value={30}>30 Seconds</option>
+          <option value={40}>40 Seconds</option>
+          <option value={50}>50 Seconds</option>
+          <option value={60}>1 Minute</option>
+        </select>
+      </div>
+
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+        <button 
+          onClick={() => onTrade('BUY')}
+          style={{ backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 500 }}
+        >
+          BUY
+        </button>
+        <button 
+          onClick={() => onTrade('SELL')}
+          style={{ backgroundColor: '#9c27b0', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 500 }}
+        >
+          SELL
+        </button>
+      </div>
+    </div>
+  );
+};
+
+// Fifth standalone component: OrderHistoryCard
+const OrderHistoryCard = ({ tradeHistory }: { tradeHistory: TradeHistory[] }) => {
+  return (
+    <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0' }}>Live Order History</h3>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Trade ID</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Date</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Duration</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Asset</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Amount</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Value</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Profit</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tradeHistory.length > 0 ? (
+              tradeHistory.map((trade) => (
+                <tr key={trade.tradeId}>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.tradeId}</td>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.date}</td>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.tradeDuration}</td>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.tradeAsset}</td>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>${trade.tradeAmount.toFixed(2)}</td>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>${trade.tradeValue.toFixed(2)}</td>
+                  <td style={{ padding: '8px', color: trade.profit >= 0 ? '#4CAF50' : '#F44336', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>${trade.profit.toFixed(2)}</td>
+                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.status}</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan={8} style={{ padding: '16px', color: 'white', textAlign: 'center', borderBottom: 'none' }}>No record found</td>
+              </tr>
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Sixth standalone component: MarketDataCard
+const MarketDataCard = ({ marketData }: { marketData: MarketData[] }) => {
+  return (
+    <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0' }}>Market Data</h3>
+      <div style={{ overflowX: 'auto' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Symbol</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Price</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Change</th>
+              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>% Change</th>
+            </tr>
+          </thead>
+          <tbody>
+            {marketData.map((item) => (
+              <tr key={item.symbol}>
+                <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.symbol}</td>
+                <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.price.toFixed(2)}</td>
+                <td style={{ padding: '8px', color: item.change >= 0 ? '#4CAF50' : '#F44336', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.change.toFixed(2)}</td>
+                <td style={{ padding: '8px', color: item.changePercent >= 0 ? '#4CAF50' : '#F44336', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.changePercent.toFixed(2)}%</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+};
+
+// Main DashboardPage component that renders each component individually in sequence
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserData | null>(null);
@@ -61,7 +359,6 @@ const DashboardPage: React.FC = () => {
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
-  const [mobileOpen, setMobileOpen] = useState(false);
   const [assetType, setAssetType] = useState<'NONE' | 'FOREX' | 'CRYPTO' | 'STOCKS'>('NONE');
   const [selectedSymbol, setSelectedSymbol] = useState('');
   const [tradeAmount, setTradeAmount] = useState('');
@@ -74,15 +371,6 @@ const DashboardPage: React.FC = () => {
     { symbol: 'AAPL', price: 175.5, change: -2.3, changePercent: -1.3 },
   ];
 
-  const getSymbolsForAssetType = () => {
-    switch (assetType) {
-      case 'FOREX': return ['EUR/USD', 'GBP/USD', 'USD/JPY'];
-      case 'CRYPTO': return ['BTC/USD', 'ETH/USD', 'SOL/USD'];
-      case 'STOCKS': return ['AAPL', 'MSFT', 'GOOGL'];
-      default: return [];
-    }
-  };
-
   const handleTrade = (type: 'BUY' | 'SELL') => {
     console.log(`${type} trade: ${assetType} ${selectedSymbol} $${tradeAmount} for ${tradeDuration}s`);
   };
@@ -91,17 +379,13 @@ const DashboardPage: React.FC = () => {
     setLoading(true);
     try {
       const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      // Handle both possible response structures (user under .data or .user)
       const userData = storedUser.data || storedUser.user;
       if (!storedUser || !storedUser.token || !userData?._id) {
         navigate('/login');
         return;
       }
       const userId = userData._id;
-      console.log("Stored User from localStorage:", storedUser);
-      console.log("User ID being used for getProfile:", userId);
       const response = await dashboardService.getProfile(userId);
-      console.log("FULL API RESPONSE:", response);
       setUser(response.user);
       setDashboard(response.dashboard);
     } catch (err: any) {
@@ -123,334 +407,110 @@ const DashboardPage: React.FC = () => {
     void fetchDashboardData();
   }, [navigate, fetchDashboardData]);
 
-  if (loading) {
-    return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <CircularProgress />
-      </Box>
-    );
-  }
-
-  if (error) {
-    return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Alert severity="error" sx={{ borderRadius: 3 }}>{error}</Alert>
-      </Box>
-    );
-  }
-
-  const drawerWidth = 240;
-
   const handleLogout = async () => {
     await authService.logout();
     navigate('/login');
   };
 
-  const menuItems = [
-    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
-    { text: 'Trade', icon: <TrendingUpIcon />, path: '/dashboard/trade' },
-    { text: 'Wallet', icon: <AccountBalanceWalletIcon />, path: '/dashboard/wallet' },
-    { text: 'Profile', icon: <PersonIcon />, path: '/dashboard/profile' },
-  ];
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a1929' }}>
+        <CircularProgress />
+      </div>
+    );
+  }
 
-  const drawer = (
-    <div>
-      <Toolbar />
-      <List>
-        {menuItems.map((item) => (
-          <ListItem key={item.text} onClick={() => navigate(item.path)} sx={{ cursor: 'pointer' }}>
-            <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
-            <ListItemText primary={item.text} sx={{ color: 'white' }} />
-          </ListItem>
-        ))}
-        <ListItem onClick={handleLogout} sx={{ cursor: 'pointer', mt: 2 }}>
-          <ListItemIcon sx={{ color: 'white' }}><LogoutIcon /></ListItemIcon>
-          <ListItemText primary="Logout" sx={{ color: 'white' }} />
-        </ListItem>
-      </List>
-    </div>
-  );
+  if (error) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a1929' }}>
+        <Alert severity="error" sx={{ borderRadius: 3 }}>{error}</Alert>
+      </div>
+    );
+  }
 
+  // Render components ONE BY ONE, completely independent, no shell wrapping
   return (
-    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#0a1929' }}>
-      <AppBar position="fixed" sx={{ width: { sm: `calc(100% - ${drawerWidth}px)` }, ml: { sm: `${drawerWidth}px` }, bgcolor: 'rgba(8, 15, 34, 0.95)' }}>
-        <Toolbar>
-          <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={() => setMobileOpen(!mobileOpen)} sx={{ mr: 2, display: { sm: 'none' } }}>
-            <MenuIcon />
-          </IconButton>
-          <Typography variant="h6" sx={{ flexGrow: 1 }}>Dashboard overview</Typography>
-          <Typography variant="body2">{user?.fullName || user?.username} • {user?.email}</Typography>
-        </Toolbar>
-      </AppBar>
-      <Drawer
-        variant="temporary"
-        open={mobileOpen}
-        onClose={() => setMobileOpen(false)}
-        ModalProps={{ keepMounted: true }}
-        sx={{
-          display: { xs: 'block', sm: 'none' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' },
-        }}
-      >
-        {drawer}
-      </Drawer>
-      <Drawer
-        variant="permanent"
-        sx={{
-          display: { xs: 'none', sm: 'block' },
-          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' },
-        }}
-        open
-      >
-        {drawer}
-      </Drawer>
-      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, mt: '64px' }}>
-        <Container maxWidth="xl" sx={{ py: 4 }}>
-          <Box sx={{ mb: 3 }}>
-            <Typography variant="h4" sx={{ fontWeight: 700, color: 'white' }}>Dashboard overview</Typography>
-            <Typography sx={{ color: 'rgba(255,255,255,0.72)' }}>{user?.fullName || user?.username} • {user?.email || ''}</Typography>
-          </Box>
-          <Grid container spacing={3}>
-        {/* Top Section: Account Info */}
-        <Grid item xs={12}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
-            <Grid container spacing={2} alignItems="center">
-              <Grid item xs={12} md={6}>
-                <Typography variant="h6" sx={{ fontWeight: 700, mb: 1 }}>Account Balance</Typography>
-                <Typography variant="h4" sx={{ fontWeight: 900, mb: 2 }}>${dashboard?.balance?.toFixed(2)}</Typography>
-                <Grid container spacing={1}>
-                  <Grid item>
-                    <Button variant="contained" color="primary" onClick={() => setShowDepositForm(true)}>Deposit</Button>
-                  </Grid>
-                  <Grid item>
-                    <Button variant="outlined" color="secondary" onClick={() => setShowWithdrawForm(true)}>Withdraw</Button>
-                  </Grid>
-                  <Grid item>
-                    <Button variant="outlined" onClick={() => setShowProfileForm(true)}>Profile</Button>
-                  </Grid>
-                </Grid>
-              </Grid>
-              <Grid item xs={12} md={6}>
-                <Grid container spacing={2}>
-                  <Grid item xs={6}>
-                    <Paper sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>Total Deposit</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>${dashboard?.totalDeposit?.toFixed(2)}</Typography>
-                    </Paper>
-                  </Grid>
-                  <Grid item xs={6}>
-                    <Paper sx={{ p: 2, borderRadius: 2, bgcolor: 'rgba(255,255,255,0.05)' }}>
-                      <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.7)' }}>Capital</Typography>
-                      <Typography variant="h6" sx={{ fontWeight: 700 }}>${dashboard?.capital?.toFixed(2) || '0.00'}</Typography>
-                    </Paper>
-                  </Grid>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
+    <div style={{ minHeight: '100vh', backgroundColor: '#0a1929' }}>
+      {/* First component */}
+      <DashboardHeader user={user} onLogout={handleLogout} />
+      
+      <div style={{ maxWidth: '100%', margin: '0 auto', padding: '32px' }}>
+        {/* Second component */}
+        <WelcomeSection user={user} />
+        
+        {/* Third component */}
+        <AccountInfoCard 
+          dashboard={dashboard}
+          onOpenDeposit={() => setShowDepositForm(true)}
+          onOpenWithdraw={() => setShowWithdrawForm(true)}
+          onOpenProfile={() => setShowProfileForm(true)}
+        />
+        
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
+          {/* Fourth component */}
+          <TradingCard
+            assetType={assetType}
+            selectedSymbol={selectedSymbol}
+            tradeAmount={tradeAmount}
+            tradeDuration={tradeDuration}
+            onAssetTypeChange={(value) => setAssetType(value as any)}
+            onSymbolChange={setSelectedSymbol}
+            onAmountChange={setTradeAmount}
+            onDurationChange={setTradeDuration}
+            onTrade={handleTrade}
+          />
+          
+          {/* Fifth component */}
+          <OrderHistoryCard tradeHistory={mockTradeHistory} />
+        </div>
+        
+        {/* Sixth component */}
+        <MarketDataCard marketData={mockMarketData} />
+      </div>
 
-        {/* BUY / SELL Section */}
-        <Grid item xs={12} lg={6}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>BUY / SELL</Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                  <InputLabel id="asset-type-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Select Asset Type</InputLabel>
-                  <Select
-                    labelId="asset-type-label"
-                    value={assetType}
-                    onChange={(e) => {
-                      setAssetType(e.target.value as 'NONE' | 'FOREX' | 'CRYPTO' | 'STOCKS');
-                      setSelectedSymbol(''); // Reset symbol when asset type changes
-                    }}
-                    label="Select Asset Type"
-                    sx={{
-                      color: 'white',
-                      '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)' },
-                      '.MuiSvgIcon-root': { color: 'white' },
-                    }}
-                  >
-                    <MenuItem value="NONE">NONE</MenuItem>
-                    <MenuItem value="FOREX">FOREX</MenuItem>
-                    <MenuItem value="CRYPTO">CRYPTO</MenuItem>
-                    <MenuItem value="STOCKS">STOCKS</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
+      {/* Modals - only rendered when needed */}
+      {showProfileForm && user?._id && (
+        <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 480, borderRadius: 4 }}>
+            <ProfileForm 
+              userId={user._id} 
+              currentProfile={dashboard ? { 
+                fullName: user.fullName, 
+                balance: dashboard.balance, 
+                totalDeposit: dashboard.totalDeposit, 
+                image: dashboard.image?.imageUrl 
+              } : null} 
+              onProfileUpdated={fetchDashboardData} 
+              onClose={() => setShowProfileForm(false)} 
+            />
+          </div>
+        </Modal>
+      )}
 
-              {assetType !== 'NONE' && (
-                <Grid item xs={12}>
-                  <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                    <InputLabel id="asset-symbol-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Select {assetType} Symbol</InputLabel>
-                    <Select
-                      labelId="asset-symbol-label"
-                      value={selectedSymbol}
-                      onChange={(e) => setSelectedSymbol(e.target.value as string)}
-                      label={`Select ${assetType} Symbol`}
-                      sx={{
-                        color: 'white',
-                        '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                        '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                        '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)' },
-                        '.MuiSvgIcon-root': { color: 'white' },
-                      }}
-                    >
-                      {getSymbolsForAssetType().map((symbol) => (
-                        <MenuItem key={symbol} value={symbol}>{symbol}</MenuItem>
-                      ))}
-                    </Select>
-                  </FormControl>
-                </Grid>
-              )}
+      {showDepositForm && user?._id && (
+        <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 480, borderRadius: 4 }}>
+            <DepositForm 
+              userId={user._id} 
+              onDepositSuccess={fetchDashboardData} 
+              onClose={() => setShowDepositForm(false)} 
+            />
+          </div>
+        </Modal>
+      )}
 
-              <Grid item xs={12}>
-                <TextField
-                  fullWidth
-                  label="Amount($)"
-                  variant="outlined"
-                  value={tradeAmount}
-                  onChange={(e) => setTradeAmount(e.target.value)}
-                  type="number"
-                  InputLabelProps={{ sx: { color: 'rgba(255,255,255,0.7)' } }}
-                  InputProps={{ sx: { color: 'white', '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' } } }}
-                  sx={{ mb: 2 }}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <FormControl fullWidth variant="outlined" sx={{ mb: 2 }}>
-                  <InputLabel id="trade-duration-label" sx={{ color: 'rgba(255,255,255,0.7)' }}>Duration (Seconds)</InputLabel>
-                  <Select
-                    labelId="trade-duration-label"
-                    value={tradeDuration}
-                    onChange={(e) => setTradeDuration(e.target.value as number)}
-                    label="Duration (Seconds)"
-                    sx={{
-                      color: 'white',
-                      '.MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.3)' },
-                      '&.Mui-focused .MuiOutlinedInput-notchedOutline': { borderColor: '#7dd3fc' },
-                      '&:hover .MuiOutlinedInput-notchedOutline': { borderColor: 'rgba(255,255,255,0.5)' },
-                      '.MuiSvgIcon-root': { color: 'white' },
-                    }}
-                  >
-                    <MenuItem value={30}>30 Seconds</MenuItem>
-                    <MenuItem value={40}>40 Seconds</MenuItem>
-                    <MenuItem value={50}>50 Seconds</MenuItem>
-                    <MenuItem value={60}>1 Minute</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12}>
-                <Button variant="contained" color="primary" fullWidth sx={{ py: 1.5, mb: 1 }} onClick={() => handleTrade('BUY')}>
-                  BUY
-                </Button>
-                <Button variant="contained" color="secondary" fullWidth sx={{ py: 1.5 }} onClick={() => handleTrade('SELL')}>
-                  SELL
-                </Button>
-              </Grid>
-            </Grid>
-          </Paper>
-        </Grid>
-
-        {/* Live Order History Section */}
-        <Grid item xs={12} lg={6}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Live Order History</Typography>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Trade ID</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Date</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Trade Duration</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Trade Asset</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Trade Amount</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Trade Value</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Profit</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Status</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {mockTradeHistory.length > 0 ? (
-                    mockTradeHistory.map((trade) => (
-                      <TableRow key={trade.tradeId}>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{trade.tradeId}</TableCell>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{trade.date}</TableCell>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{trade.tradeDuration}</TableCell>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{trade.tradeAsset}</TableCell>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>${trade.tradeAmount.toFixed(2)}</TableCell>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>${trade.tradeValue.toFixed(2)}</TableCell>
-                        <TableCell sx={{ color: trade.profit >= 0 ? '#4CAF50' : '#F44336', borderBottomColor: 'rgba(255,255,255,0.12)' }}>${trade.profit.toFixed(2)}</TableCell>
-                        <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{trade.status}</TableCell>
-                      </TableRow>
-                    ))
-                  ) : (
-                    <TableRow>
-                      <TableCell colSpan={8} sx={{ color: 'white', textAlign: 'center', borderBottom: 'none' }}>No record found</TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-
-        {/* Market Data Section */}
-        <Grid item xs={12}>
-          <Paper elevation={0} sx={{ p: 3, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
-            <Typography variant="h6" sx={{ fontWeight: 700, mb: 2 }}>Market Data</Typography>
-            <TableContainer>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Symbol</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Price</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>Change</TableCell>
-                    <TableCell sx={{ color: 'rgba(255,255,255,0.7)', borderBottomColor: 'rgba(255,255,255,0.12)' }}>% Change</TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {mockMarketData.map((item) => (
-                    <TableRow key={item.symbol}>
-                      <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{item.symbol}</TableCell>
-                      <TableCell sx={{ color: 'white', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{item.price.toFixed(2)}</TableCell>
-                      <TableCell sx={{ color: item.change >= 0 ? '#4CAF50' : '#F44336', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{item.change.toFixed(2)}</TableCell>
-                      <TableCell sx={{ color: item.changePercent >= 0 ? '#4CAF50' : '#F44336', borderBottomColor: 'rgba(255,255,255,0.12)' }}>{item.changePercent.toFixed(2)}%</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </Paper>
-        </Grid>
-      </Grid>
-
-      {/* Existing Modals */}
-      <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: { xs: '90%', sm: 480 }, borderRadius: 4 }}>
-          {user?._id && <ProfileForm userId={user._id} currentProfile={dashboard ? { fullName: user.fullName, balance: dashboard.balance, totalDeposit: dashboard.totalDeposit, image: dashboard.image?.imageUrl } : null} onProfileUpdated={fetchDashboardData} onClose={() => setShowProfileForm(false)} />}
-        </Box>
-      </Modal>
-
-      <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: { xs: '90%', sm: 480 }, borderRadius: 4 }}>
-          {user?._id && <DepositForm userId={user._id} onDepositSuccess={fetchDashboardData} onClose={() => setShowDepositForm(false)} />}
-        </Box>
-      </Modal>
-
-      <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
-        <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: { xs: '90%', sm: 480 }, borderRadius: 4 }}>
-          {user?._id && <WithdrawForm userId={user._id} onWithdrawSuccess={fetchDashboardData} onClose={() => setShowWithdrawForm(false)} />}
-        </Box>
-      </Modal>
-        </Container>
-      </Box>
-    </Box>
+      {showWithdrawForm && user?._id && (
+        <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
+          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 480, borderRadius: 4 }}>
+            <WithdrawForm 
+              userId={user._id} 
+              onWithdrawSuccess={fetchDashboardData} 
+              onClose={() => setShowWithdrawForm(false)} 
+            />
+          </div>
+        </Modal>
+      )}
+    </div>
   );
 };
 
