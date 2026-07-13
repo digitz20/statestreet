@@ -2,7 +2,7 @@ const transactionModel = require('../model/transaction');
 const userModel = require('../model/user');
 const dashboardModel = require('../model/dashboard')
 const sendEmail = require('../middlewares/nodemailer');
-// Cloudinary REMOVED from transactionController to prevent any API key errors
+const cloudinary = require('../config/cloudinary');
 const { depositConfirmationTemplate } = require('../utils/mailTemplates');
 
 /**
@@ -52,13 +52,16 @@ exports.createDeposit = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Cloudinary upload DISABLED to avoid API key errors - use dummy proof data
+        // Upload payment proof to Cloudinary - now works with fixed .env variables
         const paymentProofs = [];
         if (req.file) {
-            // Add dummy image data instead of uploading to Cloudinary (frontend sends single file)
+            const result = await cloudinary.uploader.upload(req.file.path, {
+                folder: 'receipts',
+                resource_type: 'image'
+            });
             paymentProofs.push({
-                imageUrl: 'https://via.placeholder.com/300',
-                publicId: 'dummy-id'
+                imageUrl: result.secure_url,
+                publicId: result.public_id
             });
         }
 

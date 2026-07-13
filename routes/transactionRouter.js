@@ -184,7 +184,7 @@ router.post('/transaction/:id', createTransaction);
  *         description: Error initiating deposit
  */
 
-// Match frontend's field name 'paymentProof' - was 'receipts' before
+// MATCH FRONTEND EXACTLY: frontend sends 'paymentProof', backend receives it
 const { createDeposit } = require('../controller/transactionController');
 router.post('/createDeposit/:id', upload.single('paymentProof'), createDeposit);
 
