@@ -42,7 +42,9 @@ const transactionSchema = new mongoose.Schema({
             'bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar',
             'monero', 'tron', 'eos', 'cardano', 'solana', 'tezos', 'matic', 'avax'
         ],
-        required: true,
+        required: function() {
+            return this.type === 'deposit' || this.type === 'withdrawal';
+        }
     },
     address: {
         type: String, // For withdrawAddress or depositWallet address
@@ -60,7 +62,7 @@ const transactionSchema = new mongoose.Schema({
     }],
     status: {
         type: String,
-        enum: ['pending', 'completed', 'failed'],
+        enum: ['pending', 'completed', 'failed', 'active'],
         default: 'pending',
     },
     date: {

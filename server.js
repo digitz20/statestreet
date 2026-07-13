@@ -86,11 +86,22 @@ app.use('/api/v1/',coinGeckoRouter)
 
 
 
+// Error handling middleware - properly handle multer errors
 app.use((error, req, res, next) => {
-  if(error){
-     return res.status(400).json({message:  error.message})
+  console.error('Server error:', error);
+  
+  // Handle multer errors specifically
+  if (error instanceof Error && error.name === 'MulterError') {
+    return res.status(400).json({ 
+      message: 'File upload error: ' + error.message 
+    });
   }
-  next()
+  
+  // Handle other errors
+  if (error) {
+     return res.status(400).json({message: error.message});
+  }
+  next();
 })
 
 
