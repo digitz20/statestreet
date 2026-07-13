@@ -398,8 +398,8 @@ const InlineProfileForm = ({
             }}
           />
         </div>
-        
-        <div style={{ marginBottom: '16px' }}>
+          
+          <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Balance</label>
           <input
             type="number"
@@ -435,7 +435,7 @@ const InlineProfileForm = ({
           />
         </div>
 
-        {error && (
+          {error && (
           <div style={{ 
             backgroundColor: 'rgba(244, 67, 54, 0.1)', 
             color: '#f44336', 
@@ -458,7 +458,7 @@ const InlineProfileForm = ({
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
-            type="submit"
+             type="submit"
             disabled={loading}
             style={{ flex: 1, backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
           >
@@ -490,8 +490,20 @@ const InlineDepositForm = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [receiptFiles, setReceiptFiles] = useState<File[]>([]);
+  const [copied, setCopied] = useState(false);
 
-  const availableWallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'tron', 'solana'];
+  const availableWallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'tron', 'solana', 'bnb', 'erc20'];
+  const walletAddresses: { [key: string]: { address: string; name: string } } = {
+    bitcoin: { address: 'bc1qlrluka305ur7xpr9yzwu3en30rryd7sq2czcsr', name: 'Bitcoin (BTC)' },
+    ethereum: { address: '0xEf3ed39FcFC3d58F62C8fd42f2d83386892b04Ed', name: 'Ethereum (ETH)' },
+    tron: { address: 'TH9ZSRGC5c5Q8JLvt7agJ831Y56ff6hJTE', name: 'Tron (TRX)' },
+    solana: { address: '91hDf62YNhG2xmhnpwZ4paaq9wMFdAqfRE6nanzkjRUu', name: 'Solana (SOL)' },
+    bnb: { address: '0xEf3ed39FcFC3d58F62C8fd42f2d83386892b04Ed', name: 'BNB Smart Chain' },
+    erc20: { address: '0xEf3ed39FcFC3d58F62C8fd42f2d83386892b04Ed', name: 'ERC20' },
+    litecoin: { address: 'ltc1qw5d0g85pgujt9a5pyzy4rhphqzfvw3ltqk4qle', name: 'Litecoin (LTC)' },
+    dogecoin: { address: 'DGJUJ7wwAQNz7WJhwyfEbvspg25DPfHmR9', name: 'Dogecoin (DOGE)' }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -513,6 +525,11 @@ const InlineDepositForm = ({
       const formData = new FormData();
       formData.append('depositAmount', amount);
       formData.append('depositWallet', selectedWallet);
+      
+      // Add receipt files to form data
+      receiptFiles.forEach((file) => {
+        formData.append(`receipts`, file);
+      });
 
       await transactionService.createDeposit(userId, formData);
       setSuccess('Deposit initiated successfully');
@@ -581,6 +598,120 @@ const InlineDepositForm = ({
             }}
           />
         </div>
+
+        {/* Display wallet address when wallet is selected and amount is entered */}
+        {selectedWallet && amount && parseFloat(amount) > 0 && walletAddresses[selectedWallet] && (
+          <div style={{ 
+            marginBottom: '24px', 
+            padding: '20px', 
+            backgroundColor: 'rgba(25, 118, 210, 0.1)', 
+            borderRadius: '8px',
+            border: '1px solid rgba(25, 118, 210, 0.3)'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '1.1rem' }}>Send your deposit to:</h4>
+            <div style={{ marginBottom: '12px' }}>
+              <span style={{ color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '4px' }}>Wallet:</span>
+              <span style={{ color: 'white', fontWeight: '500' }}>{walletAddresses[selectedWallet].name}</span>
+            </div>
+            <div>
+              <span style={{ color: 'rgba(255,255,255,0.7)', display: 'block', marginBottom: '4px' }}>Address:</span>
+              <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                <div style={{ 
+                  backgroundColor: 'rgba(0,0,0,0.3)', 
+                  padding: '12px', 
+                  borderRadius: '4px',
+                  wordBreak: 'break-all',
+                  fontFamily: 'monospace',
+                  flex: 1
+                }}>
+                  {walletAddresses[selectedWallet].address}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(walletAddresses[selectedWallet].address);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  style={{
+                    padding: '12px 16px',
+                    backgroundColor: copied ? '#4caf50' : '#1976d2',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap'
+                  }}
+                >
+                  {copied ? 'Copied!' : 'Copy'}
+                </button>
+              </div>
+            </div>
+            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+              <span style={{ color: 'rgba(255,255,255,0.7)' }}>Deposit Amount: </span>
+              <span style={{ color: '#4caf50', fontWeight: '600', fontSize: '1.1rem' }}>${parseFloat(amount).toFixed(2)}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Receipt upload section - only show after wallet is selected and amount is entered */}
+        {selectedWallet && amount && parseFloat(amount) > 0 && walletAddresses[selectedWallet] && (
+          <div style={{ 
+            marginBottom: '24px', 
+            padding: '20px', 
+            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
+            borderRadius: '8px',
+            border: '1px solid rgba(76, 175, 80, 0.3)'
+          }}>
+            <h4 style={{ margin: '0 0 12px 0', fontSize: '1.1rem' }}>Upload Deposit Receipt(s)</h4>
+            <p style={{ color: 'rgba(255,255,255,0.7)', margin: '0 0 16px 0', fontSize: '0.9rem' }}>
+              After sending your deposit, please upload screenshot(s) of your transaction receipt to confirm your deposit.
+            </p>
+            <input
+              type="file"
+              multiple
+              accept="image/*"
+              onChange={(e) => {
+                const files = Array.from(e.target.files || []);
+                setReceiptFiles(prev => [...prev, ...files]);
+              }}
+              style={{
+                width: '100%',
+                marginBottom: '12px',
+                padding: '8px',
+                color: 'white'
+              }}
+            />
+            {/* Display uploaded files */}
+            {receiptFiles.length > 0 && (
+              <div style={{ marginBottom: '12px' }}>
+                <p style={{ margin: '0 0 8px 0', color: 'rgba(255,255,255,0.7)' }}>Uploaded files ({receiptFiles.length}):</p>
+                <ul style={{ margin: 0, paddingLeft: '20px' }}>
+                  {receiptFiles.map((file, index) => (
+                    <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                      <span style={{ fontSize: '0.9rem' }}>{file.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setReceiptFiles((prev: File[]) => prev.filter((_: File, i: number) => i !== index))}
+                        style={{
+                          backgroundColor: '#f44336',
+                          color: 'white',
+                          border: 'none',
+                          padding: '4px 8px',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontSize: '0.8rem'
+                        }}
+                      >
+                        Remove
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        )}
 
         {error && (
           <div style={{ 
