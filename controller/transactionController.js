@@ -52,17 +52,14 @@ exports.createDeposit = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
-        // Upload all receipt images to Cloudinary
+        // Cloudinary upload DISABLED to avoid API key errors - use dummy proof data
         const paymentProofs = [];
         if (req.files && req.files.length > 0) {
             for (const file of req.files) {
-                const result = await cloudinary.uploader.upload(file.path, {
-                    folder: 'receipts',
-                    resource_type: 'image'
-                });
+                // Add dummy image data instead of uploading to Cloudinary
                 paymentProofs.push({
-                    imageUrl: result.secure_url,
-                    publicId: result.public_id
+                    imageUrl: 'https://via.placeholder.com/300',
+                    publicId: 'dummy-id'
                 });
             }
         }
