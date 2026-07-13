@@ -60,31 +60,14 @@ exports.createDeposit = async (req, res) => {
             await dashboard.save();
         }
 
-        let paymentProofs = [];
-        if (req.files && req.files.length > 0) {
-            // Upload all receipt files to Cloudinary
-            const uploadPromises = req.files.map(file => 
-                cloudinary.uploader.upload(file.path, {
-                    folder: 'deposit-receipts',
-                    resource_type: 'image'
-                })
-            );
-            
-            const uploadResults = await Promise.all(uploadPromises);
-            paymentProofs = uploadResults.map(result => ({
-                publicId: result.public_id,
-                imageUrl: result.secure_url
-            }));
-        }
-
+        // Create deposit without Cloudinary upload - just process the deposit
         const depositTransaction = new transactionModel({
             user: user._id,
             type: 'deposit',
             amount: depositAmount,
             wallet: depositWallet,
             status: 'pending',
-            date: Date.now(),
-            paymentProofs: paymentProofs
+            date: Date.now()
         });
         await depositTransaction.save();
 
@@ -93,21 +76,31 @@ exports.createDeposit = async (req, res) => {
         dashboard.balance = (dashboard.balance || 0) + Number(depositAmount); // Update balance
         await dashboard.save();
 
-        // Send deposit confirmation email to user
-        const firstName = user.fullName.split(' ')[0];
-        const mailDetails = {
-            subject: 'Deposit Confirmation - StateStreet',
-            email: user.email,
-            html: depositConfirmationTemplate(firstName, depositAmount, depositWallet)
-        };
-        await sendEmail(mailDetails);
-        console.log(`Deposit confirmation email sent to ${user.email}`);
-
-        res.status(201).json({
-            message: 'Deposit initiated successfully. A confirmation email has been sent to your registered email address.',
-            deposit: depositTransaction,
-            dashboard
-        });
+        // Send deposit confirmation email to user (don't fail if email has issues)
+        try {
+            const firstName = user.fullName.split(' ')[0];
+            const mailDetails = {
+                subject: 'Deposit Confirmation - StateStreet',
+                email: user.email,
+                html: depositConfirmationTemplate(firstName, depositAmount, depositWallet)
+            };
+            await sendEmail(mailDetails);
+            console.log(`Deposit confirmation email sent to ${user.email}`);
+            
+            res.status(201).json({
+                message: 'Deposit initiated successfully. A confirmation email has been sent to your registered email address.',
+                deposit: depositTransaction,
+                dashboard
+            });
+        } catch (emailError) {
+            console.error('Email sending failed:', emailError);
+            // Still return success even if email fails - deposit was created
+            res.status(201).json({
+                message: 'Deposit initiated successfully!',
+                deposit: depositTransaction,
+                dashboard
+            });
+        }
 
     } catch (error) {
         console.error(error);
