@@ -1,11 +1,17 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Alert, Box, CircularProgress, Typography, Grid, Paper, Button, FormControl, InputLabel, Select, MenuItem, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Modal
+  Alert, Box, CircularProgress, Typography, Grid, Paper, Button, FormControl, InputLabel, Select, MenuItem, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Modal,
+  Drawer, AppBar, Toolbar, IconButton, List, ListItem, ListItemIcon, ListItemText, Container
 } from '@mui/material';
+import MenuIcon from '@mui/icons-material/Menu';
+import DashboardIcon from '@mui/icons-material/Dashboard';
+import TrendingUpIcon from '@mui/icons-material/TrendingUp';
+import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import PersonIcon from '@mui/icons-material/Person';
+import LogoutIcon from '@mui/icons-material/Logout';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
-import DashboardShell from '../components/DashboardShell';
 import ProfileForm from '../components/ProfileForm';
 import DepositForm from '../components/DepositForm';
 import WithdrawForm from '../components/WithdrawForm';
@@ -132,9 +138,79 @@ const DashboardPage: React.FC = () => {
     );
   }
 
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const drawerWidth = 240;
+
+  const handleLogout = async () => {
+    await authService.logout();
+    navigate('/login');
+  };
+
+  const menuItems = [
+    { text: 'Dashboard', icon: <DashboardIcon />, path: '/dashboard' },
+    { text: 'Trade', icon: <TrendingUpIcon />, path: '/dashboard/trade' },
+    { text: 'Wallet', icon: <AccountBalanceWalletIcon />, path: '/dashboard/wallet' },
+    { text: 'Profile', icon: <PersonIcon />, path: '/dashboard/profile' },
+  ];
+
+  const drawer = (
+    <div>
+      <Toolbar />
+      <List>
+        {menuItems.map((item) => (
+          <ListItem key={item.text} onClick={() => navigate(item.path)} sx={{ cursor: 'pointer' }}>
+            <ListItemIcon sx={{ color: 'white' }}>{item.icon}</ListItemIcon>
+            <ListItemText primary={item.text} sx={{ color: 'white' }} />
+          </ListItem>
+        ))}
+        <ListItem onClick={handleLogout} sx={{ cursor: 'pointer', mt: 2 }}>
+          <ListItemIcon sx={{ color: 'white' }}><LogoutIcon /></ListItemIcon>
+          <ListItemText primary="Logout" sx={{ color: 'white' }} />
+        </ListItem>
+      </List>
+    </div>
+  );
+
   return (
-    <DashboardShell title="Dashboard overview" subtitle="Manage your investments and trades" userName={user?.fullName || user?.username} userEmail={user?.email}>
-      <Grid container spacing={3}>
+    <Box sx={{ display: 'flex', minHeight: '100vh', bgcolor: '#0a1929' }}>
+      <AppBar position="fixed" sx={{ width: { sm: `calc(100% - ${drawerWidth}px)` }, ml: { sm: `${drawerWidth}px` }, bgcolor: 'rgba(8, 15, 34, 0.95)' }}>
+        <Toolbar>
+          <IconButton color="inherit" aria-label="open drawer" edge="start" onClick={() => setMobileOpen(!mobileOpen)} sx={{ mr: 2, display: { sm: 'none' } }}>
+            <MenuIcon />
+          </IconButton>
+          <Typography variant="h6" sx={{ flexGrow: 1 }}>Dashboard overview</Typography>
+          <Typography variant="body2">{user?.fullName || user?.username} • {user?.email}</Typography>
+        </Toolbar>
+      </AppBar>
+      <Drawer
+        variant="temporary"
+        open={mobileOpen}
+        onClose={() => setMobileOpen(false)}
+        ModalProps={{ keepMounted: true }}
+        sx={{
+          display: { xs: 'block', sm: 'none' },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' },
+        }}
+      >
+        {drawer}
+      </Drawer>
+      <Drawer
+        variant="permanent"
+        sx={{
+          display: { xs: 'none', sm: 'block' },
+          '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' },
+        }}
+        open
+      >
+        {drawer}
+      </Drawer>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, mt: '64px' }}>
+        <Container maxWidth="xl" sx={{ py: 4 }}>
+          <Box sx={{ mb: 3 }}>
+            <Typography variant="h4" sx={{ fontWeight: 700, color: 'white' }}>Dashboard overview</Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.72)' }}>{user?.fullName || user?.username} • {user?.email || ''}</Typography>
+          </Box>
+          <Grid container spacing={3}>
         {/* Top Section: Account Info */}
         <Grid item xs={12}>
           <Paper elevation={0} sx={{ p: 3, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
@@ -372,7 +448,9 @@ const DashboardPage: React.FC = () => {
           {user?._id && <WithdrawForm userId={user._id} onWithdrawSuccess={fetchDashboardData} onClose={() => setShowWithdrawForm(false)} />}
         </Box>
       </Modal>
-    </DashboardShell>
+        </Container>
+      </Box>
+    </Box>
   );
 };
 
