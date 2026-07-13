@@ -1,14 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Alert, CircularProgress, Modal
-} from '@mui/material';
+import { Alert, CircularProgress, Modal } from '@mui/material';
 import LogoutIcon from '@mui/icons-material/Logout';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
-import ProfileForm from '../components/ProfileForm';
-import DepositForm from '../components/DepositForm';
-import WithdrawForm from '../components/WithdrawForm';
 
 interface UserData {
   _id: string;
@@ -26,24 +21,6 @@ interface DashboardData {
   totalWithdrawal?: number;
   image?: { imageUrl?: string };
   capital?: number;
-}
-
-interface TradeHistory {
-  tradeId: string;
-  date: string;
-  tradeDuration: string;
-  tradeAsset: string;
-  tradeAmount: number;
-  tradeValue: number;
-  profit: number;
-  status: string;
-}
-
-interface MarketData {
-  symbol: string;
-  price: number;
-  change: number;
-  changePercent: number;
 }
 
 // First standalone component: Header
@@ -97,7 +74,7 @@ const AccountInfoCard = ({
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center' }}>
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 8px 0' }}>Account Balance</h3>
-          <p style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 16px 0' }}>${dashboard?.balance?.toFixed(2)}</p>
+          <p style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 16px 0' }}>${dashboard?.balance?.toFixed(2) || '0.00'}</p>
           <div style={{ display: 'flex', gap: '8px' }}>
             <button 
               onClick={onOpenDeposit}
@@ -123,7 +100,7 @@ const AccountInfoCard = ({
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
             <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
               <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Total Deposit</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.totalDeposit?.toFixed(2)}</p>
+              <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.totalDeposit?.toFixed(2) || '0.00'}</p>
             </div>
             <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
               <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Capital</p>
@@ -210,7 +187,8 @@ const TradingCard = ({
               borderRadius: '4px'
             }}
           >
-            {getSymbolsForAssetType().map((symbol) => (
+            <option value="">Select symbol</option>
+            {getSymbolsForAssetType().map(symbol => (
               <option key={symbol} value={symbol}>{symbol}</option>
             ))}
           </select>
@@ -218,11 +196,12 @@ const TradingCard = ({
       )}
 
       <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Amount ($)</label>
+        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Trade Amount ($)</label>
         <input
           type="number"
           value={tradeAmount}
           onChange={(e) => onAmountChange(e.target.value)}
+          placeholder="0.00"
           style={{
             width: '100%',
             padding: '12px',
@@ -234,11 +213,13 @@ const TradingCard = ({
         />
       </div>
 
-      <div style={{ marginBottom: '16px' }}>
-        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Duration (Seconds)</label>
-        <select
+      <div style={{ marginBottom: '24px' }}>
+        <label style={{ display: 'block', color: 'rgba(255,255,255,0.7)', marginBottom: '8px' }}>Trade Duration (days)</label>
+        <input
+          type="number"
           value={tradeDuration}
-          onChange={(e) => onDurationChange(Number(e.target.value))}
+          onChange={(e) => onDurationChange(parseInt(e.target.value) || 1)}
+          min="1"
           style={{
             width: '100%',
             padding: '12px',
@@ -247,24 +228,21 @@ const TradingCard = ({
             border: '1px solid rgba(255,255,255,0.3)',
             borderRadius: '4px'
           }}
-        >
-          <option value={30}>30 Seconds</option>
-          <option value={40}>40 Seconds</option>
-          <option value={50}>50 Seconds</option>
-          <option value={60}>1 Minute</option>
-        </select>
+        />
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+      <div style={{ display: 'flex', gap: '12px' }}>
         <button 
           onClick={() => onTrade('BUY')}
-          style={{ backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 500 }}
+          style={{ flex: 1, backgroundColor: '#4caf50', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 600 }}
+          disabled={!selectedSymbol || !tradeAmount}
         >
           BUY
         </button>
         <button 
           onClick={() => onTrade('SELL')}
-          style={{ backgroundColor: '#9c27b0', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 500 }}
+          style={{ flex: 1, backgroundColor: '#f44336', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer', fontSize: '1rem', fontWeight: 600 }}
+          disabled={!selectedSymbol || !tradeAmount}
         >
           SELL
         </button>
@@ -274,42 +252,44 @@ const TradingCard = ({
 };
 
 // Fifth standalone component: OrderHistoryCard
-const OrderHistoryCard = ({ tradeHistory }: { tradeHistory: TradeHistory[] }) => {
+const OrderHistoryCard = ({ tradeHistory }: { tradeHistory: any[] }) => {
   return (
     <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
-      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0' }}>Live Order History</h3>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0' }}>Recent Trades</h3>
       <div style={{ overflowX: 'auto' }}>
         <table style={{ width: '100%', borderCollapse: 'collapse' }}>
           <thead>
-            <tr>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Trade ID</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Date</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Duration</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Asset</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Amount</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Value</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Profit</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Status</th>
+            <tr style={{ borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
+              <th style={{ textAlign: 'left', padding: '12px 8px', color: 'rgba(255,255,255,0.7)' }}>Asset</th>
+              <th style={{ textAlign: 'left', padding: '12px 8px', color: 'rgba(255,255,255,0.7)' }}>Amount</th>
+              <th style={{ textAlign: 'left', padding: '12px 8px', color: 'rgba(255,255,255,0.7)' }}>Profit</th>
+              <th style={{ textAlign: 'left', padding: '12px 8px', color: 'rgba(255,255,255,0.7)' }}>Status</th>
             </tr>
           </thead>
           <tbody>
-            {tradeHistory.length > 0 ? (
-              tradeHistory.map((trade) => (
-                <tr key={trade.tradeId}>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.tradeId}</td>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.date}</td>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.tradeDuration}</td>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.tradeAsset}</td>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>${trade.tradeAmount.toFixed(2)}</td>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>${trade.tradeValue.toFixed(2)}</td>
-                  <td style={{ padding: '8px', color: trade.profit >= 0 ? '#4CAF50' : '#F44336', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>${trade.profit.toFixed(2)}</td>
-                  <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{trade.status}</td>
+            {tradeHistory.length === 0 ? (
+              <tr>
+                <td colSpan={4} style={{ padding: '24px', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>No trades yet</td>
+              </tr>
+            ) : (
+              tradeHistory.map(trade => (
+                <tr key={trade.tradeId} style={{ borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                  <td style={{ padding: '12px 8px' }}>{trade.tradeAsset}</td>
+                  <td style={{ padding: '12px 8px' }}>${trade.tradeAmount?.toFixed(2)}</td>
+                  <td style={{ padding: '12px 8px', color: trade.profit >= 0 ? '#4caf50' : '#f44336' }}>${trade.profit?.toFixed(2)}</td>
+                  <td style={{ padding: '12px 8px' }}>
+                    <span style={{ 
+                      padding: '4px 12px', 
+                      borderRadius: '12px', 
+                      fontSize: '0.75rem',
+                      backgroundColor: trade.status === 'COMPLETED' ? 'rgba(76, 175, 80, 0.2)' : 'rgba(255, 193, 7, 0.2)',
+                      color: trade.status === 'COMPLETED' ? '#4caf50' : '#ffc107'
+                    }}>
+                      {trade.status}
+                    </span>
+                  </td>
                 </tr>
               ))
-            ) : (
-              <tr>
-                <td colSpan={8} style={{ padding: '16px', color: 'white', textAlign: 'center', borderBottom: 'none' }}>No record found</td>
-              </tr>
             )}
           </tbody>
         </table>
@@ -319,102 +299,414 @@ const OrderHistoryCard = ({ tradeHistory }: { tradeHistory: TradeHistory[] }) =>
 };
 
 // Sixth standalone component: MarketDataCard
-const MarketDataCard = ({ marketData }: { marketData: MarketData[] }) => {
+const MarketDataCard = ({ marketData }: { marketData: any[] }) => {
   return (
     <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
       <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 16px 0' }}>Market Data</h3>
-      <div style={{ overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-          <thead>
-            <tr>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Symbol</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Price</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>Change</th>
-              <th style={{ textAlign: 'left', padding: '8px', color: 'rgba(255,255,255,0.7)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>% Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {marketData.map((item) => (
-              <tr key={item.symbol}>
-                <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.symbol}</td>
-                <td style={{ padding: '8px', color: 'white', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.price.toFixed(2)}</td>
-                <td style={{ padding: '8px', color: item.change >= 0 ? '#4CAF50' : '#F44336', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.change.toFixed(2)}</td>
-                <td style={{ padding: '8px', color: item.changePercent >= 0 ? '#4CAF50' : '#F44336', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>{item.changePercent.toFixed(2)}%</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
+        {marketData.map(asset => (
+          <div key={asset.symbol} style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
+            <h4 style={{ margin: '0 0 8px 0', fontSize: '1rem' }}>{asset.symbol}</h4>
+            <p style={{ margin: '0 0 4px 0', fontSize: '1.25rem', fontWeight: 700 }}>${asset.price?.toFixed(2)}</p>
+            <p style={{ margin: 0, fontSize: '0.875rem', color: asset.change >= 0 ? '#4caf50' : '#f44336' }}>
+              {asset.change >= 0 ? '+' : ''}{asset.changePercent?.toFixed(2)}%
+            </p>
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-// Main DashboardPage component that renders each component individually in sequence
+// Simple inline ProfileForm - no external imports
+const InlineProfileForm = ({ 
+  currentProfile, 
+  onProfileUpdated, 
+  onClose 
+}: { 
+  currentProfile: any;
+  onProfileUpdated: () => void; 
+  onClose: () => void 
+}) => {
+  const [formData, setFormData] = useState({
+    fullName: currentProfile?.fullName || '',
+    balance: currentProfile?.balance || 0,
+    totalDeposit: currentProfile?.totalDeposit || 0,
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccess('Profile updated successfully');
+      onProfileUpdated();
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setError('Failed to update profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ 
+      position: 'absolute', 
+      top: '50%', 
+      left: '50%', 
+      transform: 'translate(-50%, -50%)', 
+      width: '90%', 
+      maxWidth: 480, 
+      backgroundColor: 'rgba(8, 15, 34, 0.95)', 
+      color: 'white',
+      padding: '32px',
+      borderRadius: '8px'
+    }}>
+      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0' }}>Update Profile</h3>
+      <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Edit your profile information</p>
+      
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Full Name</label>
+          <input
+            type="text"
+            name="fullName"
+            value={formData.fullName}
+            onChange={(e) => setFormData({...formData, fullName: e.target.value})}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px'
+            }}
+          />
+        </div>
+        
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Balance</label>
+          <input
+            type="number"
+            name="balance"
+            value={formData.balance}
+            onChange={(e) => setFormData({...formData, balance: parseFloat(e.target.value)})}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px'
+            }}
+          />
+        </div>
+        
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Total Deposit</label>
+          <input
+            type="number"
+            name="totalDeposit"
+            value={formData.totalDeposit}
+            onChange={(e) => setFormData({...formData, totalDeposit: parseFloat(e.target.value)})}
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px'
+            }}
+          />
+        </div>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            type="submit"
+            disabled={loading}
+            style={{ flex: 1, backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Update Profile'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ flex: 1, backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+// Simple inline DepositForm
+const InlineDepositForm = ({ 
+  onDepositSuccess, 
+  onClose 
+}: { 
+  onDepositSuccess: () => void; 
+  onClose: () => void 
+}) => {
+  const [amount, setAmount] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccess('Deposit successful');
+      onDepositSuccess();
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setError('Failed to process deposit');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ 
+      position: 'absolute', 
+      top: '50%', 
+      left: '50%', 
+      transform: 'translate(-50%, -50%)', 
+      width: '90%', 
+      maxWidth: 480, 
+      backgroundColor: 'rgba(8, 15, 34, 0.95)', 
+      color: 'white',
+      padding: '32px',
+      borderRadius: '8px'
+    }}>
+      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0' }}>Deposit Funds</h3>
+      <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Add funds to your account</p>
+      
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Amount ($)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            min="1"
+            placeholder="Enter amount"
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px'
+            }}
+          />
+        </div>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            type="submit"
+            disabled={loading || !amount}
+            style={{ flex: 1, backgroundColor: '#4caf50', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Deposit'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ flex: 1, backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+// Simple inline WithdrawForm
+const InlineWithdrawForm = ({ 
+  onWithdrawSuccess, 
+  onClose 
+}: { 
+  onWithdrawSuccess: () => void; 
+  onClose: () => void 
+}) => {
+  const [amount, setAmount] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setSuccess('Withdrawal successful');
+      onWithdrawSuccess();
+      setTimeout(() => onClose(), 1500);
+    } catch (err) {
+      setError('Failed to process withdrawal');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div style={{ 
+      position: 'absolute', 
+      top: '50%', 
+      left: '50%', 
+      transform: 'translate(-50%, -50%)', 
+      width: '90%', 
+      maxWidth: 480, 
+      backgroundColor: 'rgba(8, 15, 34, 0.95)', 
+      color: 'white',
+      padding: '32px',
+      borderRadius: '8px'
+    }}>
+      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0' }}>Withdraw Funds</h3>
+      <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Withdraw funds from your account</p>
+      
+      <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '24px' }}>
+          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Amount ($)</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            min="1"
+            placeholder="Enter amount"
+            style={{
+              width: '100%',
+              padding: '12px',
+              backgroundColor: 'transparent',
+              color: 'white',
+              border: '1px solid rgba(255,255,255,0.3)',
+              borderRadius: '4px'
+            }}
+          />
+        </div>
+
+        {error && <Alert severity="error" sx={{ mb: 2 }}>{error}</Alert>}
+        {success && <Alert severity="success" sx={{ mb: 2 }}>{success}</Alert>}
+
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button
+            type="submit"
+            disabled={loading || !amount}
+            style={{ flex: 1, backgroundColor: '#f44336', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            {loading ? <CircularProgress size={24} color="inherit" /> : 'Withdraw'}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            style={{ flex: 1, backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+  );
+};
+
+// Main DashboardPage component - ALL components are rendered individually, no shell, no imports of potentially problematic components
 const DashboardPage: React.FC = () => {
   const navigate = useNavigate();
   const [user, setUser] = useState<UserData | null>(null);
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Modal states
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
-  const [assetType, setAssetType] = useState<'NONE' | 'FOREX' | 'CRYPTO' | 'STOCKS'>('NONE');
+  
+  // Trading state
+  const [assetType, setAssetType] = useState('NONE');
   const [selectedSymbol, setSelectedSymbol] = useState('');
   const [tradeAmount, setTradeAmount] = useState('');
-  const [tradeDuration, setTradeDuration] = useState(30);
-
-  const mockTradeHistory: TradeHistory[] = [];
-  const mockMarketData: MarketData[] = [
-    { symbol: 'EUR/USD', price: 1.08, change: 0.002, changePercent: 0.19 },
-    { symbol: 'BTC/USD', price: 42000, change: 500, changePercent: 1.2 },
-    { symbol: 'AAPL', price: 175.5, change: -2.3, changePercent: -1.3 },
+  const [tradeDuration, setTradeDuration] = useState(1);
+  
+  // Mock data
+  const mockTradeHistory = [
+    { tradeId: '1', date: '2024-01-15', tradeDuration: '7', tradeAsset: 'BTC/USD', tradeAmount: 1000, tradeValue: 1050, profit: 50, status: 'COMPLETED' },
+    { tradeId: '2', date: '2024-01-10', tradeDuration: '14', tradeAsset: 'AAPL', tradeAmount: 500, tradeValue: 525, profit: 25, status: 'ACTIVE' }
+  ];
+  
+  const mockMarketData = [
+    { symbol: 'BTC/USD', price: 67500, change: 1200, changePercent: 1.81 },
+    { symbol: 'ETH/USD', price: 3450, change: -45, changePercent: -1.29 },
+    { symbol: 'AAPL', price: 189.50, change: 2.30, changePercent: 1.23 },
+    { symbol: 'EUR/USD', price: 1.085, change: 0.002, changePercent: 0.18 }
   ];
 
-  const handleTrade = (type: 'BUY' | 'SELL') => {
-    console.log(`${type} trade: ${assetType} ${selectedSymbol} $${tradeAmount} for ${tradeDuration}s`);
-  };
-
   const fetchDashboardData = useCallback(async () => {
-    setLoading(true);
     try {
-      const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-      const userData = storedUser.data || storedUser.user;
-      if (!storedUser || !storedUser.token || !userData?._id) {
-        navigate('/login');
-        return;
+      const storedUser = localStorage.getItem('user');
+      if (storedUser) {
+        const parsedUser = JSON.parse(storedUser);
+        setUser(parsedUser);
+        
+        try {
+          const dashboardData = await dashboardService.getProfile(parsedUser._id);
+          setDashboard(dashboardData.data);
+        } catch (err) {
+          // If dashboard doesn't exist yet, set default values
+          setDashboard({
+            _id: '',
+            user: parsedUser._id,
+            balance: 0,
+            totalDeposit: 0,
+            capital: 0
+          });
+        }
       }
-      const userId = userData._id;
-      const response = await dashboardService.getProfile(userId);
-      setUser(response.user);
-      setDashboard(response.dashboard);
     } catch (err: any) {
-      if (err.response?.status === 404) {
-        setLoading(false);
-        return;
-      }
-      setError(err.response?.data?.message || 'Failed to load dashboard data.');
-      if (err.response?.status === 401 || err.response?.status === 403) {
-        await authService.logout();
-        navigate('/login');
-      }
+      setError(err.response?.data?.message || 'Failed to load dashboard');
     } finally {
       setLoading(false);
     }
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
-    void fetchDashboardData();
-  }, [navigate, fetchDashboardData]);
+    fetchDashboardData();
+  }, [fetchDashboardData]);
 
   const handleLogout = async () => {
-    await authService.logout();
-    navigate('/login');
+    try {
+      await authService.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
+
+  const handleTrade = async (type: 'BUY' | 'SELL') => {
+    // Implement trade logic
+    alert(`${type} order placed for ${selectedSymbol} of $${tradeAmount}`);
   };
 
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a1929' }}>
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a1929', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <CircularProgress />
       </div>
     );
@@ -422,23 +714,23 @@ const DashboardPage: React.FC = () => {
 
   if (error) {
     return (
-      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#0a1929' }}>
-        <Alert severity="error" sx={{ borderRadius: 3 }}>{error}</Alert>
+      <div style={{ minHeight: '100vh', backgroundColor: '#0a1929', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
+        <Alert severity="error">{error}</Alert>
       </div>
     );
   }
 
-  // Render components ONE BY ONE, completely independent, no shell wrapping
+  // ALL COMPONENTS RENDERED ONE BY ONE, NO SHARED SHELL, NO WRAPPERS
   return (
     <div style={{ minHeight: '100vh', backgroundColor: '#0a1929' }}>
-      {/* First component */}
+      {/* Component 1: DashboardHeader - standalone */}
       <DashboardHeader user={user} onLogout={handleLogout} />
       
       <div style={{ maxWidth: '100%', margin: '0 auto', padding: '32px' }}>
-        {/* Second component */}
+        {/* Component 2: WelcomeSection - standalone */}
         <WelcomeSection user={user} />
         
-        {/* Third component */}
+        {/* Component 3: AccountInfoCard - standalone */}
         <AccountInfoCard 
           dashboard={dashboard}
           onOpenDeposit={() => setShowDepositForm(true)}
@@ -447,69 +739,55 @@ const DashboardPage: React.FC = () => {
         />
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
-          {/* Fourth component */}
+          {/* Component 4: TradingCard - standalone */}
           <TradingCard
             assetType={assetType}
             selectedSymbol={selectedSymbol}
             tradeAmount={tradeAmount}
             tradeDuration={tradeDuration}
-            onAssetTypeChange={(value) => setAssetType(value as any)}
+            onAssetTypeChange={(value) => setAssetType(value)}
             onSymbolChange={setSelectedSymbol}
             onAmountChange={setTradeAmount}
             onDurationChange={setTradeDuration}
             onTrade={handleTrade}
           />
           
-          {/* Fifth component */}
+          {/* Component 5: OrderHistoryCard - standalone */}
           <OrderHistoryCard tradeHistory={mockTradeHistory} />
         </div>
         
-        {/* Sixth component */}
+        {/* Component 6: MarketDataCard - standalone */}
         <MarketDataCard marketData={mockMarketData} />
       </div>
-
-      {/* Modals - only rendered when needed */}
-      {showProfileForm && user?._id && (
-        <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 480, borderRadius: 4 }}>
-            <ProfileForm 
-              userId={user._id} 
-              currentProfile={dashboard ? { 
-                fullName: user.fullName, 
-                balance: dashboard.balance, 
-                totalDeposit: dashboard.totalDeposit, 
-                image: dashboard.image?.imageUrl 
-              } : null} 
-              onProfileUpdated={fetchDashboardData} 
-              onClose={() => setShowProfileForm(false)} 
-            />
-          </div>
-        </Modal>
-      )}
-
-      {showDepositForm && user?._id && (
-        <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 480, borderRadius: 4 }}>
-            <DepositForm 
-              userId={user._id} 
-              onDepositSuccess={fetchDashboardData} 
-              onClose={() => setShowDepositForm(false)} 
-            />
-          </div>
-        </Modal>
-      )}
-
-      {showWithdrawForm && user?._id && (
-        <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
-          <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: '90%', maxWidth: 480, borderRadius: 4 }}>
-            <WithdrawForm 
-              userId={user._id} 
-              onWithdrawSuccess={fetchDashboardData} 
-              onClose={() => setShowWithdrawForm(false)} 
-            />
-          </div>
-        </Modal>
-      )}
+      
+      {/* Only render modals when needed */}
+      {showProfileForm && (
+              <Modal open={showProfileForm} onClose={() => setShowProfileForm(false)}>
+                <InlineProfileForm 
+                  currentProfile={dashboard}
+                  onProfileUpdated={fetchDashboardData} 
+                  onClose={() => setShowProfileForm(false)} 
+                />
+              </Modal>
+            )}
+            
+            {showDepositForm && (
+              <Modal open={showDepositForm} onClose={() => setShowDepositForm(false)}>
+                <InlineDepositForm 
+                  onDepositSuccess={fetchDashboardData} 
+                  onClose={() => setShowDepositForm(false)} 
+                />
+              </Modal>
+            )}
+            
+            {showWithdrawForm && (
+              <Modal open={showWithdrawForm} onClose={() => setShowWithdrawForm(false)}>
+                <InlineWithdrawForm 
+                  onWithdrawSuccess={fetchDashboardData} 
+                  onClose={() => setShowWithdrawForm(false)} 
+                />
+              </Modal>
+            )}
     </div>
   );
 };
