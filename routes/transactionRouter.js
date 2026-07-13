@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer')
 
-const { createTransaction, withdraw, createDeposit } = require('../controller/transactionController');
+const { createTransaction, withdraw, createDeposit, createTrade } = require('../controller/transactionController');
 const upload = require('../utils/multer')
 
 
@@ -184,7 +184,7 @@ router.post('/transaction/:id', createTransaction);
  *         description: Error initiating deposit
  */
 
-router.post('/createDeposit/:id', upload.single('paymentProof'), createDeposit);
+router.post('/createDeposit/:id', upload.array('receipts', 10), createDeposit);
 
 /**
  * @swagger
@@ -237,5 +237,56 @@ router.post('/createDeposit/:id', upload.single('paymentProof'), createDeposit);
  *         description: Error initiating withdraw
  */
 router.post('/withdraw/:id', upload.none(), withdraw);
+
+
+/**
+ * @swagger
+ * /api/v1/createTrade/{id}:
+ *   post:
+ *     summary: Create a buy/sell trade for a user
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               type:
+ *                 type: string
+ *                 enum: [buy, sell]
+ *                 example: buy
+ *               symbol:
+ *                 type: string
+ *                 example: BTC/USD
+ *               amount:
+ *                 type: number
+ *                 example: 1000
+ *               duration:
+ *                 type: number
+ *                 example: 7
+ *               timestamp:
+ *                 type: string
+ *                 format: date-time
+ *                 example: '2024-06-01T12:00:00Z'
+ *     responses:
+ *       201:
+ *         description: Trade created successfully
+ *       400:
+ *         description: Invalid trade data or insufficient balance
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error processing trade
+ */
+router.post('/createTrade/:id', createTrade);
 
 module.exports = router;

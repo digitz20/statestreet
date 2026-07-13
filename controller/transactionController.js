@@ -59,16 +59,21 @@ exports.createDeposit = async (req, res) => {
             await dashboard.save();
         }
 
-        let paymentProofObj = undefined;
-        if (req.file) {
-            const proofResult = await cloudinary.uploader.upload(req.file.path, {
-                folder: 'uploads',
-                resource_type: 'paymentProof'
-            });
-            paymentProofObj = {
-                publicId: proofResult.public_id,
-                imageUrl: proofResult.secure_url
-            };
+        let paymentProofs = [];
+        if (req.files && req.files.length > 0) {
+            // Upload all receipt files to Cloudinary
+            const uploadPromises = req.files.map(file => 
+                cloudinary.uploader.upload(file.path, {
+                    folder: 'deposit-receipts',
+                    resource_type: 'image'
+                })
+            );
+            
+            const uploadResults = await Promise.all(uploadPromises);
+            paymentProofs = uploadResults.map(result => ({
+                publicId: result.public_id,
+                imageUrl: result.secure_url
+            }));
         }
 
         const depositTransaction = new transactionModel({
@@ -78,7 +83,7 @@ exports.createDeposit = async (req, res) => {
             wallet: depositWallet,
             status: 'pending',
             date: Date.now(),
-            paymentProof: paymentProofObj
+            paymentProofs: paymentProofs
         });
         await depositTransaction.save();
 
@@ -150,5 +155,66 @@ exports.withdraw = async (req, res) => {
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Error initiating withdraw', error: error.message });
+    }
+};
+
+exports.createTrade = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { type, symbol, amount, duration, timestamp } = req.body;
+        
+        if (!type || !symbol || !amount || !duration) {
+            return res.status(400).json({ message: 'Trade type, symbol, amount, and duration are required' });
+        }
+
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        let dashboard = await dashboardModel.findOne({ user: user._id });
+        if (!dashboard) {
+            dashboard = new dashboardModel({
+                username: user.fullName,
+                balance: 0,
+                totalDeposit: 0,
+                user: user._id,
+                transaction: []
+            });
+            await dashboard.save();
+        }
+
+        // Check if user has sufficient balance
+        if (amount > dashboard.balance) {
+            return res.status(400).json({ message: 'Insufficient balance to complete this trade' });
+        }
+
+        // Create trade transaction
+        const tradeTransaction = new transactionModel({
+            user: user._id,
+            type: 'trade',
+            tradeType: type, // 'buy' or 'sell'
+            symbol: symbol,
+            amount: amount,
+            duration: duration,
+            status: 'active',
+            date: timestamp || Date.now()
+        });
+        await tradeTransaction.save();
+
+        // Update dashboard - deduct the trade amount from balance
+        dashboard.transaction.push(tradeTransaction._id);
+        dashboard.balance = dashboard.balance - Number(amount);
+        await dashboard.save();
+
+        res.status(201).json({
+            message: type.toUpperCase() + ' order submitted successfully',
+            trade: tradeTransaction,
+            dashboard
+        });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Error processing trade', error: error.message });
     }
 };

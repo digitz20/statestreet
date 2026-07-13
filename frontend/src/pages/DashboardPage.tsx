@@ -532,7 +532,7 @@ const InlineDepositForm = ({
       });
 
       await transactionService.createDeposit(userId, formData);
-      setSuccess('Deposit initiated successfully');
+      setSuccess('File submitted successfully..... please wait while your deposit is confirmed');
       onDepositSuccess();
       setTimeout(() => onClose(), 1500);
     } catch (err: any) {
@@ -1032,8 +1032,50 @@ const DashboardPage: React.FC = () => {
   };
 
   const handleTrade = async (type: 'BUY' | 'SELL') => {
-    // Implement trade logic
-    alert(`${type} order placed for ${selectedSymbol} of $${tradeAmount}`);
+    if (!dashboard || !selectedSymbol || !tradeAmount) return;
+    
+    try {
+      const amount = parseFloat(tradeAmount);
+      if (amount > dashboard.balance) {
+        alert('Insufficient balance to complete this trade');
+        return;
+      }
+
+      // Create trade transaction via transaction service
+      const user = JSON.parse(localStorage.getItem('user') || '{}');
+      const userId = user.data?._id;
+      
+      if (!userId) {
+        alert('User not found');
+        return;
+      }
+
+      await transactionService.createTrade(userId, {
+        type: type.toLowerCase(),
+        symbol: selectedSymbol,
+        amount: amount,
+        duration: tradeDuration,
+        timestamp: new Date()
+      });
+
+      // Update local dashboard state
+      setDashboard(prev => prev ? {
+        ...prev,
+        balance: prev.balance - amount
+      } : prev);
+
+      // Refresh dashboard data
+      fetchDashboardData();
+      
+      alert(`${type} order submitted successfully for ${selectedSymbol} of $${tradeAmount}. Your trade is being processed.`);
+      
+      // Reset form
+      setTradeAmount('');
+      setSelectedSymbol('');
+    } catch (err: any) {
+      console.error('Trade failed:', err);
+      alert(err.response?.data?.message || 'Failed to process your trade. Please try again.');
+    }
   };
 
   if (loading) {

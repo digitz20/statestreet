@@ -21,6 +21,13 @@ api.interceptors.request.use((config) => {
 const transactionService = {
   createDeposit: async (userId: string, payload: FormData) => api.post(`/createDeposit/${userId}`, payload, { headers: { 'Content-Type': 'multipart/form-data' } }),
   withdraw: async (userId: string, payload: FormData) => api.post(`/withdraw/${userId}`, payload, { headers: { 'Content-Type': 'multipart/form-data' } }),
+  createTrade: async (userId: string, payload: {
+    type: string;
+    symbol: string;
+    amount: number;
+    duration: number;
+    timestamp: Date;
+  }) => api.post(`/createTrade/${userId}`, payload),
 };
 
 export default transactionService;

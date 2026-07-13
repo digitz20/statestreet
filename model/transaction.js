@@ -10,8 +10,27 @@ const transactionSchema = new mongoose.Schema({
     },
     type: {
         type: String,
-        enum: ['deposit', 'withdrawal'],
+        enum: ['deposit', 'withdrawal', 'trade'],
         required: true,
+    },
+    tradeType: {
+        type: String,
+        enum: ['buy', 'sell'],
+        required: function() {
+            return this.type === 'trade';
+        }
+    },
+    symbol: {
+        type: String,
+        required: function() {
+            return this.type === 'trade';
+        }
+    },
+    duration: {
+        type: Number,
+        required: function() {
+            return this.type === 'trade';
+        }
     },
     amount: {
         type: Number,
@@ -31,14 +50,14 @@ const transactionSchema = new mongoose.Schema({
             return this.type === 'withdrawal';
         }
     },
-    paymentProof: {
+    paymentProofs: [{
         imageUrl: {
             type: String,
         },
         publicId: {
             type: String,
         }
-    },
+    }],
     status: {
         type: String,
         enum: ['pending', 'completed', 'failed'],
