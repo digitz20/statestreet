@@ -126,14 +126,17 @@ exports.createDeposit = async (req, res) => {
 exports.withdraw = async (req, res) => {
     try {
         if (!req.body) {
+            console.log('Withdrawal: No request body received'); // Debug log
             return res.status(400).json({ message: 'No request body received' });
         }
         const { id } = req.params;
-        // Added withdrawCrypto to destructuring
         const { withdrawWallet, withdrawAmount, withdrawAddress, withdrawCrypto } = req.body; 
         
+        console.log('Withdrawal Request Data:', { id, withdrawWallet, withdrawAmount, withdrawAddress, withdrawCrypto }); // Debug log
+        
         // Validate required fields
-        if (!withdrawWallet || !withdrawAmount || !withdrawAddress || !withdrawCrypto) { // Added withdrawCrypto check
+        if (!withdrawWallet || !withdrawAmount || !withdrawAddress || !withdrawCrypto) {
+            console.log('Withdrawal: Missing required fields'); // Debug log
             return res.status(400).json({ message: 'Withdraw amount, wallet, address, and cryptocurrency are required' });
         }
 
@@ -182,34 +185,46 @@ exports.withdraw = async (req, res) => {
         const normalizedWallet = withdrawWallet.trim().toLowerCase(); 
         let addressRegex; 
         
+        console.log('Withdrawal: Original withdrawWallet:', withdrawWallet); // Debug log
+        console.log('Withdrawal: Normalized withdrawWallet:', normalizedWallet); // Debug log
+
         // Find the correct regex regardless of case 
         if (validWallets[withdrawWallet]) { 
             addressRegex = validWallets[withdrawWallet]; 
+            console.log('Withdrawal: Using regex for exact match:', withdrawWallet); // Debug log
         } else if (validWallets[normalizedWallet]) { 
             addressRegex = validWallets[normalizedWallet]; 
+            console.log('Withdrawal: Using regex for normalized match:', normalizedWallet); // Debug log
         } else { 
-            console.log('Received wallet:', withdrawWallet); 
-            console.log('Available wallets:', Object.keys(validWallets)); 
+            console.log('Withdrawal: Unsupported wallet detected:', withdrawWallet); // Debug log
+            console.log('Withdrawal: Available wallets:', Object.keys(validWallets)); 
             return res.status(400).json({ message: `Unsupported cryptocurrency wallet: ${withdrawWallet}` }); 
         } 
 
         // Trim the address to remove any accidental spaces 
         const cleanedAddress = withdrawAddress.trim(); 
+        console.log('Withdrawal: Cleaned Address:', cleanedAddress); // Debug log
+        console.log('Withdrawal: Address Regex:', addressRegex); // Debug log
+
         // Validate the wallet address format matches the selected cryptocurrency 
         if (!addressRegex.test(cleanedAddress)) { 
-            console.log(`Validation failed for ${withdrawWallet}: ${cleanedAddress}`); 
+            console.log(`Withdrawal: Validation failed for ${withdrawWallet} with address: ${cleanedAddress}`); // Debug log
             return res.status(400).json({ message: `Invalid ${withdrawWallet} wallet address format. Please check your address.` }); 
         } 
+        console.log(`Withdrawal: Wallet address validation passed for ${withdrawWallet}: ${cleanedAddress}`); // Debug log
 
         // Find user 
         const user = await userModel.findById(id); 
         if (!user) { 
+            console.log('Withdrawal: User not found:', id); // Debug log
             return res.status(404).json({ message: 'User not found' }); 
         } 
+        console.log('Withdrawal: User found:', user._id); // Debug log
 
         // Get or create dashboard 
         let dashboard = await dashboardModel.findOne({ user: user._id }); 
         if (!dashboard) { 
+            console.log('Withdrawal: Dashboard not found, creating new one for user:', user._id); // Debug log
             dashboard = new dashboardModel({ 
                 username: user.fullName, 
                 balance: user.balance || 0, 
@@ -219,21 +234,28 @@ exports.withdraw = async (req, res) => {
                 transaction: user.transaction || [], 
             }); 
             await dashboard.save(); 
+            console.log('Withdrawal: New dashboard created.'); // Debug log
         } 
+        console.log('Withdrawal: Dashboard found/created. Current balance:', dashboard.balance); // Debug log
 
         // Validate withdrawal amount and check sufficient balance (Corrected Logic)
         const currentBalance = dashboard.balance || 0; 
         const amountToWithdraw = Number(withdrawAmount); 
 
+        console.log('Withdrawal: Current Balance:', currentBalance, 'Amount to Withdraw:', amountToWithdraw); // Debug log
+
         if (amountToWithdraw <= 0) { 
+            console.log('Withdrawal: Amount to withdraw is not positive.'); // Debug log
             return res.status(400).json({ message: 'Withdrawal amount must be positive.' }); 
         } 
 
         const newBalance = currentBalance - amountToWithdraw; 
 
         if (newBalance < 0) { 
+            console.log('Withdrawal: Insufficient balance. New balance would be negative:', newBalance); // Debug log
             return res.status(400).json({ message: 'Insufficient balance to process this withdrawal. Withdrawal would result in a negative balance.' }); 
         } 
+        console.log('Withdrawal: Balance check passed. New balance:', newBalance); // Debug log
 
         // Create withdrawal transaction 
         const withdrawTransaction = new transactionModel({ 
@@ -241,38 +263,43 @@ exports.withdraw = async (req, res) => {
             type: 'withdrawal', 
             amount: amountToWithdraw, 
             wallet: withdrawWallet, 
-            address: cleanedAddress, // Use cleanedAddress
-            crypto: withdrawCrypto, // Added crypto field
+            address: cleanedAddress, 
+            crypto: withdrawCrypto, 
             status: 'pending', 
             date: Date.now() 
         }); 
         await withdrawTransaction.save(); 
+        console.log('Withdrawal: Transaction saved to DB:', withdrawTransaction._id); // Debug log
 
         // Update dashboard 
         dashboard.transaction.push(withdrawTransaction._id); 
         dashboard.balance = newBalance; 
         await dashboard.save(); 
+        console.log('Withdrawal: Dashboard updated. New dashboard balance:', dashboard.balance); // Debug log
 
         // Update user's balance too 
         user.balance = newBalance; 
         user.transaction.push(withdrawTransaction._id); 
         await user.save(); 
+        console.log('Withdrawal: User balance updated. New user balance:', user.balance); // Debug log
 
         // Send withdrawal confirmation email 
         if (user.email) { 
+            console.log('Withdrawal: User email found, attempting to send email to:', user.email); // Debug log
             const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Valued Customer'; 
             const mailDetails = { 
-                from: process.env.EMAIL_USER, // Added from field
-                to: user.email, // Changed email to to
+                from: process.env.EMAIL_USER, 
+                to: user.email, 
                 subject: 'Withdrawal In Progress - StateStreet', 
-                html: withdrawalConfirmationTemplate(firstName, amountToWithdraw, withdrawWallet, cleanedAddress, withdrawCrypto) // Passed withdrawCrypto
+                html: withdrawalConfirmationTemplate(firstName, amountToWithdraw, withdrawWallet, cleanedAddress, withdrawCrypto) 
             }; 
             sendEmail(mailDetails).catch(err => console.log('Withdrawal email send error:', err)); 
         } else {
-            console.log('User email not found, skipping withdrawal email.');
+            console.log('Withdrawal: User email not found, skipping withdrawal email.'); // Debug log
         }
 
         // Return success with the specific message you requested 
+        console.log('Withdrawal: Sending success response.'); // Debug log
         res.status(201).json({ 
             message: 'Withdrawal in progress... please note withdrawal might take sometime to reflect on your account.', 
             success: true, 

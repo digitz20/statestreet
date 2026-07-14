@@ -45,6 +45,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     data.append('withdrawAmount', amount.toString());
     data.append('withdrawWallet', wallet);
     data.append('withdrawAddress', address);
+    data.append('withdrawCrypto', wallet); // Add this line
 
 
     try {
