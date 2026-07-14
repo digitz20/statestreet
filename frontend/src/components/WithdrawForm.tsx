@@ -12,14 +12,68 @@ interface WithdrawFormProps {
 
 const wallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'monero', 'tron', 'eos', 'cardano', 'solana', 'tezos', 'matic', 'avax'];
 
+// Address detection regex patterns
+const addressPatterns = {
+  bitcoin: /^(1|3|bc1)/, // BTC addresses start with 1, 3, or bc1
+  ethereum: /^0x/, // ETH/ERC20/BNB/MATIC start with 0x
+  litecoin: /^(L|M|3|ltc1)/, // LTC addresses start with L, M, 3, or ltc1
+  dogecoin: /^D/, // DOGE starts with D
+  ripple: /^r/, // XRP starts with r
+  stellar: /^G/, // XLM starts with G
+  monero: /^(4|8|A|B)/, // XMR starts with 4,8,A,B
+  tron: /^T/, // TRX starts with T
+  eos: /^[a-z1-5]{12}$/, // EOS is 12 characters
+  cardano: /^(addr1|Ae2tdPwUPEZ)/, // ADA starts with addr1 or Ae2tdPwUPEZ
+  solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/, // SOL is 32-44 chars base58
+  tezos: /^tz[1-3]/, // XTZ starts with tz1, tz2, tz3
+  avax: /^(X-avax1|0x)/, // AVAX C-chain starts with 0x, P-chain with X-avax1
+};
+
+const walletDisplayNames: Record<string, string> = {
+  bitcoin: 'Bitcoin (BTC)',
+  ethereum: 'Ethereum (ETH)',
+  litecoin: 'Litecoin (LTC)',
+  dogecoin: 'Dogecoin (DOGE)',
+  ripple: 'Ripple (XRP)',
+  stellar: 'Stellar (XLM)',
+  monero: 'Monero (XMR)',
+  tron: 'Tron (TRX)',
+  eos: 'EOS (EOS)',
+  cardano: 'Cardano (ADA)',
+  solana: 'Solana (SOL)',
+  tezos: 'Tezos (XTZ)',
+  matic: 'Polygon (MATIC)',
+  avax: 'Avalanche (AVAX)',
+};
+
 
 const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, onClose }) => {
   const [amount, setAmount] = useState<number | string>('');
   const [wallet, setWallet] = useState('bitcoin');
   const [address, setAddress] = useState('');
+  const [detectedCurrency, setDetectedCurrency] = useState<string | null>(null);
   const [showStateStreetLoading, setShowStateStreetLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  // Detect cryptocurrency from address when it changes
+  const handleAddressChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newAddress = e.target.value;
+    setAddress(newAddress);
+    
+    if (newAddress.trim().length > 5) { // Only check if address has enough characters
+      for (const [currency, pattern] of Object.entries(addressPatterns)) {
+        if (pattern.test(newAddress)) {
+          setDetectedCurrency(currency);
+          setWallet(currency); // Auto-select the detected currency
+          return;
+        }
+      }
+      setDetectedCurrency(null); // No currency detected
+    } else {
+      setDetectedCurrency(null);
+    }
+  };
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -108,9 +162,23 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
         <Stack spacing={2}>
           <TextField label="Amount" name="amount" type="number" value={amount} onChange={(event) => setAmount(event.target.value)} fullWidth required inputProps={{ min: '0.01', step: '0.01' }} sx={fieldSx} />
           <TextField select label="Wallet" value={wallet} onChange={(event) => setWallet(event.target.value)} fullWidth sx={fieldSx}>
-            {wallets.map((item) => <MenuItem key={item} value={item}>{item}</MenuItem>)}
+            {wallets.map((item) => <MenuItem key={item} value={item} sx={{ color: 'black' }}>{walletDisplayNames[item]}</MenuItem>)}
           </TextField>
-          <TextField label="Wallet address" value={address} onChange={(event) => setAddress(event.target.value)} fullWidth required sx={fieldSx} />
+          <TextField 
+            label="Wallet address" 
+            value={address} 
+            onChange={handleAddressChange}
+            fullWidth 
+            required 
+            sx={fieldSx}
+            helperText={detectedCurrency ? `✅ Detected: ${walletDisplayNames[detectedCurrency]}` : "Paste your wallet address to auto-detect currency"}
+            FormHelperTextProps={{
+              sx: { 
+                color: detectedCurrency ? '#4ade80' : 'rgba(255,255,255,0.5)',
+                fontWeight: detectedCurrency ? 600 : 400
+              }
+            }}
+          />
         </Stack>
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}

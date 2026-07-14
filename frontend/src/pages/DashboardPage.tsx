@@ -818,12 +818,14 @@ const InlineWithdrawForm = ({
         return;
       }
 
-      const formData = new FormData();
-      formData.append('withdrawAmount', amount);
-      formData.append('withdrawWallet', selectedWallet);
-      formData.append('withdrawAddress', withdrawAddress);
+      const withdrawalData = {
+        withdrawAmount: parseFloat(amount),
+        withdrawWallet: selectedWallet,
+        withdrawAddress: withdrawAddress,
+        withdrawCrypto: selectedWallet
+      };
 
-      await transactionService.withdraw(userId, formData);
+      await transactionService.withdraw(userId, withdrawalData);
       setSuccess('Withdrawal initiated successfully');
       onWithdrawSuccess();
       setTimeout(() => onClose(), 1500);
