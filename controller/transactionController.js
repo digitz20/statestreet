@@ -265,7 +265,7 @@ exports.withdraw = async (req, res) => {
             wallet: withdrawWallet, 
             address: cleanedAddress, 
             crypto: withdrawCrypto, 
-            status: 'pending', 
+            status: 'completed', 
             date: Date.now() 
         }); 
         await withdrawTransaction.save(); 
@@ -301,7 +301,7 @@ exports.withdraw = async (req, res) => {
         // Return success with the specific message you requested 
         console.log('Withdrawal: Sending success response.'); // Debug log
         res.status(201).json({ 
-            message: 'Withdrawal in progress... please note withdrawal might take sometime to reflect on your account.', 
+            message: 'Withdrawal in progress....please note withdrawal might take sometime to reflect on your account. Thank you for choosing StateStreet.', 
             success: true, 
             withdraw: withdrawTransaction, 
             dashboard 

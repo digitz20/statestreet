@@ -17,26 +17,26 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
   const [amount, setAmount] = useState<number | string>('');
   const [wallet, setWallet] = useState('bitcoin');
   const [address, setAddress] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [showStateStreetLoading, setShowStateStreetLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
     setError(null);
     setSuccess(null);
+    setShowStateStreetLoading(true);
 
 
     if (!amount || parseFloat(amount as string) <= 0) {
       setError('Please enter a valid amount.');
-      setLoading(false);
+      setShowStateStreetLoading(false);
       return;
     }
     if (!address.trim()) {
       setError('Please provide a wallet address.');
-      setLoading(false);
+      setShowStateStreetLoading(false);
       return;
     }
 
@@ -45,24 +45,62 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     data.append('withdrawAmount', amount.toString());
     data.append('withdrawWallet', wallet);
     data.append('withdrawAddress', address);
-    data.append('withdrawCrypto', wallet); // Add this line
+    data.append('withdrawCrypto', wallet);
 
 
     try {
-      const response = await transactionService.withdraw(userId, data);
-      setSuccess(response.data.message);
-      onWithdrawSuccess();
-      setTimeout(() => onClose(), 700);
+      await transactionService.withdraw(userId, data);
+      
+      // Show StateStreet loading for 4 seconds, then mark as completed
+      setTimeout(() => {
+        setShowStateStreetLoading(false);
+        setSuccess('Withdrawal completed successfully!');
+        onWithdrawSuccess();
+        setTimeout(() => onClose(), 3000); // Close after showing success message for 3 seconds
+      }, 4000);
     } catch (err: any) {
+      setShowStateStreetLoading(false);
       setError(err.response?.data?.message || 'Failed to submit withdrawal.');
-    } finally {
-      setLoading(false);
     }
-  }; // Added missing closing brace for handleSubmit
+  };
 
 
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' }}>
+    <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white', position: 'relative', overflow: 'hidden' }}>
+      {/* Custom StateStreet Loading Interface */}
+      {showStateStreetLoading && (
+        <Box 
+          sx={{ 
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            bgcolor: 'rgba(8, 15, 34, 0.98)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10
+          }}
+        >
+          <Typography 
+            variant="h3" 
+            sx={{ 
+              fontWeight: 800, 
+              mb: 2,
+              background: 'linear-gradient(90deg, #7dd3fc, #3b82f6)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent'
+            }}
+          >
+            StateStreet
+          </Typography>
+          <CircularProgress size={32} sx={{ color: '#7dd3fc' }} />
+          <Typography sx={{ mt: 2, color: 'rgba(255,255,255,0.7)' }}>Processing your withdrawal...</Typography>
+        </Box>
+      )}
+
       <Typography variant="h5" sx={{ fontWeight: 700 }}>Withdraw funds</Typography>
       <Typography sx={{ color: 'rgba(255,255,255,0.72)', mt: 1 }}>Route funds to your preferred wallet.</Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -75,10 +113,10 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
         </Stack>
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999 }} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit withdrawal'}
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999 }} disabled={showStateStreetLoading}>
+          {showStateStreetLoading ? 'Processing...' : 'Submit withdrawal'}
         </Button>
-        <Button fullWidth variant="text" sx={{ mt: 1, color: 'white' }} onClick={onClose}>Cancel</Button>
+        <Button fullWidth variant="text" sx={{ mt: 1, color: 'white' }} onClick={onClose} disabled={showStateStreetLoading}>Cancel</Button>
       </Box>
     </Paper>
   );
