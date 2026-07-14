@@ -271,10 +271,8 @@ exports.withdraw = async (req, res) => {
 
         // Update dashboard - ensure transaction array exists
         if (!Array.isArray(dashboard.transaction)) {
-            console.log('Withdrawal: dashboard.transaction is not an array, initializing to empty array.');
             dashboard.transaction = [];
         }
-        console.log('Withdrawal: Before push, dashboard.transaction:', dashboard.transaction, 'Type:', typeof dashboard.transaction, 'IsArray:', Array.isArray(dashboard.transaction));
         dashboard.transaction.push(withdrawTransaction._id); 
         dashboard.balance = newBalance; 
         await dashboard.save(); 
@@ -302,6 +300,7 @@ exports.withdraw = async (req, res) => {
 
         // Return success with the specific message you requested 
         console.log('Withdrawal: Sending success response.'); // Debug log
+        console.log('Withdrawal: Response data - withdrawTransaction:', withdrawTransaction, 'dashboard:', dashboard);
         res.status(201).json({ 
             message: 'Withdrawal completed! Your transaction has been processed successfully. Thank you for choosing StateStreet.', 
             success: true, 
