@@ -40,9 +40,11 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     data.append('withdrawWallet', wallet);
     data.append('withdrawAddress', address);
 
+
+
     try {
-      await transactionService.withdraw(userId, data);
-      setSuccess('Withdrawal request submitted successfully.');
+      const response = await transactionService.withdraw(userId, data);
+      setSuccess(response.data.message);
       onWithdrawSuccess();
       setTimeout(() => onClose(), 700);
     } catch (err: any) {
@@ -50,7 +52,8 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     } finally {
       setLoading(false);
     }
-  };
+  }; // This closes the handleSubmit function
+
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' }}>
