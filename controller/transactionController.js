@@ -270,7 +270,7 @@ exports.withdraw = async (req, res) => {
         console.log('Withdrawal: Transaction saved to DB:', withdrawTransaction._id); // Debug log
 
         // Update dashboard - ensure transaction array exists
-        if (!dashboard.transaction) {
+        if (!Array.isArray(dashboard.transaction)) {
             dashboard.transaction = [];
         }
         dashboard.transaction.push(withdrawTransaction._id); 
