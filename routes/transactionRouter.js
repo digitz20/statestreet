@@ -185,7 +185,6 @@ router.post('/transaction/:id', createTransaction);
  */
 
 // Both frontend and backend use 'receipts' as the field name
-const { createDeposit } = require('../controller/transactionController');
 router.post('/createDeposit/:id', upload.single('receipts'), createDeposit);
 
 /**

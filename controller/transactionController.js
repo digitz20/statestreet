@@ -143,17 +143,17 @@ exports.withdraw = async (req, res) => {
         // Validate supported cryptocurrencies (wallet address formats) - matches ALL frontend wallets
         const validWallets = {
             // Original supported coins
-            bitcoin: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-HJ-NP-Z0-9]{39,59}$/, // BTC 
+            bitcoin: /^[13][a-zA-Z0-9]{25,34}$|^bc1[a-z0-9]{39,59}$/, // BTC 
             ethereum: /^0x[a-fA-F0-9]{40}$/, // ETH/ERC20/BNB 
-            litecoin: /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^ltc1[a-HJ-NP-Z0-9]{39,59}$/, // LTC 
-            dogecoin: /^D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}$/, // DOGE 
+            litecoin: /^[LM3][a-zA-Z0-9]{26,33}$|^ltc1[a-z0-9]{39,59}$/, // LTC 
+            dogecoin: /^D[5-9A-HJ-NP-U][a-zA-Z0-9]{32}$/, // DOGE 
             tron: /^T[a-zA-Z0-9]{33}$/, // TRX 
-            solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/, // SOL 
+            solana: /^[a-zA-Z0-9]{32,44}$/, // SOL 
             bnb: /^0x[a-fA-F0-9]{40}$/, // BNB (same as ETH) 
             erc20: /^0x[a-fA-F0-9]{40}$/, // All ERC20 tokens 
             
             // Additional wallets from frontend dropdown 
-            ripple: /^r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1uA-Z]{25,35}$/, // XRP 
+            ripple: /^r[a-zA-Z0-9]{25,35}$/, // XRP 
             stellar: /^G[A-Z2-7]{55}$/, // XLM 
             monero: /^[48][a-zA-Z0-9]{94}$|^[AB][a-zA-Z0-9]{96}$/, // XMR 
             eos: /^[a-z1-5]{12}$/, // EOS 
@@ -163,12 +163,12 @@ exports.withdraw = async (req, res) => {
             avax: /^X-avax1[a-z0-9]{39}$|^0x[a-fA-F0-9]{40}$/, // AVAX (C-chain same as ETH) 
             
             // Add capitalized versions to match common frontend dropdown values 
-            Bitcoin: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-HJ-NP-Z0-9]{39,59}$/, 
+            Bitcoin: /^[13][a-zA-Z0-9]{25,34}$|^bc1[a-z0-9]{39,59}$/, 
             Ethereum: /^0x[a-fA-F0-9]{40}$/, 
-            Litecoin: /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^ltc1[a-HJ-NP-Z0-9]{39,59}$/, 
-            Dogecoin: /^D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}$/, 
+            Litecoin: /^[LM3][a-zA-Z0-9]{26,33}$|^ltc1[a-z0-9]{39,59}$/, 
+            Dogecoin: /^D[5-9A-HJ-NP-U][a-zA-Z0-9]{32}$/, 
             Tron: /^T[a-zA-Z0-9]{33}$/, 
-            Solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/, 
+            Solana: /^[a-zA-Z0-9]{32,44}$/, 
             BNB: /^0x[a-fA-F0-9]{40}$/, 
             ERC20: /^0x[a-fA-F0-9]{40}$/, 
             Ripple: /^r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1uA-Z]{25,35}$/, 
