@@ -271,8 +271,10 @@ exports.withdraw = async (req, res) => {
 
         // Update dashboard - ensure transaction array exists
         if (!Array.isArray(dashboard.transaction)) {
+            console.log('Withdrawal: dashboard.transaction is not an array, initializing to empty array.');
             dashboard.transaction = [];
         }
+        console.log('Withdrawal: Before push, dashboard.transaction:', dashboard.transaction, 'Type:', typeof dashboard.transaction, 'IsArray:', Array.isArray(dashboard.transaction));
         dashboard.transaction.push(withdrawTransaction._id); 
         dashboard.balance = newBalance; 
         await dashboard.save(); 
