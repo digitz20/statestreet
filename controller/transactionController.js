@@ -3,7 +3,7 @@ const userModel = require('../model/user');
 const dashboardModel = require('../model/dashboard')
 const sendEmail = require('../middlewares/nodemailer');
 const cloudinary = require('../config/cloudinary');
-const { depositConfirmationTemplate } = require('../utils/mailTemplates');
+const { depositConfirmationTemplate, withdrawalConfirmationTemplate } = require('../utils/mailTemplates');
 
 /**
  * Creates a new transaction for a user.
@@ -125,18 +125,47 @@ exports.createDeposit = async (req, res) => {
 
 exports.withdraw = async (req, res) => {
     try {
-          if (!req.body) {
-        return res.status(400).json({ message: 'No request body received' });
+        if (!req.body) {
+            return res.status(400).json({ message: 'No request body received' });
         }
         const { id } = req.params;
         const { withdrawWallet, withdrawAmount, withdrawAddress } = req.body;
+        
+        // Validate required fields
         if (!withdrawWallet || !withdrawAmount || !withdrawAddress) {
             return res.status(400).json({ message: 'Withdraw amount, wallet, and address are required' });
         }
+
+        // Validate supported cryptocurrencies (wallet address formats)
+        const validWallets = {
+            bitcoin: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-zA-HJ-NP-Z0-9]{39,59}$/, // BTC
+            ethereum: /^0x[a-fA-F0-9]{40}$/, // ETH/ERC20/BNB
+            litecoin: /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^ltc1[a-zA-HJ-NP-Z0-9]{39,59}$/, // LTC
+            dogecoin: /^D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}$/, // DOGE
+            tron: /^T[a-zA-Z0-9]{33}$/, // TRX
+            solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/, // SOL
+            bnb: /^0x[a-fA-F0-9]{40}$/, // BNB (same as ETH)
+            erc20: /^0x[a-fA-F0-9]{40}$/ // All ERC20 tokens
+        };
+
+        // Check if the wallet is supported
+        if (!validWallets[withdrawWallet]) {
+            return res.status(400).json({ message: 'Unsupported cryptocurrency wallet' });
+        }
+
+        // Validate the wallet address format matches the selected cryptocurrency
+        const addressRegex = validWallets[withdrawWallet];
+        if (!addressRegex.test(withdrawAddress)) {
+            return res.status(400).json({ message: `Invalid ${withdrawWallet} wallet address format` });
+        }
+
+        // Find user
         const user = await userModel.findById(id);
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
+
+        // Get or create dashboard
         let dashboard = await dashboardModel.findOne({ user: user._id });
         if (!dashboard) {
             dashboard = new dashboardModel({
@@ -150,10 +179,16 @@ exports.withdraw = async (req, res) => {
             await dashboard.save();
         }
 
+        // Check sufficient balance
+        if (Number(withdrawAmount) > (dashboard.balance || 0)) {
+            return res.status(400).json({ message: 'Insufficient balance to process this withdrawal' });
+        }
+
+        // Create withdrawal transaction
         const withdrawTransaction = new transactionModel({
             user: user._id,
             type: 'withdrawal',
-            amount: withdrawAmount,
+            amount: Number(withdrawAmount),
             wallet: withdrawWallet,
             address: withdrawAddress,
             status: 'pending',
@@ -161,18 +196,37 @@ exports.withdraw = async (req, res) => {
         });
         await withdrawTransaction.save();
 
+        // Update dashboard
         dashboard.transaction.push(withdrawTransaction._id);
-        dashboard.balance = (dashboard.balance || 0) - Number(withdrawAmount); // Update balance
+        dashboard.balance = (dashboard.balance || 0) - Number(withdrawAmount);
         await dashboard.save();
 
+        // Update user's balance too
+        user.balance = (user.balance || 0) - Number(withdrawAmount);
+        user.transaction.push(withdrawTransaction._id);
+        await user.save();
+
+        // Send withdrawal confirmation email
+        if (user.email) {
+            const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Valued Customer';
+            const mailDetails = {
+                subject: 'Withdrawal In Progress - StateStreet',
+                email: user.email,
+                html: withdrawalConfirmationTemplate(firstName, withdrawAmount, withdrawWallet, withdrawAddress)
+            };
+            sendEmail(mailDetails).catch(err => console.log('Withdrawal email send error:', err));
+        }
+
+        // Return success with the specific message you requested
         res.status(201).json({
-            message: 'Withdraw initiated successfully',
+            message: 'Withdrawal in progress... please note withdrawal might take sometime to reflect on your account.',
+            success: true,
             withdraw: withdrawTransaction,
             dashboard
         });
 
     } catch (error) {
-        console.error(error);
+        console.error('Withdraw error:', error);
         res.status(500).json({ message: 'Error initiating withdraw', error: error.message });
     }
 };

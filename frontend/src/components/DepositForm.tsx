@@ -39,7 +39,7 @@ const DepositForm: React.FC<DepositFormProps> = ({ userId, onDepositSuccess, onC
     const data = new FormData();
     data.append('depositAmount', amount.toString());
     data.append('depositWallet', wallet);
-    data.append('paymentProof', proofImage);
+    data.append('receipts', proofImage);
 
     try {
       await transactionService.createDeposit(userId, data);

@@ -526,10 +526,10 @@ const InlineDepositForm = ({
       formData.append('depositAmount', amount);
       formData.append('depositWallet', selectedWallet);
       
-      // Add receipt files to form data
-      receiptFiles.forEach((file) => {
-        formData.append(`receipts`, file);
-      });
+      // Add single receipt file to form data - matches backend's 'receipts' field
+      if (receiptFiles.length > 0) {
+        formData.append('receipts', receiptFiles[0]);
+      }
 
       await transactionService.createDeposit(userId, formData);
       setSuccess('File submitted successfully..... please wait while your deposit is confirmed');
