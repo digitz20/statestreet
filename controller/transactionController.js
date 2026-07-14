@@ -229,7 +229,7 @@ exports.withdraw = async (req, res) => {
                 totalDeposit: user.totalDeposit || 0, 
                 image: user.image, 
                 user: user._id, 
-                transaction: user.transaction || [], 
+                transaction: Array.isArray(user.transaction) ? user.transaction : [], 
             }); 
             await dashboard.save(); 
             console.log('Withdrawal: New dashboard created.'); // Debug log
