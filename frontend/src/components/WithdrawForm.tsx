@@ -41,15 +41,16 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     }
 
 
-    const data = new FormData();
-    data.append('withdrawAmount', amount.toString());
-    data.append('withdrawWallet', wallet);
-    data.append('withdrawAddress', address);
-    data.append('withdrawCrypto', wallet);
+    const withdrawalData = {
+      withdrawAmount: parseFloat(amount.toString()),
+      withdrawWallet: wallet,
+      withdrawAddress: address,
+      withdrawCrypto: wallet
+    };
 
 
     try {
-      await transactionService.withdraw(userId, data);
+      await transactionService.withdraw(userId, withdrawalData);
       
       // Show StateStreet loading for 4 seconds, then mark as completed
       setTimeout(() => {
