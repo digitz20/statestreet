@@ -2,13 +2,16 @@ import React, { useState } from 'react';
 import { Alert, Box, Button, CircularProgress, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
 import transactionService from '../services/transactionService';
 
+
 interface WithdrawFormProps {
   userId: string;
   onWithdrawSuccess: () => void;
   onClose: () => void;
 }
 
+
 const wallets = ['bitcoin', 'ethereum', 'litecoin', 'dogecoin', 'ripple', 'stellar', 'monero', 'tron', 'eos', 'cardano', 'solana', 'tezos', 'matic', 'avax'];
+
 
 const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, onClose }) => {
   const [amount, setAmount] = useState<number | string>('');
@@ -18,11 +21,13 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
+
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
     setError(null);
     setSuccess(null);
+
 
     if (!amount || parseFloat(amount as string) <= 0) {
       setError('Please enter a valid amount.');
@@ -35,11 +40,11 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
       return;
     }
 
+
     const data = new FormData();
     data.append('withdrawAmount', amount.toString());
     data.append('withdrawWallet', wallet);
     data.append('withdrawAddress', address);
-
 
 
     try {
@@ -52,7 +57,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     } finally {
       setLoading(false);
     }
-  }; // This closes the handleSubmit function
+  }; // Added missing closing brace for handleSubmit
 
 
   return (
@@ -78,6 +83,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
   );
 };
 
+
 const fieldSx = {
   input: { color: 'white' },
   label: { color: 'rgba(255,255,255,0.7)' },
@@ -88,5 +94,6 @@ const fieldSx = {
   },
   '& .MuiSelect-select': { color: 'white' },
 };
+
 
 export default WithdrawForm;
