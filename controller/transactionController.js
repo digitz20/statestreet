@@ -280,12 +280,8 @@ exports.withdraw = async (req, res) => {
         await dashboard.save(); 
         console.log('Withdrawal: Dashboard updated. New dashboard balance:', dashboard.balance); // Debug log
 
-        // Update user's balance too - ensure transaction array exists
+        // Update user's balance only (no transaction array on user model)
         user.balance = newBalance; 
-        if (!user.transaction) {
-            user.transaction = [];
-        }
-        user.transaction.push(withdrawTransaction._id); 
         await user.save(); 
         console.log('Withdrawal: User balance updated. New user balance:', user.balance); // Debug log
 
