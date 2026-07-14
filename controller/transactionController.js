@@ -94,10 +94,8 @@ exports.createDeposit = async (req, res) => {
         dashboard.balance = (dashboard.balance || 0) + Number(depositAmount);
         await dashboard.save();
 
-        // Update user's totals too
-        user.totalDeposit = (user.totalDeposit || 0) + Number(depositAmount);
+        // Update user's balance only (no transaction array on user model)
         user.balance = (user.balance || 0) + Number(depositAmount);
-        user.transaction.push(depositTransaction._id);
         await user.save();
 
         // Send confirmation email
@@ -303,7 +301,7 @@ exports.withdraw = async (req, res) => {
         // Return success with the specific message you requested 
         console.log('Withdrawal: Sending success response.'); // Debug log
         res.status(201).json({ 
-            message: 'Withdrawal in progress....please note withdrawal might take sometime to reflect on your account. Thank you for choosing StateStreet.', 
+            message: 'Withdrawal completed! Your transaction has been processed successfully. Thank you for choosing StateStreet.', 
             success: true, 
             withdraw: withdrawTransaction, 
             dashboard 
