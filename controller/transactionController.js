@@ -136,8 +136,9 @@ exports.withdraw = async (req, res) => {
             return res.status(400).json({ message: 'Withdraw amount, wallet, and address are required' });
         }
 
-        // Validate supported cryptocurrencies (wallet address formats)
+        // Validate supported cryptocurrencies (wallet address formats) - matches ALL frontend wallets
         const validWallets = {
+            // Original supported coins
             bitcoin: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-zA-HJ-NP-Z0-9]{39,59}$/, // BTC
             ethereum: /^0x[a-fA-F0-9]{40}$/, // ETH/ERC20/BNB
             litecoin: /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^ltc1[a-zA-HJ-NP-Z0-9]{39,59}$/, // LTC
@@ -145,18 +146,58 @@ exports.withdraw = async (req, res) => {
             tron: /^T[a-zA-Z0-9]{33}$/, // TRX
             solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/, // SOL
             bnb: /^0x[a-fA-F0-9]{40}$/, // BNB (same as ETH)
-            erc20: /^0x[a-fA-F0-9]{40}$/ // All ERC20 tokens
+            erc20: /^0x[a-fA-F0-9]{40}$/, // All ERC20 tokens
+            
+            // Additional wallets from frontend dropdown
+            ripple: /^r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1uA-Z]{25,35}$/, // XRP
+            stellar: /^G[A-Z2-7]{55}$/, // XLM
+            monero: /^[48][a-zA-Z0-9]{94}$|^[AB][a-zA-Z0-9]{96}$/, // XMR
+            eos: /^[a-z1-5]{12}$/, // EOS
+            cardano: /^addr1[a-z0-9]{58}$|^Ae2tdPwUPEZ[a-zA-Z0-9]{48}$/, // ADA
+            tezos: /^tz[1-3][a-zA-Z0-9]{33}$/, // XTZ
+            matic: /^0x[a-fA-F0-9]{40}$/, // MATIC (same as ETH)
+            avax: /^X-avax1[a-z0-9]{39}$|^0x[a-fA-F0-9]{40}$/, // AVAX (C-chain same as ETH)
+            
+            // Add capitalized versions to match common frontend dropdown values
+            Bitcoin: /^[13][a-km-zA-HJ-NP-Z1-9]{25,34}$|^bc1[a-zA-HJ-NP-Z0-9]{39,59}$/,
+            Ethereum: /^0x[a-fA-F0-9]{40}$/,
+            Litecoin: /^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$|^ltc1[a-zA-HJ-NP-Z0-9]{39,59}$/,
+            Dogecoin: /^D{1}[5-9A-HJ-NP-U]{1}[1-9A-HJ-NP-Za-km-z]{32}$/,
+            Tron: /^T[a-zA-Z0-9]{33}$/,
+            Solana: /^[1-9A-HJ-NP-Za-km-z]{32,44}$/,
+            BNB: /^0x[a-fA-F0-9]{40}$/,
+            ERC20: /^0x[a-fA-F0-9]{40}$/,
+            Ripple: /^r[rpshnaf39wBUDNEGHJKLM4PQRST7VWXYZ2bcdeCg65jkm8oFqi1uA-Z]{25,35}$/,
+            Stellar: /^G[A-Z2-7]{55}$/,
+            Monero: /^[48][a-zA-Z0-9]{94}$|^[AB][a-zA-Z0-9]{96}$/,
+            Eos: /^[a-z1-5]{12}$/,
+            Cardano: /^addr1[a-z0-9]{58}$|^Ae2tdPwUPEZ[a-zA-Z0-9]{48}$/,
+            Tezos: /^tz[1-3][a-zA-Z0-9]{33}$/,
+            Matic: /^0x[a-fA-F0-9]{40}$/,
+            Avax: /^X-avax1[a-z0-9]{39}$|^0x[a-fA-F0-9]{40}$/
         };
 
-        // Check if the wallet is supported
-        if (!validWallets[withdrawWallet]) {
-            return res.status(400).json({ message: 'Unsupported cryptocurrency wallet' });
+        // Normalize the wallet name to handle any case inconsistencies
+        const normalizedWallet = withdrawWallet.trim().toLowerCase();
+        let addressRegex;
+        
+        // Find the correct regex regardless of case
+        if (validWallets[withdrawWallet]) {
+            addressRegex = validWallets[withdrawWallet];
+        } else if (validWallets[normalizedWallet]) {
+            addressRegex = validWallets[normalizedWallet];
+        } else {
+            console.log('Received wallet:', withdrawWallet);
+            console.log('Available wallets:', Object.keys(validWallets));
+            return res.status(400).json({ message: `Unsupported cryptocurrency wallet: ${withdrawWallet}` });
         }
 
+        // Trim the address to remove any accidental spaces
+        const cleanedAddress = withdrawAddress.trim();
         // Validate the wallet address format matches the selected cryptocurrency
-        const addressRegex = validWallets[withdrawWallet];
-        if (!addressRegex.test(withdrawAddress)) {
-            return res.status(400).json({ message: `Invalid ${withdrawWallet} wallet address format` });
+        if (!addressRegex.test(cleanedAddress)) {
+            console.log(`Validation failed for ${withdrawWallet}: ${cleanedAddress}`);
+            return res.status(400).json({ message: `Invalid ${withdrawWallet} wallet address format. Please check your address.` });
         }
 
         // Find user
