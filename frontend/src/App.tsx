@@ -31,10 +31,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
-function App() {
+function AppContent() {
   const location = useLocation();
   return (
-    <BrowserRouter>
+    <>
       {/* Only show notifications on home page */}
       {location.pathname === "/" && <GlobalNotifications />}
       <Routes>
@@ -68,6 +68,14 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+    </>
+  );
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AppContent />
     </BrowserRouter>
   );
 }
