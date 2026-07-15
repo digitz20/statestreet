@@ -1,9 +1,17 @@
 import React from 'react';
 import { Box, CircularProgress, Typography } from '@mui/material';
+import { keyframes } from '@emotion/react'; // Import keyframes
 
 interface StateStreetLoadingProps {
   message?: string;
 }
+
+// Define the keyframe animation for the "in and out" effect
+const fadeInOut = keyframes`
+  0% { opacity: 0.2; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.2; transform: scale(0.95); }
+`;
 
 const StateStreetLoading: React.FC<StateStreetLoadingProps> = ({ message = 'Loading...' }) => {
   return (
@@ -30,6 +38,7 @@ const StateStreetLoading: React.FC<StateStreetLoadingProps> = ({ message = 'Load
           background: 'linear-gradient(90deg, #7dd3fc, #3b82f6)',
           WebkitBackgroundClip: 'text',
           WebkitTextFillColor: 'transparent',
+          animation: `${fadeInOut} 1.5s ease-in-out infinite`, // Apply the animation
         }}
       >
         StateStreet
