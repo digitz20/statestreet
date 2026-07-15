@@ -72,7 +72,7 @@ const DashboardShell: React.FC<DashboardShellProps> = ({ title, subtitle, childr
   const drawer = (
     <div>
       <Toolbar sx={{ bgcolor: 'rgba(8, 15, 34, 0.9)', borderBottom: '1px solid rgba(255,255,255,0.12)' }}>
-        <Typography variant="h6" sx={{ fontWeight: 700, color: 'white' }}>StateStreet</Typography>
+        <Typography variant="h6" sx={{ fontWeight: 700, color: 'white' }}>STATESTREET</Typography>
       </Toolbar>
       <Divider sx={{ bgcolor: 'rgba(255,255,255,0.12)' }} />
       <List>

@@ -33,7 +33,6 @@ exports.createProfile = async (req, res) => {
         const dashboard = new dashboardModel({
             username: user.fullName,
             balance: user.balance,
-            totalDeposit: user.totalDeposit,
             image: user.image,
             user: user._id,
             transaction: user.transaction || [],
@@ -79,7 +78,7 @@ exports.updateProfile = async (req, res) => {
         const { fullName, balance, totalDeposit } = req.body;
         if (fullName) user.fullName = fullName;
         if (balance) user.balance = balance;
-        if (totalDeposit) user.totalDeposit = totalDeposit;
+
 
         // If a new image is uploaded, upload to Cloudinary and update
         if (req.file) {

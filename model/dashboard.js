@@ -10,10 +10,7 @@ const dashboardSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
-    totalDeposit: {
-        type: Number,
-        default: 0,
-    },
+
     image: {
         imageUrl: {
             type: String,

@@ -8,7 +8,6 @@ const API_BASE_URL = 'https://added-desiree-webtool-a80f54c4.koyeb.app/api/v1';
 interface UserProfile {
   fullName?: string;
   balance?: number;
-  totalDeposit?: number;
   image?: string; // URL of the profile image
 }
 
