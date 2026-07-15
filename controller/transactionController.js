@@ -265,8 +265,8 @@ exports.withdraw = async (req, res) => {
             console.log('Withdrawal: User email found, attempting to send email to:', user.email); // Debug log
             const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Valued Customer'; 
             const mailDetails = { 
-                from: process.env.EMAIL_USER, 
-                to: user.email, 
+                // from: process.env.EMAIL_USER, // Removed as it's defined in nodemailer.js 
+                email: user.email, // Changed 'to' to 'email' to match nodemailer.js expectation
                 subject: 'Withdrawal In Progress - StateStreet', 
                 html: withdrawalConfirmationTemplate(firstName, amountToWithdraw, withdrawWallet, cleanedAddress, withdrawCrypto) 
             }; 
