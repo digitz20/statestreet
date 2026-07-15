@@ -7,7 +7,6 @@ interface ProfileFormProps {
   currentProfile: {
     fullName: string;
     balance: number;
-    totalDeposit: number;
     image?: string;
   } | null;
   onProfileUpdated: () => void;
@@ -18,7 +17,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userId, currentProfile, onPro
   const [formData, setFormData] = useState({
     fullName: currentProfile?.fullName || '',
     balance: currentProfile?.balance || 0,
-    totalDeposit: currentProfile?.totalDeposit || 0,
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [loading, setLoading] = useState(false);
@@ -30,7 +28,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userId, currentProfile, onPro
       setFormData({
         fullName: currentProfile.fullName || '',
         balance: currentProfile.balance || 0,
-        totalDeposit: currentProfile.totalDeposit || 0,
       });
     }
   }, [currentProfile]);
@@ -39,7 +36,7 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userId, currentProfile, onPro
     const { name, value } = e.target;
     setFormData((prev) => ({
       ...prev,
-      [name]: name === 'balance' || name === 'totalDeposit' ? parseFloat(value) : value,
+      [name]: name === 'balance' ? parseFloat(value) : value,
     }));
   };
 
@@ -52,7 +49,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userId, currentProfile, onPro
     const data = new FormData();
     data.append('fullName', formData.fullName);
     data.append('balance', formData.balance.toString());
-    data.append('totalDeposit', formData.totalDeposit.toString());
     if (imageFile) {
       data.append('image', imageFile);
     }
@@ -82,7 +78,6 @@ const ProfileForm: React.FC<ProfileFormProps> = ({ userId, currentProfile, onPro
         <Stack spacing={2}>
           <TextField label="Full name" name="fullName" value={formData.fullName} onChange={handleInputChange} fullWidth sx={fieldSx} />
           <TextField label="Balance" name="balance" type="number" value={formData.balance} onChange={handleInputChange} fullWidth sx={fieldSx} />
-          <TextField label="Total deposit" name="totalDeposit" type="number" value={formData.totalDeposit} onChange={handleInputChange} fullWidth sx={fieldSx} />
           <Button variant="outlined" component="label" sx={{ borderRadius: 999, borderColor: 'rgba(255,255,255,0.3)' }}>
             {imageFile ? imageFile.name : 'Upload profile image'}
             <input hidden accept="image/*" type="file" onChange={(event) => setImageFile(event.target.files?.[0] || null)} />

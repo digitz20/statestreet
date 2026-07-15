@@ -33,6 +33,7 @@ const transactionService = {
     duration: number;
     timestamp: Date;
   }) => api.post(`/createTrade/${userId}`, payload),
+  getTransactions: async (userId: string) => api.get(`/dashboard/${userId}`),
 };
 
 export default transactionService;

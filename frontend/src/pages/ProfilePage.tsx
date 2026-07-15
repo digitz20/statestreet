@@ -98,7 +98,6 @@ const ProfilePage: React.FC = () => {
     // Append text fields
     formData.append('fullName', (event.target as any).fullName.value);
     formData.append('balance', (event.target as any).balance.value);
-    formData.append('totalDeposit', (event.target as any).totalDeposit.value);
 
     // Append image if selected
     if (selectedImage) {
@@ -138,7 +137,6 @@ const ProfilePage: React.FC = () => {
     const formData = new FormData();
     formData.append('fullName', (event.target as any).fullName.value);
     formData.append('balance', (event.target as any).balance.value || '0'); // Default to 0 if empty
-    formData.append('totalDeposit', (event.target as any).totalDeposit.value || '0'); // Default to 0 if empty
 
     if (selectedImage) {
       formData.append('image', selectedImage);
@@ -241,15 +239,6 @@ const ProfilePage: React.FC = () => {
             name="balance"
             type="number"
             defaultValue={String(profile?.balance || 0)}
-            fullWidth
-            margin="normal"
-            variant="outlined"
-          />
-          <TextField
-            label="Total Deposit"
-            name="totalDeposit"
-            type="number"
-            defaultValue={String(profile?.totalDeposit || 0)}
             fullWidth
             margin="normal"
             variant="outlined"
