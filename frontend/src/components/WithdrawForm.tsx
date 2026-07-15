@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, Box, Button, CircularProgress, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
 import transactionService from '../services/transactionService';
-
+import StateStreetLoading from './StateStreetLoading'; // Import the new loading component
 
 interface WithdrawFormProps {
   userId: string;
@@ -122,39 +122,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
 
   return (
     <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white', position: 'relative', overflow: 'hidden' }}>
-      {/* Custom StateStreet Loading Interface */}
-      {showStateStreetLoading && (
-        <Box 
-          sx={{ 
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            right: 0,
-            bottom: 0,
-            bgcolor: 'rgba(8, 15, 34, 0.98)',
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            zIndex: 10
-          }}
-        >
-          <Typography 
-            variant="h3" 
-            sx={{ 
-              fontWeight: 800, 
-              mb: 2,
-              background: 'linear-gradient(90deg, #7dd3fc, #3b82f6)',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent'
-            }}
-          >
-            StateStreet
-          </Typography>
-          <CircularProgress size={32} sx={{ color: '#7dd3fc' }} />
-          <Typography sx={{ mt: 2, color: 'rgba(255,255,255,0.7)' }}>Processing your withdrawal...</Typography>
-        </Box>
-      )}
+      {showStateStreetLoading && <StateStreetLoading message="Processing your withdrawal..." />} {/* Display the new loading component */}
 
       <Typography variant="h5" sx={{ fontWeight: 700 }}>Withdraw funds</Typography>
       <Typography sx={{ color: 'rgba(255,255,255,0.72)', mt: 1 }}>Route funds to your preferred wallet.</Typography>
