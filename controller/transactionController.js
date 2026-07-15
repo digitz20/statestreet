@@ -94,6 +94,7 @@ exports.createDeposit = async (req, res) => {
 }
 
 exports.withdraw = async (req, res) => {
+    console.log('Withdrawal: Entering withdraw function - Debug Version 3.0'); // Debug log to confirm code version
     try {
         if (!req.body) {
             console.log('Withdrawal: No request body received'); // Debug log
@@ -247,6 +248,8 @@ exports.withdraw = async (req, res) => {
         console.log('Withdrawal: Transaction saved to DB:', withdrawTransaction._id); // Debug log
 
 
+        console.log('Withdrawal: Before push - dashboard object:', dashboard); // Debug log
+        console.log('Withdrawal: Before push - dashboard.transaction:', dashboard.transaction); // Debug log
         dashboard.transaction.push(withdrawTransaction._id); 
         dashboard.balance = newBalance; 
         await dashboard.save(); 
