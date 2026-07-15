@@ -106,13 +106,13 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
     try {
       await transactionService.withdraw(userId, withdrawalData);
       
-      // Show StateStreet loading for 4 seconds, then mark as completed
+      // Show StateStreet loading for 3 seconds, then mark as completed
       setTimeout(() => {
         setShowStateStreetLoading(false);
         setSuccess('Withdrawal completed! Your transaction has been processed successfully. Thank you for choosing StateStreet.');
         onWithdrawSuccess();
         setTimeout(() => onClose(), 3000); // Close after showing success message for 3 seconds
-      }, 4000);
+      }, 3000);
     } catch (err: any) {
       setShowStateStreetLoading(false);
       setError(err.response?.data?.message || 'Failed to submit withdrawal.');

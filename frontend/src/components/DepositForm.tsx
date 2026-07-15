@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import { Alert, Box, Button, CircularProgress, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
+import { Alert, Box, Button, MenuItem, Paper, Stack, TextField, Typography } from '@mui/material';
 import transactionService from '../services/transactionService';
+import StateStreetLoading from './StateStreetLoading'; // Import StateStreetLoading
 
 interface DepositFormProps {
   userId: string;
@@ -15,24 +16,24 @@ const DepositForm: React.FC<DepositFormProps> = ({ userId, onDepositSuccess, onC
   const [amount, setAmount] = useState<number | string>('');
   const [wallet, setWallet] = useState('bitcoin');
   const [proofImage, setProofImage] = useState<File | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [showStateStreetLoading, setShowStateStreetLoading] = useState(false); // New loading state
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setLoading(true);
+    setShowStateStreetLoading(true); // Show loading
     setError(null);
     setSuccess(null);
 
     if (!amount || parseFloat(amount as string) <= 0) {
       setError('Please enter a valid amount.');
-      setLoading(false);
+      setShowStateStreetLoading(false); // Hide loading on error
       return;
     }
     if (!proofImage) {
       setError('Please upload proof of payment.');
-      setLoading(false);
+      setShowStateStreetLoading(false); // Hide loading on error
       return;
     }
 
@@ -43,18 +44,22 @@ const DepositForm: React.FC<DepositFormProps> = ({ userId, onDepositSuccess, onC
 
     try {
       await transactionService.createDeposit(userId, data);
-      setSuccess('Deposit request submitted successfully.');
-      onDepositSuccess();
-      setTimeout(() => onClose(), 700);
+      // Show StateStreet loading for 3 seconds, then mark as completed
+      setTimeout(() => {
+        setShowStateStreetLoading(false);
+        setSuccess('Deposit request submitted successfully.');
+        onDepositSuccess();
+        setTimeout(() => onClose(), 3000); // Close after showing success message for 3 seconds
+      }, 3000);
     } catch (err: any) {
+      setShowStateStreetLoading(false); // Hide loading on error
       setError(err.response?.data?.message || 'Failed to submit deposit.');
-    } finally {
-      setLoading(false);
     }
   };
 
   return (
-    <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white' }}>
+    <Paper elevation={0} sx={{ p: 4, borderRadius: 4, bgcolor: 'rgba(8, 15, 34, 0.95)', color: 'white', position: 'relative', overflow: 'hidden' }}>
+      {showStateStreetLoading && <StateStreetLoading message="Processing your deposit..." />} {/* Display loading overlay */}
       <Typography variant="h5" sx={{ fontWeight: 700 }}>Deposit funds</Typography>
       <Typography sx={{ color: 'rgba(255,255,255,0.72)', mt: 1 }}>Add funds and attach proof for approval.</Typography>
       <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
@@ -70,10 +75,10 @@ const DepositForm: React.FC<DepositFormProps> = ({ userId, onDepositSuccess, onC
         </Stack>
         {error && <Alert severity="error" sx={{ mt: 2 }}>{error}</Alert>}
         {success && <Alert severity="success" sx={{ mt: 2 }}>{success}</Alert>}
-        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999 }} disabled={loading}>
-          {loading ? <CircularProgress size={24} color="inherit" /> : 'Submit deposit'}
+        <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, py: 1.3, borderRadius: 999 }} disabled={showStateStreetLoading}> {/* Disable button during loading */}
+          {showStateStreetLoading ? 'Processing...' : 'Submit deposit'}
         </Button>
-        <Button fullWidth variant="text" sx={{ mt: 1, color: 'white' }} onClick={onClose}>Cancel</Button>
+        <Button fullWidth variant="text" sx={{ mt: 1, color: 'white' }} onClick={onClose} disabled={showStateStreetLoading}>Cancel</Button> {/* Disable button during loading */}
       </Box>
     </Paper>
   );

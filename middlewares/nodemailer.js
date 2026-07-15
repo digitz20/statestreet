@@ -8,8 +8,8 @@ const transporter = nodemailer.createTransport({
   port: 587,
   secure: false, // true for port 465, false for other ports
   auth: {
-    user: process.env.APP_USERNAME,
-    pass: process.env.APP_PASSWORD
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
   },
 });
 
@@ -17,7 +17,7 @@ const transporter = nodemailer.createTransport({
 async function main() {
   // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: `statestreet <${process.env.APP_USERNAME}>`, // sender address
+    from: `statestreet <${process.env.EMAIL_USER}>`, // sender address
     to: options.email, // list of receivers
     subject: options.subject, // Subject line
     html: options.html, // html body

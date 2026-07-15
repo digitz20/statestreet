@@ -11,6 +11,7 @@ import VerifyEmailPage from './pages/VerifyEmailPage';
 import ContactPage from './pages/ContactPage';
 import PrivacyPage from './pages/PrivacyPage';
 import GlobalNotifications from './components/GlobalNotifications';
+import StateStreetLoading from './components/StateStreetLoading'; // Import the new loading component
 
 // Import new dashboard pages
 import MarketsPage from './pages/MarketsPage';
@@ -25,6 +26,7 @@ import HistoryPage from './pages/HistoryPage';
 import ProfilePage from './pages/ProfilePage';
 import ResetPasswordDashboardPage from './pages/ResetPasswordDashboardPage';
 import SupportPage from './pages/SupportPage';
+import { useEffect, useState } from 'react'; // Import useEffect and useState
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const user = localStorage.getItem('user');
@@ -33,8 +35,28 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function AppContent() {
   const location = useLocation();
+  const [isLoading, setIsLoading] = useState(true); // State for global loading
+
+  useEffect(() => {
+    // Simulate initial loading for 3 seconds
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
+    // Show loading screen on route change
+    setIsLoading(true);
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 3000);
+    return () => clearTimeout(timer);
+  }, [location.pathname]); // Re-run when pathname changes
+
   return (
     <>
+      {isLoading && <StateStreetLoading />} {/* Display global loading */}
       {/* Only show notifications on home page */}
       {location.pathname === "/" && <GlobalNotifications />}
       <Routes>
