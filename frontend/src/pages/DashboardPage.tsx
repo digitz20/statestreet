@@ -826,7 +826,7 @@ const InlineWithdrawForm = ({
       };
 
       await transactionService.withdraw(userId, withdrawalData);
-      setSuccess('Withdrawal initiated successfully');
+      setSuccess('Withdrawal completed! Your transaction has been processed successfully. Thank you for choosing StateStreet.');
       onWithdrawSuccess();
       setTimeout(() => onClose(), 1500);
     } catch (err: any) {

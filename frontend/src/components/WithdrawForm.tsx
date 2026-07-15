@@ -109,7 +109,7 @@ const WithdrawForm: React.FC<WithdrawFormProps> = ({ userId, onWithdrawSuccess, 
       // Show StateStreet loading for 4 seconds, then mark as completed
       setTimeout(() => {
         setShowStateStreetLoading(false);
-        setSuccess('Withdrawal completed successfully!');
+        setSuccess('Withdrawal completed! Your transaction has been processed successfully. Thank you for choosing StateStreet.');
         onWithdrawSuccess();
         setTimeout(() => onClose(), 3000); // Close after showing success message for 3 seconds
       }, 4000);
