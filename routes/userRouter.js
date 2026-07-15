@@ -1,7 +1,7 @@
 const router = require('express').Router()
 
 
-const { register, login, verifyEmail, forgotPassword, resetPassword, resendVerificationEmail, changePassword, logout } = require('../controller/userController')
+const { register, login, verifyEmail, forgotPassword, resetPassword, resendVerificationEmail, changePassword, logout, verifyPermanentPassword } = require('../controller/userController')
 const { authenticate } = require('../middlewares/authentication')
 
 
