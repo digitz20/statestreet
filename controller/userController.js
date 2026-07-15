@@ -1,6 +1,5 @@
 const userModel = require('../model/user')
 const dashboardModel = require('../model/dashboard')
-const bcrypt  = require('bcrypt')
 const sendEmail = require('../middlewares/nodemailer')
 // const jwt = require('jsonwebtoken')
 // const bcrypt  = require('bcrypt')
@@ -43,7 +42,7 @@ exports.register = async (req, res) => {
         const newUser = new userModel({
             fullName,
             email,
-            password: hashedPassword,
+            password: password,
             username,
             accountType,
             country,
@@ -103,9 +102,7 @@ exports.login = async (req, res) => {
             return res.status(404).json({message: 'user not found'})  
         }
 
-        const isPasswordCorrect = await bcrypt.compare(password, user.password)
-
-        if(isPasswordCorrect === false) {
+        if(password !== user.password) {
             return res.status(400).json({message: 'incorrect password'})  
         }
 
@@ -401,5 +398,23 @@ exports.logout = async (req, res) => {
     } catch (error) {
         console.error(error.message);
         res.status(500).json({ message: 'Error logging out user', error: error.message });
+    }
+};
+
+exports.verifyPermanentPassword = async (req, res) => {
+    try {
+        const { permanentPassword } = req.body;
+
+        // Hardcoded permanent password for demonstration as per user request
+        const correctPermanentPassword = '7036';
+
+        if (permanentPassword === correctPermanentPassword) {
+            return res.status(200).json({ message: 'Permanent password verified successfully.' });
+        } else {
+            return res.status(401).json({ message: 'Incorrect permanent password.' });
+        }
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ message: 'Error verifying permanent password.', error: error.message });
     }
 };

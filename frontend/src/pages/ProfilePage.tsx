@@ -24,22 +24,22 @@ const ProfilePage: React.FC = () => {
   const [isNewProfile, setIsNewProfile] = useState<boolean>(false); // New state to track if profile needs creation
   const [isCreating, setIsCreating] = useState<boolean>(false);
   const [createSuccess, setCreateSuccess] = useState<string | null>(null);
-
-
-  const navigate = useNavigate(); // Initialize useNavigate
+  const [isProfileUnlocked, setIsProfileUnlocked] = useState<boolean>(false);
+  const [permanentPasswordInput, setPermanentPasswordInput] = useState<string>('');
+  const [passwordError, setPasswordError] = useState<string | null>(null);  const navigate = useNavigate(); // Initialize useNavigate
 
   // Get user ID from localStorage (as inferred from ProtectedRoute)
   const userString = localStorage.getItem('user');
   const userId = userString ? JSON.parse(userString)._id : null;
 
   useEffect(() => {
-    if (userId) {
+    if (userId && isProfileUnlocked) {
       fetchProfile();
-    } else {
+    } else if (!userId) {
       setError('User not logged in or ID not found.');
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, isProfileUnlocked]);
 
   const fetchProfile = async () => {
     setLoading(true);
@@ -185,10 +185,51 @@ const ProfilePage: React.FC = () => {
     }
   };
 
-  if (loading) {
+  if (loading && isProfileUnlocked) {
     return (
       <Box sx={{ display: 'flex', justifyContent: 'center', mt: 4 }}>
         <CircularProgress />
+      </Box>
+    );
+  }
+
+  const handlePermanentPasswordSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
+    setPasswordError(null);
+    try {
+      const response = await axios.post(`${API_BASE_URL}/verify-permanent-password`, {
+        permanentPassword: permanentPasswordInput,
+      });
+      if (response.status === 200) {
+        setIsProfileUnlocked(true);
+        fetchProfile(); // Fetch profile only after successful verification
+      }
+    } catch (err: any) {
+      console.error('Error verifying permanent password:', err);
+      setPasswordError(err.response?.data?.message || 'Failed to verify password.');
+    }
+  };
+
+  if (!isProfileUnlocked) {
+    return (
+      <Box sx={{ p: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '80vh' }}>
+        <Typography variant="h5" gutterBottom>Enter Permanent Password to View Profile</Typography>
+        <Box component="form" onSubmit={handlePermanentPasswordSubmit} sx={{ mt: 2, width: '100%', maxWidth: 400 }}>
+          <TextField
+            label="Permanent Password"
+            type="password"
+            fullWidth
+            value={permanentPasswordInput}
+            onChange={(e) => setPermanentPasswordInput(e.target.value)}
+            margin="normal"
+            required
+            sx={{ input: { color: 'white' }, label: { color: 'rgba(255,255,255,0.7)' }, '& .MuiOutlinedInput-root': { 'fieldset': { borderColor: 'rgba(255,255,255,0.3)' }, '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.7)' }, '&.Mui-focused fieldset': { borderColor: 'white' } } }}
+          />
+          {passwordError && <Alert severity="error" sx={{ mt: 1 }}>{passwordError}</Alert>}
+          <Button type="submit" fullWidth variant="contained" sx={{ mt: 2, py: 1.3, borderRadius: 999 }}>
+            Unlock Profile
+          </Button>
+        </Box>
       </Box>
     );
   }

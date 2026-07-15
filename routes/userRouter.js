@@ -447,5 +447,56 @@ router.post('/changePassword', authenticate, changePassword)
  */
 router.post('/logout', authenticate, logout)
 
-module.exports = router
+/**
+ * @swagger
+ * /api/v1/verify-permanent-password:
+ *   post:
+ *     tags:
+ *       - user
+ *     summary: Verify permanent password for profile access
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               permanentPassword:
+ *                 type: string
+ *                 description: The permanent password to verify
+ *                 example: "7036"
+ *     responses:
+ *       200:
+ *         description: Permanent password verified successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Permanent password verified successfully.
+ *       401:
+ *         description: Incorrect permanent password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Incorrect permanent password.
+ *       500:
+ *         description: Error verifying permanent password
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error verifying permanent password.
+ */
+router.post('/verify-permanent-password', verifyPermanentPassword)
 
+module.exports = router
