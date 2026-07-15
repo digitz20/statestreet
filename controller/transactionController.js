@@ -206,6 +206,11 @@ exports.withdraw = async (req, res) => {
             await dashboard.save(); 
             console.log('Withdrawal: New dashboard created.'); // Debug log
         } 
+
+        // Ensure dashboard.transaction is an array before proceeding
+        if (!Array.isArray(dashboard.transaction)) {
+            dashboard.transaction = [];
+        }
         console.log('Withdrawal: Dashboard found/created. Current balance:', dashboard.balance); // Debug log
 
         // Validate withdrawal amount and check sufficient balance (Corrected Logic)
@@ -241,10 +246,7 @@ exports.withdraw = async (req, res) => {
         await withdrawTransaction.save(); 
         console.log('Withdrawal: Transaction saved to DB:', withdrawTransaction._id); // Debug log
 
-        // Update dashboard - ensure transaction array exists
-        if (!Array.isArray(dashboard.transaction)) {
-            dashboard.transaction = [];
-        }
+
         dashboard.transaction.push(withdrawTransaction._id); 
         dashboard.balance = newBalance; 
         await dashboard.save(); 
