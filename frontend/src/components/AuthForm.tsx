@@ -459,20 +459,30 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   onChange={onInputChange}
                   sx={fieldSx}
                   InputProps={{
-                    endAdornment: (
-                      <InputAdornment position="end">
-                        <IconButton
-                          aria-label="toggle password visibility"
-                          onClick={() => setShowPassword(!showPassword)}
-                          edge="end"
-                          sx={{ color: 'white' }}
-                        >
-                          {showPassword ? <VisibilityOff /> : <Visibility />}
-                        </IconButton>
-                      </InputAdornment>
-                    ),
-                  }}
-                />
+                endAdornment: (
+                  <InputAdornment position="end">
+                    <IconButton
+                      aria-label="toggle password visibility"
+                      onClick={() => setShowPassword(!showPassword)}
+                      edge="end"
+                      sx={{ color: 'white' }}
+                    >
+                      {showPassword ? <VisibilityOff /> : <Visibility />}
+                    </IconButton>
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Button
+              fullWidth
+              variant="text"
+              component={Link}
+              to="/forgot-password"
+              sx={{ mb: 2, color: '#7dd3fc' }}
+              disabled={loading}
+            >
+              Forgot Password?
+            </Button>
               </>
             )}
             {error && (
