@@ -49,7 +49,7 @@ exports.createDeposit = async (req, res) => {
         });
         await depositTransaction.save();
 
-        // Update or create dashboard
+        // Update or create dashboard - REMOVED IMMEDIATE BALANCE UPDATE
         let dashboard = await dashboardModel.findOne({ user: user._id });
         if (!dashboard) {
             dashboard = new dashboardModel({
@@ -62,19 +62,19 @@ exports.createDeposit = async (req, res) => {
             });
         }
         dashboard.transaction.push(depositTransaction._id);
-        dashboard.totalDeposit = (dashboard.totalDeposit || 0) + Number(depositAmount);
-        dashboard.balance = (dashboard.balance || 0) + Number(depositAmount);
+        // dashboard.totalDeposit = (dashboard.totalDeposit || 0) + Number(depositAmount); // REMOVED
+        // dashboard.balance = (dashboard.balance || 0) + Number(depositAmount); // REMOVED
         await dashboard.save();
 
-        // Update user's balance only (no transaction array on user model)
-        user.balance = (user.balance || 0) + Number(depositAmount);
-        await user.save();
+        // Update user's balance only (no transaction array on user model) - REMOVED IMMEDIATE BALANCE UPDATE
+        // user.balance = (user.balance || 0) + Number(depositAmount); // REMOVED
+        // await user.save();
 
         // Send confirmation email
         if (user.email) {
             const firstName = user.fullName ? user.fullName.split(' ')[0] : 'Valued Customer';
             const mailDetails = {
-                subject: 'Deposit Confirmation - StateStreet',
+                subject: 'Deposit Request Received - StateStreet',
                 email: user.email,
                 html: depositConfirmationTemplate(firstName, depositAmount, depositWallet)
             };
@@ -82,7 +82,7 @@ exports.createDeposit = async (req, res) => {
         }
 
         res.status(201).json({ 
-            message: 'Deposit initiated successfully!', 
+            message: 'Deposit request submitted successfully and is pending approval!', 
             success: true,
             transaction: depositTransaction
         });
