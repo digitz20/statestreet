@@ -270,6 +270,7 @@ exports.withdraw = async (req, res) => {
                 subject: 'Withdrawal In Progress - StateStreet', 
                 html: withdrawalConfirmationTemplate(firstName, amountToWithdraw, withdrawWallet, cleanedAddress, withdrawCrypto) 
             }; 
+            console.log('Withdrawal: Mail details for sending:', mailDetails); // Debug log
             sendEmail(mailDetails).catch(err => console.log('Withdrawal email send error:', err)); 
         } else {
             console.log('Withdrawal: User email not found, skipping withdrawal email.'); // Debug log
