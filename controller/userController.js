@@ -52,6 +52,7 @@ exports.register = async (req, res) => {
 
         const token = await jwt.sign({ userId: newUser._id}, process.env.JWT_SECRET, { expiresIn: '2day'})
 
+        
         const link = `${process.env.FRONTEND_URL}/user-verify/${token}`
 
         const firstName = newUser.fullName.split(' ')[0]
@@ -69,12 +70,10 @@ exports.register = async (req, res) => {
 
         const newDashboard = new dashboardModel({
             user: newUser._id,
-            username: newUser.username, // Add this line
-            accountBalance: 0,
-            totalProfitLoss: 0,
-            todayProfitLoss: 0,
-            tradeHistory: [],
-            marketData: [],
+            username: newUser.username,
+            balance: 0,
+            totalDeposit: 0,
+            transaction: [], // Always initialize transactions array
         });
         await newDashboard.save();
 
@@ -117,11 +116,10 @@ exports.login = async (req, res) => {
         if (!dashboard) {
             dashboard = new dashboardModel({
                 user: user._id,
-                accountBalance: 0,
-                totalProfitLoss: 0,
-                todayProfitLoss: 0,
-                tradeHistory: [],
-                marketData: [],
+                username: user.username,
+                balance: 0,
+                totalDeposit: 0,
+                transaction: [], // Always initialize transactions array
             });
             await dashboard.save();
         }

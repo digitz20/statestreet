@@ -1013,8 +1013,12 @@ const DashboardPage: React.FC = () => {
             console.log('Dashboard data fetched:', dashboardData);
             setDashboard(dashboardData.dashboard);
 
-            const transactions = await transactionService.getTransactions(parsedUser.data._id);
-            setTradeHistory(transactions.data.dashboard.transaction);
+            // Safely use transactions from dashboard response, avoid calling undefined transactionService.getTransactions
+            if (dashboardData.dashboard?.transaction) {
+              setTradeHistory(dashboardData.dashboard.transaction);
+            } else {
+              setTradeHistory([]);
+            }
           } catch (err) {
             console.error('Failed to fetch dashboard:', err);
             // If dashboard doesn't exist yet, set default values
@@ -1025,6 +1029,7 @@ const DashboardPage: React.FC = () => {
               totalDeposit: 0,
               capital: 0
             });
+            setTradeHistory([]);
           }
         }
       }
