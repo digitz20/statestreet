@@ -6,6 +6,31 @@ const cloudinary = require('../config/cloudinary');
 const { depositConfirmationTemplate, withdrawalConfirmationTemplate } = require('../utils/mailTemplates');
 
 
+// Add getTransactions function here
+exports.getTransactions = async (req, res) => {
+    try {
+        const { id } = req.params;
+
+        // Find user
+        const user = await userModel.findById(id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Find all transactions for the user
+        const transactions = await transactionModel.find({ user: id });
+
+        // If no transactions found, return a message
+        if (!transactions || transactions.length === 0) {
+            return res.status(200).json({ message: 'No transactions found for this user', data: [] });
+        }
+
+        res.status(200).json({ message: 'Transactions retrieved successfully', data: transactions });
+    } catch (error) {
+        console.error('Error fetching transactions:', error);
+        res.status(500).json({ message: 'Error retrieving transactions', error: error.message });
+    }
+};
 
 
 exports.createDeposit = async (req, res) => {

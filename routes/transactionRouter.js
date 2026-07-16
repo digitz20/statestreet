@@ -186,4 +186,39 @@ router.post('/withdraw/:id', upload.none(), withdraw);
  */
 router.post('/createTrade/:id', createTrade);
 
+/**
+ * @swagger
+ * /api/v1/getTransactions/{id}:
+ *   get:
+ *     summary: Get all transactions for a user
+ *     tags:
+ *       - Transactions
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Transactions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Transaction' # Assuming a Transaction schema exists
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error retrieving transactions
+ */
+router.get('/getTransactions/:id', getTransactions);
+
 module.exports = router;
