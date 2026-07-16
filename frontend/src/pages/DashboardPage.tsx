@@ -985,7 +985,7 @@ const DashboardPage: React.FC = () => {
   }, [profileCode]);
   
   // Trading state
-  const [assetType, setAssetType] = useState('NONE');
+  const [assetType, setAssetType] = useState('FOREX');
   const [selectedSymbol, setSelectedSymbol] = useState('');
   const [tradeAmount, setTradeAmount] = useState('');
   const [tradeDuration, setTradeDuration] = useState(1);
