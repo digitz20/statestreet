@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const multer = require('multer')
 
-const { withdraw, createDeposit, createTrade } = require('../controller/transactionController');
+const { withdraw, createDeposit, createTrade, getTransactions } = require('../controller/transactionController');
 const upload = require('../utils/multer')
 
 
