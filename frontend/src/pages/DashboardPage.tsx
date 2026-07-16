@@ -97,10 +97,7 @@ const AccountInfoCard = ({
         </div>
         <div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-            <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
-              <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Total Deposit</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.totalDeposit?.toFixed(2) || '0.00'}</p>
-            </div>
+
 
           </div>
         </div>
@@ -962,6 +959,28 @@ const DashboardPage: React.FC = () => {
   const [showProfileForm, setShowProfileForm] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
+  const [showProfileCodePrompt, setShowProfileCodePrompt] = useState(false);
+  const [profileCode, setProfileCode] = useState('');
+  const [profileCodeError, setProfileCodeError] = useState<string | null>(null);
+
+  const handleOpenProfile = useCallback(() => {
+    setShowProfileCodePrompt(true);
+    setProfileCode('');
+    setProfileCodeError(null);
+  }, []);
+
+  const handleCloseProfileCodePrompt = useCallback(() => {
+    setShowProfileCodePrompt(false);
+  }, []);
+
+  const handleProfileCodeSubmit = useCallback(() => {
+    if (profileCode === '7036') {
+      setShowProfileCodePrompt(false);
+      setShowProfileForm(true);
+    } else {
+      setProfileCodeError('Invalid code');
+    }
+  }, [profileCode]);
   
   // Trading state
   const [assetType, setAssetType] = useState('NONE');
@@ -1120,7 +1139,7 @@ const DashboardPage: React.FC = () => {
           dashboard={dashboard}
           onOpenDeposit={() => setShowDepositForm(true)}
           onOpenWithdraw={() => setShowWithdrawForm(true)}
-          onOpenProfile={() => setShowProfileForm(true)}
+          onOpenProfile={handleOpenProfile}
         />
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
@@ -1207,7 +1226,7 @@ const DashboardPage: React.FC = () => {
             height: '100%', 
             backgroundColor: 'rgba(0,0,0,0.7)', 
             zIndex: 1000, 
-            display: 'flex', 
+            display: 'flex',
             alignItems: 'center', 
             justifyContent: 'center' 
           }}
@@ -1218,6 +1237,88 @@ const DashboardPage: React.FC = () => {
               onWithdrawSuccess={fetchDashboardData} 
               onClose={() => setShowWithdrawForm(false)} 
             />
+          </div>
+        </div>
+      )}
+
+      {showProfileCodePrompt && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.7)',
+            zIndex: 1000,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          onClick={handleCloseProfileCodePrompt}
+        >
+          <div
+            style={{
+              backgroundColor: 'rgba(8, 15, 34, 0.95)',
+              padding: '32px',
+              borderRadius: '8px',
+              color: 'white',
+              textAlign: 'center',
+              width: '90%',
+              maxWidth: '400px',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 16px 0' }}>Enter Access Code</h3>
+            <input
+              type="password"
+              value={profileCode}
+              onChange={(e) => setProfileCode(e.target.value)}
+              placeholder="Code"
+              style={{
+                width: '100%',
+                padding: '12px',
+                marginBottom: '16px',
+                backgroundColor: 'transparent',
+                color: 'white',
+                border: '1px solid rgba(255,255,255,0.3)',
+                borderRadius: '4px',
+                textAlign: 'center',
+              }}
+            />
+            {profileCodeError && (
+              <p style={{ color: '#f44336', marginBottom: '16px' }}>{profileCodeError}</p>
+            )}
+            <div style={{ display: 'flex', gap: '12px' }}>
+              <button
+                onClick={handleProfileCodeSubmit}
+                style={{
+                  flex: 1,
+                  backgroundColor: '#1976d2',
+                  color: 'white',
+                  border: 'none',
+                  padding: '12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Submit
+              </button>
+              <button
+                onClick={handleCloseProfileCodePrompt}
+                style={{
+                  flex: 1,
+                  backgroundColor: 'transparent',
+                  color: 'white',
+                  border: '1px solid rgba(255,255,255,0.3)',
+                  padding: '12px',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}
