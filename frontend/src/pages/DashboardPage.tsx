@@ -1069,8 +1069,7 @@ const DashboardPage: React.FC = () => {
         tradeAmount: tx.amount,
         profit: tx.profit || 0, // Use real profit from database if available
         status: tx.status === 'active' ? 'ACTIVE' : tx.status === 'completed' ? 'COMPLETED' : tx.status.toUpperCase()
-      }))
-      .slice(0, 10); // Show only last 10 trades
+      }));
   };
 
   const fetchDashboardData = useCallback(async () => {
@@ -1092,9 +1091,15 @@ const DashboardPage: React.FC = () => {
             const transactionsResponse = await transactionService.getTransactions(parsedUser.data._id);
             if (transactionsResponse.data && Array.isArray(transactionsResponse.data)) {
               const formattedTrades = formatTransactionsForHistory(transactionsResponse.data);
-              setTradeHistory(formattedTrades);
-            } else {
-              setTradeHistory([]);
+              
+              // Merge with existing trades to preserve any newly added trades not yet in backend
+              setTradeHistory(prev => {
+                const existingIds = new Set(formattedTrades.map(t => t.tradeId));
+                // Keep any local trades that haven't been saved to backend yet
+                const newLocalTrades = prev.filter(t => !existingIds.has(t.tradeId));
+                // Combine backend trades with local new trades, sort by most recent first, limit to 10
+                return [...newLocalTrades, ...formattedTrades].slice(0, 10);
+              });
             }
           } catch (err) {
             console.error('Failed to fetch dashboard:', err);
@@ -1106,7 +1111,6 @@ const DashboardPage: React.FC = () => {
               totalDeposit: 0,
               capital: 0
             });
-            setTradeHistory([]);
           }
         }
       }
@@ -1132,10 +1136,6 @@ const DashboardPage: React.FC = () => {
       clearInterval(dashboardInterval);
     };
   }, [fetchDashboardData, fetchMarketPrices]);
-
-  useEffect(() => {
-    fetchDashboardData();
-  }, [fetchDashboardData]);
 
   const handleLogout = async () => {
     try {
