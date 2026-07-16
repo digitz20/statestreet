@@ -101,10 +101,7 @@ const AccountInfoCard = ({
               <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Total Deposit</p>
               <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.totalDeposit?.toFixed(2) || '0.00'}</p>
             </div>
-            <div style={{ padding: '16px', borderRadius: '8px', backgroundColor: 'rgba(255,255,255,0.05)' }}>
-              <p style={{ fontSize: '0.875rem', color: 'rgba(255,255,255,0.7)', margin: '0 0 8px 0' }}>Capital</p>
-              <p style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0 }}>${dashboard?.capital?.toFixed(2) || '0.00'}</p>
-            </div>
+
           </div>
         </div>
       </div>

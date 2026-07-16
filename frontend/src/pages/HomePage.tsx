@@ -10,7 +10,7 @@ type MetricItem = {
 };
 
 const initialMetrics: MetricItem[] = [
-  { label: 'Total clients', value: '179,591', baseValue: 179591 },
+
   { label: 'Available options', value: '24', baseValue: 24 },
   { label: 'Completed trades', value: '1,578,497', baseValue: 1578497 },
   { label: 'Activity level', value: '75%', baseValue: 75, isPercentage: true },
