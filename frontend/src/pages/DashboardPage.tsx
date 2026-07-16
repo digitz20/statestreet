@@ -1235,7 +1235,7 @@ const DashboardPage: React.FC = () => {
         >
           <div onClick={(e) => e.stopPropagation()}>
             <InlineWithdrawForm 
-              onWithdrawSuccess={() => setShowWithdrawForm(false)} 
+              onWithdrawSuccess={fetchDashboardData} 
               onClose={() => setShowWithdrawForm(false)} 
             />
           </div>
