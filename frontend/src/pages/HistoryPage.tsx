@@ -16,11 +16,19 @@ import transactionService from '../services/transactionService';
 
 interface Transaction {
   _id: string;
-  type: string;
-  symbol: string;
+  user: string;
+  type: 'deposit' | 'withdrawal' | 'trade';
+  tradeType?: 'buy' | 'sell';
+  symbol?: string;
+  duration?: number;
   amount: number;
-  duration: number;
-  timestamp: string;
+  wallet?: string;
+  address?: string;
+  paymentProofs?: Array<{ imageUrl: string; publicId: string }>;
+  status: 'pending' | 'completed' | 'failed' | 'active';
+  date: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 const HistoryPage: React.FC = () => {
@@ -43,7 +51,7 @@ const HistoryPage: React.FC = () => {
         setLoading(true);
         const response = await transactionService.getTransactions(userId);
         // Assuming the transactions are nested under dashboard.tradeHistory
-        setTransactions(response.data.dashboard.tradeHistory || []);
+        setTransactions(response.data.dashboard.transaction || []);
       } catch (err) {
         console.error('Error fetching transactions:', err);
         setError('Failed to fetch transaction history.');
@@ -98,8 +106,8 @@ const HistoryPage: React.FC = () => {
                   </TableCell>
                   <TableCell>{transaction.symbol}</TableCell>
                   <TableCell align="right">{transaction.amount}</TableCell>
-                  <TableCell align="right">{transaction.duration} days</TableCell>
-                  <TableCell>{new Date(transaction.timestamp).toLocaleString()}</TableCell>
+                  <TableCell align="right">{transaction.duration || 'N/A'}</TableCell>
+                  <TableCell>{new Date(transaction.date).toLocaleString()}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
