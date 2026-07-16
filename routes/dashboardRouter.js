@@ -159,6 +159,41 @@ router.delete('/deleteProfile/:id', deleteProfile);
 
 router.get('/getProfile/:id', getProfile);
 
+/**
+ * @swagger
+ * /api/v1/getTransactions/{id}:
+ *   get:
+ *     summary: Get a user's transactions
+ *     tags:
+ *       - Dashboard
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: Transactions retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                 user:
+ *                   $ref: '#/components/schemas/User'
+ *                 dashboard:
+ *                   $ref: '#/components/schemas/Dashboard'
+ *       404:
+ *         description: User or dashboard not found
+ *       500:
+ *         description: Error getting transactions
+ */
+router.get('/getTransactions/:id', getProfile);
+
 
 
 

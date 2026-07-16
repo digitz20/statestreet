@@ -55,7 +55,7 @@ exports.getDashboard = async (req, res) => {
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-        const dashboard = await dashboardModel.findOne({ user: user._id });
+        const dashboard = await dashboardModel.findOne({ user: user._id }).populate('transaction');
         if (!dashboard) {
             return res.status(404).json({ message: 'Dashboard not found' });
         }
