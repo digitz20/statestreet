@@ -1135,7 +1135,17 @@ const DashboardPage: React.FC = () => {
         balance: prev.balance - amount
       } : prev);
 
-      // Refresh dashboard data
+      // Immediately add the new trade to recent trades list so it shows up instantly
+      const newTrade = {
+        tradeId: Date.now().toString(), // Temporary ID until API refresh updates it
+        tradeAsset: selectedSymbol,
+        tradeAmount: amount,
+        profit: 0,
+        status: 'ACTIVE'
+      };
+      setTradeHistory(prev => [newTrade, ...prev]);
+
+      // Refresh dashboard data to get the real trade ID from backend
       fetchDashboardData();
       
       alert(`${type} order submitted successfully for ${selectedSymbol} of $${tradeAmount}. Your trade is being processed.`);
