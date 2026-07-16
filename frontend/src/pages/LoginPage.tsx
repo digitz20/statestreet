@@ -79,15 +79,6 @@ const LoginPage: React.FC = () => {
       >
         Resend Verification Email
       </Button>
-      <Button
-        fullWidth
-        variant="text"
-        onClick={() => navigate('/forgot-password')}
-        sx={{ mb: 2, color: '#7dd3fc' }}
-        disabled={loading}
-      >
-        Forgot Password?
-      </Button>
     </AuthForm>
   );
 };

@@ -965,53 +965,6 @@ const DashboardPage: React.FC = () => {
   const [profileCodeError, setProfileCodeError] = useState<string | null>(null);
   const [tradeHistory, setTradeHistory] = useState<any[]>([]);
 
-  // Inactivity logout
-  const INACTIVITY_TIMEOUT = 15 * 60 * 1000; // 15 minutes in milliseconds
-  const [timeoutId, setTimeoutId] = useState<any | null>(null); 
-
-  const handleLogout = useCallback(async () => {
-    try {
-      await authService.logout();
-      localStorage.removeItem('user');
-      localStorage.removeItem('token');
-      navigate('/login');
-    } catch (err) {
-      console.error('Logout failed:', err);
-    }
-  }, [navigate]); // Added navigate to dependency array
-
-  const inactivityLogout = useCallback(() => {
-    handleLogout();
-  }, [handleLogout]);
-
-  const resetTimer = useCallback(() => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    const newTimeoutId = setTimeout(inactivityLogout, INACTIVITY_TIMEOUT);
-    setTimeoutId(newTimeoutId);
-  }, [timeoutId, inactivityLogout]);
-
-  useEffect(() => {
-    resetTimer(); // Initialize timer on component mount
-
-    // Set up event listeners for user activity
-    window.addEventListener('mousemove', resetTimer);
-    window.addEventListener('keypress', resetTimer);
-    window.addEventListener('click', resetTimer);
-
-    // Clean up event listeners and timer on component unmount
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId);
-      }
-      window.removeEventListener('mousemove', resetTimer);
-      window.removeEventListener('keypress', resetTimer);
-      window.removeEventListener('click', resetTimer);
-    };
-  }, [resetTimer, timeoutId]);
-
-
   const handleOpenProfile = useCallback(() => {
     setShowProfileCodePrompt(true);
     setProfileCode('');
@@ -1057,12 +1010,10 @@ const DashboardPage: React.FC = () => {
         if (parsedUser.data?._id) {
           try {
             const dashboardData = await dashboardService.getProfile(parsedUser.data._id);
-            console.log('Raw dashboard data:', dashboardData); // Log the entire object
-            console.log('Dashboard data fetched:', dashboardData); // Log the specific property
-            setDashboard(dashboardData);
+            console.log('Dashboard data fetched:', dashboardData);
+            setDashboard(dashboardData.dashboard);
 
             const transactions = await transactionService.getTransactions(parsedUser.data._id);
-            console.log('Transactions fetched:', transactions);
             setTradeHistory(transactions.data);
           } catch (err) {
             console.error('Failed to fetch dashboard:', err);
@@ -1088,7 +1039,16 @@ const DashboardPage: React.FC = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
-
+  const handleLogout = async () => {
+    try {
+      await authService.logout();
+      localStorage.removeItem('user');
+      localStorage.removeItem('token');
+      navigate('/login');
+    } catch (err) {
+      console.error('Logout failed:', err);
+    }
+  };
 
   const handleTrade = async (type: 'BUY' | 'SELL') => {
     if (!dashboard || !selectedSymbol || !tradeAmount) return;
