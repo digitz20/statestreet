@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import dashboardService from '../services/dashboardService';
 import authService from '../services/authService';
 import transactionService from '../services/transactionService';
@@ -291,7 +292,52 @@ const OrderHistoryCard = ({ tradeHistory }: { tradeHistory: any[] }) => {
   );
 };
 
-// Sixth standalone component: MarketDataCard
+// Sixth standalone component: TradeChart - Shows recent trades on a bar chart
+const TradeChart = ({ tradeHistory }: { tradeHistory: any[] }) => {
+  // Format trade data for the chart
+  const chartData = tradeHistory.map(trade => ({
+    name: trade.tradeAsset,
+    amount: trade.tradeAmount,
+    profit: trade.profit,
+    fill: trade.profit >= 0 ? '#4caf50' : '#f44336'
+  })).slice(0, 10); // Show only last 10 trades
+
+  return (
+    <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
+      <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 24px 0' }}>Trade Performance</h3>
+      {chartData.length === 0 ? (
+        <div style={{ padding: '40px', textAlign: 'center', color: 'rgba(255,255,255,0.5)' }}>
+          No trades to display on chart yet. Start trading to see your performance!
+        </div>
+      ) : (
+        <ResponsiveContainer width="100%" height={300}>
+          <BarChart data={chartData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
+            <XAxis dataKey="name" stroke="rgba(255,255,255,0.7)" />
+            <YAxis stroke="rgba(255,255,255,0.7)" />
+            <Tooltip 
+              contentStyle={{ 
+                backgroundColor: 'rgba(8, 15, 34, 0.95)', 
+                border: '1px solid rgba(255,255,255,0.2)',
+                borderRadius: '8px',
+                color: 'white'
+              }}
+            />
+            <Legend wrapperStyle={{ color: 'white' }} />
+            <Bar dataKey="amount" name="Trade Amount ($)" fill="#1976d2" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="profit" name="Profit/Loss ($)" radius={[4, 4, 0, 0]}>
+              {chartData.map((entry, index) => (
+                <Cell key={`cell-${index}`} fill={entry.fill} />
+              ))}
+            </Bar>
+          </BarChart>
+        </ResponsiveContainer>
+      )}
+    </div>
+  );
+};
+
+// Seventh standalone component: MarketDataCard
 const MarketDataCard = ({ marketData }: { marketData: any[] }) => {
   return (
     <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white' }}>
@@ -1223,7 +1269,10 @@ const DashboardPage: React.FC = () => {
         <OrderHistoryCard tradeHistory={tradeHistory} />
         </div>
         
-        {/* Component 6: MarketDataCard - standalone */}
+        {/* Component 6: TradeChart - standalone */}
+        <TradeChart tradeHistory={tradeHistory} />
+        
+        {/* Component 7: MarketDataCard - standalone */}
         <MarketDataCard marketData={marketData} />
       </div>
       

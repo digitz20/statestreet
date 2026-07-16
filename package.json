@@ -24,6 +24,7 @@
     "multer": "^2.0.0",
     "nodemailer": "^7.0.3",
     "nodemon": "^3.1.10",
+    "recharts": "^3.9.2",
     "swagger": "^0.7.5",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
