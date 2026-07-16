@@ -1242,6 +1242,7 @@ const DashboardPage: React.FC = () => {
         </div>
       )}
 
+
       {showProfileCodePrompt && (
         <div
           style={{
