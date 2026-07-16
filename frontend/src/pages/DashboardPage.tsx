@@ -1014,7 +1014,7 @@ const DashboardPage: React.FC = () => {
             setDashboard(dashboardData.dashboard);
 
             const transactions = await transactionService.getTransactions(parsedUser.data._id);
-            setTradeHistory(transactions.data);
+            setTradeHistory(transactions.data.dashboard.transaction);
           } catch (err) {
             console.error('Failed to fetch dashboard:', err);
             // If dashboard doesn't exist yet, set default values
