@@ -64,6 +64,10 @@ const transactionSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'completed', 'failed', 'active'],
     },
+    profit: {
+        type: Number,
+        default: 0
+    },
     date: {
         type: Date,
         default: Date.now,

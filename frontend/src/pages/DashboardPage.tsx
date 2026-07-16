@@ -990,14 +990,42 @@ const DashboardPage: React.FC = () => {
   const [tradeAmount, setTradeAmount] = useState('');
   const [tradeDuration, setTradeDuration] = useState(1);
   
-  // Mock data
-  
-  const mockMarketData = [
-    { symbol: 'BTC/USD', price: 67500, change: 1200, changePercent: 1.81 },
-    { symbol: 'ETH/USD', price: 3450, change: -45, changePercent: -1.29 },
-    { symbol: 'AAPL', price: 189.50, change: 2.30, changePercent: 1.23 },
-    { symbol: 'EUR/USD', price: 1.085, change: 0.002, changePercent: 0.18 }
-  ];
+  // Real market data state
+  const [marketData, setMarketData] = useState<any[]>([]);
+
+  // Fetch real cryptocurrency prices from CoinGecko
+  const fetchMarketPrices = useCallback(async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
+      const response = await fetch(`${API_BASE_URL}/prices`);
+      if (response.ok) {
+        const data = await response.json();
+        
+        // Format market data for the MarketDataCard
+        const formattedMarketData = [];
+        if (data.bitcoin) formattedMarketData.push({ symbol: 'BTC/USD', price: data.bitcoin.usd, change: data.bitcoin.usd_24h_change, changePercent: data.bitcoin.usd_24h_change });
+        if (data.ethereum) formattedMarketData.push({ symbol: 'ETH/USD', price: data.ethereum.usd, change: data.ethereum.usd_24h_change, changePercent: data.ethereum.usd_24h_change });
+        if (data.solana) formattedMarketData.push({ symbol: 'SOL/USD', price: data.solana.usd, change: data.solana.usd_24h_change, changePercent: data.solana.usd_24h_change });
+        setMarketData(formattedMarketData);
+      }
+    } catch (err) {
+      console.error('Failed to fetch market prices:', err);
+    }
+  }, []);
+
+  // Format real backend transactions to match what the OrderHistoryCard expects
+  const formatTransactionsForHistory = (transactions: any[]) => {
+    return transactions
+      .filter(tx => tx.type === 'trade') // Only show trade transactions in recent trades
+      .map(tx => ({
+        tradeId: tx._id,
+        tradeAsset: tx.symbol,
+        tradeAmount: tx.amount,
+        profit: tx.profit || 0, // Use real profit from database if available
+        status: tx.status === 'active' ? 'ACTIVE' : tx.status === 'completed' ? 'COMPLETED' : tx.status.toUpperCase()
+      }))
+      .slice(0, 10); // Show only last 10 trades
+  };
 
   const fetchDashboardData = useCallback(async () => {
     try {
@@ -1009,13 +1037,16 @@ const DashboardPage: React.FC = () => {
         // Ensure we have a valid user ID before making API call
         if (parsedUser.data?._id) {
           try {
+            // Fetch real dashboard data from backend
             const dashboardData = await dashboardService.getProfile(parsedUser.data._id);
             console.log('Dashboard data fetched:', dashboardData);
             setDashboard(dashboardData.dashboard);
 
-            // Safely use transactions from dashboard response, avoid calling undefined transactionService.getTransactions
-            if (dashboardData.dashboard?.transaction) {
-              setTradeHistory(dashboardData.dashboard.transaction);
+            // Fetch real transactions from backend
+            const transactionsResponse = await transactionService.getTransactions(parsedUser.data._id);
+            if (transactionsResponse.data && Array.isArray(transactionsResponse.data)) {
+              const formattedTrades = formatTransactionsForHistory(transactionsResponse.data);
+              setTradeHistory(formattedTrades);
             } else {
               setTradeHistory([]);
             }
@@ -1039,6 +1070,22 @@ const DashboardPage: React.FC = () => {
       setLoading(false);
     }
   }, []);
+
+  // Refresh data periodically to keep everything real and up to date
+  useEffect(() => {
+    fetchDashboardData();
+    fetchMarketPrices();
+    
+    // Refresh prices every 30 seconds to keep market data real
+    const priceInterval = setInterval(fetchMarketPrices, 30000);
+    // Refresh dashboard/transactions every 10 seconds to show new trades
+    const dashboardInterval = setInterval(fetchDashboardData, 10000);
+    
+    return () => {
+      clearInterval(priceInterval);
+      clearInterval(dashboardInterval);
+    };
+  }, [fetchDashboardData, fetchMarketPrices]);
 
   useEffect(() => {
     fetchDashboardData();
@@ -1167,7 +1214,7 @@ const DashboardPage: React.FC = () => {
         </div>
         
         {/* Component 6: MarketDataCard - standalone */}
-        <MarketDataCard marketData={mockMarketData} />
+        <MarketDataCard marketData={marketData} />
       </div>
       
       {/* Native HTML Modals - NO MUI */}
@@ -1205,7 +1252,7 @@ const DashboardPage: React.FC = () => {
             left: 0, 
             width: '100%', 
             height: '100%', 
-            backgroundColor: 'rgba(0,0,0,0.7)', 
+            backgroundColor: 'rgba(109, 68, 68, 0.7)', 
             zIndex: 1000, 
             display: 'flex', 
             alignItems: 'center', 

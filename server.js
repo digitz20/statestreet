@@ -4,6 +4,8 @@ require('dotenv').config()
 const cors = require('cors')
 const swaggerUIEXPRESS = require('swagger-ui-express');
 const swaggerJSDOC = require('swagger-jsdoc');
+// Start the real-time trade settlement worker
+require('./utils/tradeSettlementWorker');
 
 
 
