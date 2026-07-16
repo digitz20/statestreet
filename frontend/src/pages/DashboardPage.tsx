@@ -1057,10 +1057,12 @@ const DashboardPage: React.FC = () => {
         if (parsedUser.data?._id) {
           try {
             const dashboardData = await dashboardService.getProfile(parsedUser.data._id);
-            console.log('Dashboard data fetched:', dashboardData);
-            setDashboard(dashboardData.dashboard);
+            console.log('Raw dashboard data:', dashboardData); // Log the entire object
+            console.log('Dashboard data fetched:', dashboardData); // Log the specific property
+            setDashboard(dashboardData);
 
             const transactions = await transactionService.getTransactions(parsedUser.data._id);
+            console.log('Transactions fetched:', transactions);
             setTradeHistory(transactions.data);
           } catch (err) {
             console.error('Failed to fetch dashboard:', err);
