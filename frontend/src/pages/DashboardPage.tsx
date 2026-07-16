@@ -158,7 +158,7 @@ const TradingCard = ({
             borderRadius: '4px'
           }}
         >
-          <option value="NONE">NONE</option>
+          
           <option value="FOREX">FOREX</option>
           <option value="CRYPTO">CRYPTO</option>
           <option value="STOCKS">STOCKS</option>
@@ -1210,7 +1210,7 @@ const DashboardPage: React.FC = () => {
         >
           <div onClick={(e) => e.stopPropagation()}>
             <InlineDepositForm 
-              onDepositSuccess={() => setShowDepositForm(false)} 
+              onDepositSuccess={fetchDashboardData}
               onClose={() => setShowDepositForm(false)} 
             />
           </div>
