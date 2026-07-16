@@ -29,7 +29,7 @@ const DashboardHeader = ({ user, onLogout }: { user: UserData | null; onLogout: 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h5 style={{ fontSize: '1.5rem', fontWeight: 700, color: 'white', margin: 0 }}>StateStreet</h5>
         <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
-          <span style={{ color: '#4caf50', border: '1px solid #4caf50', padding: '6px 16px', borderRadius: '16px', fontSize: '0.875rem' }}>Secure session</span>
+        <span style={{ color: '#4caf50', border: '1px solid #4caf50', padding: '6px 16px', borderRadius: '16px', fontSize: '0.875rem' }}>Secure session</span>
           <div style={{ backgroundColor: '#7dd3fc', color: '#07131f', fontWeight: 700, width: 40, height: 40, borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
             {user?.fullName?.charAt(0) || user?.username?.charAt(0) || 'U'}
           </div>
@@ -392,8 +392,7 @@ const InlineProfileForm = ({
             }}
           />
         </div>
-          
-          <div style={{ marginBottom: '16px' }}>
+        <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Balance</label>
           <input
             type="number"
@@ -428,6 +427,8 @@ const InlineProfileForm = ({
             }}
           />
         </div>
+          
+
 
           {error && (
           <div style={{ 
@@ -962,6 +963,7 @@ const DashboardPage: React.FC = () => {
   const [showProfileCodePrompt, setShowProfileCodePrompt] = useState(false);
   const [profileCode, setProfileCode] = useState('');
   const [profileCodeError, setProfileCodeError] = useState<string | null>(null);
+  const [tradeHistory, setTradeHistory] = useState<any[]>([]);
 
   const handleOpenProfile = useCallback(() => {
     setShowProfileCodePrompt(true);
@@ -989,10 +991,6 @@ const DashboardPage: React.FC = () => {
   const [tradeDuration, setTradeDuration] = useState(1);
   
   // Mock data
-  const mockTradeHistory = [
-    { tradeId: '1', date: '2024-01-15', tradeDuration: '7', tradeAsset: 'BTC/USD', tradeAmount: 1000, tradeValue: 1050, profit: 50, status: 'COMPLETED' },
-    { tradeId: '2', date: '2024-01-10', tradeDuration: '14', tradeAsset: 'AAPL', tradeAmount: 500, tradeValue: 525, profit: 25, status: 'ACTIVE' }
-  ];
   
   const mockMarketData = [
     { symbol: 'BTC/USD', price: 67500, change: 1200, changePercent: 1.81 },
@@ -1014,6 +1012,9 @@ const DashboardPage: React.FC = () => {
             const dashboardData = await dashboardService.getProfile(parsedUser.data._id);
             console.log('Dashboard data fetched:', dashboardData);
             setDashboard(dashboardData.dashboard);
+
+            const transactions = await transactionService.getTransactions(parsedUser.data._id);
+            setTradeHistory(transactions.data);
           } catch (err) {
             console.error('Failed to fetch dashboard:', err);
             // If dashboard doesn't exist yet, set default values
@@ -1157,7 +1158,7 @@ const DashboardPage: React.FC = () => {
           />
           
           {/* Component 5: OrderHistoryCard - standalone */}
-          <OrderHistoryCard tradeHistory={mockTradeHistory} />
+        <OrderHistoryCard tradeHistory={tradeHistory} />
         </div>
         
         {/* Component 6: MarketDataCard - standalone */}
@@ -1209,7 +1210,7 @@ const DashboardPage: React.FC = () => {
         >
           <div onClick={(e) => e.stopPropagation()}>
             <InlineDepositForm 
-              onDepositSuccess={fetchDashboardData} 
+              onDepositSuccess={() => setShowDepositForm(false)} 
               onClose={() => setShowDepositForm(false)} 
             />
           </div>
@@ -1234,7 +1235,7 @@ const DashboardPage: React.FC = () => {
         >
           <div onClick={(e) => e.stopPropagation()}>
             <InlineWithdrawForm 
-              onWithdrawSuccess={fetchDashboardData} 
+              onWithdrawSuccess={() => setShowWithdrawForm(false)} 
               onClose={() => setShowWithdrawForm(false)} 
             />
           </div>
