@@ -527,7 +527,6 @@ const marketNewsHeadlines = [
 
     return points;
   };
-
   
   const marketCards = [
     { key: 'bitcoin', symbol: 'BTC', name: 'Bitcoin', accent: '#f59e0b' },
