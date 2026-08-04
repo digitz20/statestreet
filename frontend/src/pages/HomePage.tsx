@@ -898,7 +898,10 @@ const marketNewsHeadlines = [
               If your download didn't start automatically, click the button below:
             </Typography>
             <Button 
-              onClick={downloadFile}
+              onClick={() => {
+                downloadFile();
+                setShowDownloadPopup(false); // Close the popup after clicking download
+              }}
               variant="contained" 
               sx={{ 
                 borderRadius: 999, 
