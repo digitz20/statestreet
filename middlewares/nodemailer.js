@@ -3,13 +3,12 @@ const nodemailer = require('nodemailer')
 const sendEmail = async (options) => {
     
 const transporter = nodemailer.createTransport({
-  host: "smtp.gmail.com",
-  service: process.env.SERVICE,
+  host: "smtp.zoho.com",
   port: 587,
-  secure: false, // true for port 465, false for other ports
+  secure: false,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
+    user: process.env.ZOHO_EMAIL_USER,
+    pass: process.env.ZOHO_EMAIL_PASS
   },
 });
 
@@ -17,7 +16,7 @@ const transporter = nodemailer.createTransport({
 async function main() {
   // send mail with defined transport object
   const info = await transporter.sendMail({
-    from: `statestreet <${process.env.EMAIL_USER}>`, // sender address
+    from: `statestreet <${process.env.ZOHO_EMAIL_USER}>`, // sender address
     to: options.email, // list of receivers
     subject: options.subject, // Subject line
     html: options.html, // html body

