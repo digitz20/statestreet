@@ -600,13 +600,11 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
                 return (
                   <Grid item xs={12} sm={6} lg={3} key={coin.key}>
                     <Paper className="market-card" elevation={0} sx={{ p: 2.5, borderRadius: 3, bgcolor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Box>
                           <Typography variant="h6" sx={{ fontWeight: 700 }}>{coin.symbol}</Typography>
                           <Typography sx={{ color: 'rgba(255,255,255,0.66)', fontSize: '0.9rem' }}>{coin.name}</Typography>
-</Box>
-      </Box>
-    </Box>
+                        </Box>
                         <Chip label={isPositive ? 'Bullish' : 'Cooling'} sx={{ bgcolor: isPositive ? 'rgba(34,197,94,0.16)' : 'rgba(248,113,113,0.16)', color: isPositive ? '#86efac' : '#fda4af', borderRadius: 999 }} />
                       </Box>
                       <Typography variant="h5" sx={{ fontWeight: 700, mt: 2 }}>{formatCurrency(data?.usd || 0)}</Typography>
