@@ -810,3 +810,4 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
               <Button component={Link} to="/privacy-policy" sx={{ color: 'white' }}>Privacy</Button>
               <Button component={Link} to="/register" sx={{ color: 'white' }}>Sign up</Button>
             </Box>
+</Box>
