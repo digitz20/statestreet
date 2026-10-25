@@ -33,6 +33,27 @@ const userSchema = new mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    role: {
+        type: String,
+        enum: ['user', 'admin', 'superadmin'],
+        default: 'user'
+    },
+    isActive: {
+        type: Boolean,
+        default: true
+    },
+    lastLogin: {
+        type: Date
+    },
+    avatar: {
+        type: String
+    },
+    phoneNumber: {
+        type: String
+    },
+    address: {
+        type: String
+    },
 
 },{timestamps: true})
 

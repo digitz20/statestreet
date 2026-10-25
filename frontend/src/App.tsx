@@ -12,20 +12,8 @@ import ContactPage from './pages/ContactPage';
 import PrivacyPage from './pages/PrivacyPage';
 import GlobalNotifications from './components/GlobalNotifications';
 import StateStreetLoading from './components/StateStreetLoading'; // Import the new loading component
-
-// Import new dashboard pages
-import MarketsPage from './pages/MarketsPage';
-import TradePage from './pages/TradePage';
-import FundAccountPage from './pages/FundAccountPage';
-import WithdrawFundsPage from './pages/WithdrawFundsPage';
-import CheckTradePage from './pages/CheckTradePage';
-import SignalPurchasePage from './pages/SignalPurchasePage';
-import CopyTradingPage from './pages/CopyTradingPage';
-import MyPurchasedPage from './pages/MyPurchasedPage';
-import HistoryPage from './pages/HistoryPage';
-import ProfilePage from './pages/ProfilePage';
-import ResetPasswordDashboardPage from './pages/ResetPasswordDashboardPage';
-import SupportPage from './pages/SupportPage';
+import AdminSupportPage from './pages/AdminSupportPage';
+import AdminChatPage from './pages/AdminChatPage';
 import { useEffect, useState } from 'react'; // Import useEffect and useState
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
@@ -70,6 +58,8 @@ function AppContent() {
         <Route path="/user-verify/:token" element={<VerifyEmailPage />} />
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy-policy" element={<PrivacyPage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
+        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
 
         {/* Protected Dashboard Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
@@ -86,6 +76,8 @@ function AppContent() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="reset-password" element={<ResetPasswordDashboardPage />} />
           <Route path="support" element={<SupportPage />} />
+          <Route path="admin-support" element={<AdminSupportPage />} />
+          <Route path="admin-chat" element={<AdminChatPage />} />
         </Route>
 
         <Route path="*" element={<NotFound />} />
