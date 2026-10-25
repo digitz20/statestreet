@@ -71,7 +71,7 @@ const AccountInfoCard = ({
 }) => {
   return (
     <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px', alignItems: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px', alignItems: 'center' }}>
         <div>
           <h3 style={{ fontSize: '1.25rem', fontWeight: 700, margin: '0 0 8px 0' }}>Account Balance</h3>
           <p style={{ fontSize: '2rem', fontWeight: 900, margin: '0 0 16px 0' }}>${dashboard?.balance?.toFixed(2) || '0.00'}</p>
@@ -97,7 +97,7 @@ const AccountInfoCard = ({
           </div>
         </div>
         <div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
 
 
           </div>
