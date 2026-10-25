@@ -604,7 +604,9 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
                         <Box>
                           <Typography variant="h6" sx={{ fontWeight: 700 }}>{coin.symbol}</Typography>
                           <Typography sx={{ color: 'rgba(255,255,255,0.66)', fontSize: '0.9rem' }}>{coin.name}</Typography>
-                        </Box>
+</Box>
+      </Box>
+    </Box>
                         <Chip label={isPositive ? 'Bullish' : 'Cooling'} sx={{ bgcolor: isPositive ? 'rgba(34,197,94,0.16)' : 'rgba(248,113,113,0.16)', color: isPositive ? '#86efac' : '#fda4af', borderRadius: 999 }} />
                       </Box>
                       <Typography variant="h5" sx={{ fontWeight: 700, mt: 2 }}>{formatCurrency(data?.usd || 0)}</Typography>
