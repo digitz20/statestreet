@@ -1,17 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Chip, Alert } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Typography, Chip, Button } from '@mui/material';
 import axios from 'axios';
 
 const AdminChatPage: React.FC = () => {
-  const { adminId, userId } = useParams()
   const [conversations, setConversations] = useState<Array<any>>([])
   const [loading, setLoading] = useState(true)
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedUser, setSelectedUser] = useState<any>(null)
   const [messages, setMessages] = useState<Array<any>>([])
-  const [io] = useState(() => {
-    return null
-  })
+  const [io] = useState<any>(null)
 
   useEffect(() => {
     const loadConversations = async () => {
@@ -32,7 +28,7 @@ const AdminChatPage: React.FC = () => {
     const setupSocketListeners = () => {
       if (!io) return
 
-      io.on('conversation_update', (data) => {
+      io.on('conversation_update', (data: any) => {
         setConversations(prev => prev.map(c =>
           c._id === data.conversationId
             ? { ...c, lastMessage: data.lastMessage, lastMessageAt: data.lastMessageAt, unreadCount: data.unreadCount }
@@ -57,14 +53,6 @@ const AdminChatPage: React.FC = () => {
     } catch (error) {
       console.error('Error loading conversation:', error)
     }
-  }
-
-  const handleSendMessage = async (content: string) => {
-    if (!content.trim() || !selectedUser) return
-
-    await axios.post(`/api/v1/chat/conversations/${selectedUser}/messages`, { content })
-    const response = await axios.get(`/api/v1/chat/conversations/${selectedUser}`)
-    setMessages(response.data.data.messages)
   }
 
   return (

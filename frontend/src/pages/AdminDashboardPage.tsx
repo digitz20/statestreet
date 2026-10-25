@@ -1,9 +1,8 @@
 import React, { useEffect } from 'react';
 import { Box, Typography, Chip } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const AdminDashboardPage: React.FC = () => {
-  const { adminId } = useParams()
   const navigate = useNavigate()
 
   useEffect(() => {

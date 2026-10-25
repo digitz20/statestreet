@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Box, Typography, TextField, Button, Avatar, Alert } from '@mui/material';
+import { Box, Typography, TextField, Button, Avatar } from '@mui/material';
 
 const AdminLoginPage: React.FC = () => {
   const [password, setPassword] = useState('')
@@ -49,6 +49,7 @@ const AdminLoginPage: React.FC = () => {
           variant="contained"
           color="primary"
           disabled={loading}
+          onClick={handleLogin}
           sx={{ width: '100%' }}
         >
           {loading ? 'Authenticating...' : 'Enter Admin Panel'}

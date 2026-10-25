@@ -14,6 +14,20 @@ import GlobalNotifications from './components/GlobalNotifications';
 import StateStreetLoading from './components/StateStreetLoading'; // Import the new loading component
 import AdminSupportPage from './pages/AdminSupportPage';
 import AdminChatPage from './pages/AdminChatPage';
+import AdminLoginPage from './pages/AdminLoginPage';
+import AdminDashboardPage from './pages/AdminDashboardPage';
+import MarketsPage from './pages/MarketsPage';
+import TradePage from './pages/TradePage';
+import FundAccountPage from './pages/FundAccountPage';
+import WithdrawFundsPage from './pages/WithdrawFundsPage';
+import CheckTradePage from './pages/CheckTradePage';
+import SignalPurchasePage from './pages/SignalPurchasePage';
+import CopyTradingPage from './pages/CopyTradingPage';
+import MyPurchasedPage from './pages/MyPurchasedPage';
+import HistoryPage from './pages/HistoryPage';
+import ProfilePage from './pages/ProfilePage';
+import ResetPasswordDashboardPage from './pages/ResetPasswordDashboardPage';
+import SupportPage from './pages/SupportPage';
 import { useEffect, useState } from 'react'; // Import useEffect and useState
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {

@@ -530,8 +530,8 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
                    color = '#86efac'; // Green
                  } else if (change < 0) {
                    color = '#fda4af'; // Red
-                 }
-                 const formattedPrice = formatCurrency(data?.usd || 0);
+      }
+                  const formattedPrice = formatCurrency(data?.usd || 0);
                  const formattedChange = change.toFixed(2);
                 return (
                   <Typography key={`${coin.key}-${index}`} sx={{ color: color, fontWeight: 700, fontSize: '0.95rem' }}>
@@ -599,34 +599,32 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
                 const isPositive = (data?.usd_24h_change || 0) >= 0;
                 return (
                   <Grid item xs={12} sm={6} lg={3} key={coin.key}>
-                    <Paper className="market-card" elevation={0} sx={{ p: 2.5, borderRadius: 3, bgcolor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-<Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <Box>
-                          <Typography variant="h6" sx={{ fontWeight: 700 }}>{coin.symbol}</Typography>
-                          <Typography sx={{ color: 'rgba(255,255,255,0.66)', fontSize: '0.9rem' }}>{coin.name}</Typography>
-</Box>
-      </Box>
-    </Box>
-                        <Chip label={isPositive ? 'Bullish' : 'Cooling'} sx={{ bgcolor: isPositive ? 'rgba(34,197,94,0.16)' : 'rgba(248,113,113,0.16)', color: isPositive ? '#86efac' : '#fda4af', borderRadius: 999 }} />
-                      </Box>
-                      <Typography variant="h5" sx={{ fontWeight: 700, mt: 2 }}>{formatCurrency(data?.usd || 0)}</Typography>
-                      <Typography sx={{ color: isPositive ? '#86efac' : '#fda4af', fontWeight: 600, mt: 0.5 }}>
-                        {isPositive ? '+' : ''}{(data?.usd_24h_change || 0).toFixed(2)}% in 24h
-                      </Typography>
-                      <Box sx={{ mt: 2 }}>
-                        <svg viewBox="0 0 126 60" width="100%" height="70" aria-label={`${coin.name} live chart`}>
-                          <polyline
-                            points={buildSparkline(data?.usd || 0, coin.symbol.length)}
-                            fill="none"
-                            stroke={coin.accent}
-                            strokeWidth="3"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            style={{ animation: 'drawLine 1.2s ease-out' }}
-                          />
-                        </svg>
-                      </Box>
-                    </Paper>
+                      <Paper className="market-card" elevation={0} sx={{ p: 2.5, borderRadius: 3, bgcolor: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <Box>
+                            <Typography variant="h6" sx={{ fontWeight: 700 }}>{coin.symbol}</Typography>
+                            <Typography sx={{ color: 'rgba(255,255,255,0.66)', fontSize: '0.9rem' }}>{coin.name}</Typography>
+                          </Box>
+                          <Chip label={isPositive ? 'Bullish' : 'Cooling'} sx={{ bgcolor: isPositive ? 'rgba(34,197,94,0.16)' : 'rgba(248,113,113,0.16)', color: isPositive ? '#86efac' : '#fda4af', borderRadius: 999 }} />
+                        </Box>
+                        <Typography variant="h5" sx={{ fontWeight: 700, mt: 2 }}>{formatCurrency(data?.usd || 0)}</Typography>
+                        <Typography sx={{ color: isPositive ? '#86efac' : '#fda4af', fontWeight: 600, mt: 0.5 }}>
+                          {isPositive ? '+' : ''}{(data?.usd_24h_change || 0).toFixed(2)}% in 24h
+                        </Typography>
+                        <Box sx={{ mt: 2 }}>
+                          <svg viewBox="0 0 126 60" width="100%" height="70" aria-label={`${coin.name} live chart`}>
+                            <polyline
+                              points={buildSparkline(data?.usd || 0, coin.symbol.length)}
+                              fill="none"
+                              stroke={coin.accent}
+                              strokeWidth="3"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              style={{ animation: 'drawLine 1.2s ease-out' }}
+                            />
+                          </svg>
+                        </Box>
+                      </Paper>
                   </Grid>
                 );
               })}
@@ -812,3 +810,7 @@ const [currentImageIndex, setCurrentImageIndex] = useState(0);
               <Button component={Link} to="/privacy-policy" sx={{ color: 'white' }}>Privacy</Button>
               <Button component={Link} to="/register" sx={{ color: 'white' }}>Sign up</Button>
             </Box>
+          </Box>
+        );
+      }
+export default HomePage;

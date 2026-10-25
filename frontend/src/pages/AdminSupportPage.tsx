@@ -1,34 +1,29 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableFooter, TableHead, TableRow, Button, Chip, Alert } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';
+import { Box, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Button, Chip, Paper } from '@mui/material';
+import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
 const AdminSupportPage: React.FC = () => {
   const { adminId } = useParams()
   const [conversations, setConversations] = useState<Array<any>>([])
   const [loading, setLoading] = useState(true)
-  const [selectedConversation, setSelectedConversation] = useState(null)
-  const [messages, setMessages] = useState<Array<any>>([])
-  const [search, setSearch] = useState('')
+  const [selectedConversation, setSelectedConversation] = useState<any>(null)
+  const [messages] = useState<Array<any>>([])
   const [filters, setFilters] = useState({ status: '', priority: '' })
-  const navigate = useNavigate()
-  const [io] = useState(() => {
-    // Socket.io will be injected by the app
-    return null
-  })
+  const [io] = useState<any>(null)
+
+  const loadConversations = async () => {
+    try {
+      const response = await axios.get(`/api/v1/chat/admin/conversations?status=${filters.status}&priority=${filters.priority}`)
+      setConversations(response.data.data)
+    } catch (error) {
+      console.error('Error loading conversations:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadConversations = async () => {
-      try {
-        const response = await axios.get(`/api/v1/chat/admin/conversations?status=${filters.status}&priority=${filters.priority}`)
-        setConversations(response.data.data)
-      } catch (error) {
-        console.error('Error loading conversations:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadConversations()
   }, [filters.status, filters.priority])
 
@@ -37,7 +32,7 @@ const AdminSupportPage: React.FC = () => {
     const setupSocketListeners = () => {
       if (!io) return
 
-      io.on('conversation_update', (data) => {
+      io.on('conversation_update', (data: any) => {
         // Update conversation in state
         setConversations(prev => prev.map(c =>
           c._id === data.conversationId
@@ -46,7 +41,7 @@ const AdminSupportPage: React.FC = () => {
         ))
       })
 
-      io.on('messages_read', (data) => {
+      io.on('messages_read', (data: any) => {
         console.log('Messages read:', data)
       })
     }
@@ -57,12 +52,6 @@ const AdminSupportPage: React.FC = () => {
       io?.off('messages_read')
     }
   }, [io])
-
-  const handleStatusChange = async (conversationId: string, status: string) => {
-    await axios.patch(`/api/v1/chat/conversations/${conversationId}/status`, { status })
-    setFilters(prev => ({ ...prev, status: '' }))
-    loadConversations()
-  }
 
   const handleAssign = async (conversationId: string, adminId: string) => {
     await axios.post(`/api/v1/chat/admin/conversations/${conversationId}/assign`, { adminId })
@@ -83,28 +72,24 @@ const AdminSupportPage: React.FC = () => {
           color="primary"
           label="All"
           onClick={() => setFilters(prev => ({ ...prev, status: '' }))}
-          selected={!filters.status}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="Open"
           onClick={() => setFilters(prev => ({ ...prev, status: 'open' }))}
-          selected={filters.status === 'open'}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="Pending"
           onClick={() => setFilters(prev => ({ ...prev, status: 'pending' }))}
-          selected={filters.status === 'pending'}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="Closed"
           onClick={() => setFilters(prev => ({ ...prev, status: 'closed' }))}
-          selected={filters.status === 'closed'}
         />
 
         <Typography variant="subtitle1" sx={{ mr: 2 }}>Priority:</Typography>
@@ -113,35 +98,30 @@ const AdminSupportPage: React.FC = () => {
           color="primary"
           label="All"
           onClick={() => setFilters(prev => ({ ...prev, priority: '' }))}
-          selected={!filters.priority}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="Low"
           onClick={() => setFilters(prev => ({ ...prev, priority: 'low' }))}
-          selected={filters.priority === 'low'}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="Medium"
           onClick={() => setFilters(prev => ({ ...prev, priority: 'medium' }))}
-          selected={filters.priority === 'medium'}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="High"
           onClick={() => setFilters(prev => ({ ...prev, priority: 'high' }))}
-          selected={filters.priority === 'high'}
         />
         <Chip
           variant="outlined"
           color="primary"
           label="Urgent"
           onClick={() => setFilters(prev => ({ ...prev, priority: 'urgent' }))}
-          selected={filters.priority === 'urgent'}
         />
       </Box>
 
@@ -162,7 +142,7 @@ const AdminSupportPage: React.FC = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colspan={6}>Loading...</TableCell>
+                  <TableCell colSpan={6}>Loading...</TableCell>
                 </TableRow>
               ) : (
                 conversations.map((conversation: any) => (
@@ -173,7 +153,7 @@ const AdminSupportPage: React.FC = () => {
                     <TableCell component="td">{conversation.subject || 'General Support'}</TableCell>
                     <TableCell>
                       <Chip
-                        variant="outline"
+                        variant="outlined"
                         color={conversation.priority === 'urgent' ? 'error' : conversation.priority === 'high' ? 'warning' : 'primary'}
                       >
                         {conversation.priority}
@@ -181,7 +161,7 @@ const AdminSupportPage: React.FC = () => {
                     </TableCell>
                     <TableCell>
                       <Chip
-                        variant="outline"
+                        variant="outlined"
                         color={conversation.status === 'closed' ? 'secondary' : conversation.status === 'open' ? 'primary' : 'warning'}
                       >
                         {conversation.status}
@@ -211,7 +191,7 @@ const AdminSupportPage: React.FC = () => {
                         <Button
                           variant="outlined"
                           color="secondary"
-                          onClick={() => handleAssign(conversation._id, adminId)}
+                          onClick={() => handleAssign(conversation._id, adminId ?? '')}
                         >
                           Assign
                         </Button>
@@ -229,7 +209,7 @@ const AdminSupportPage: React.FC = () => {
       {selectedConversation && (
         <Box sx={{ p: 2, bgcolor: 'background', borderRadius: 1, mb: 3 }}>
           <Typography variant="h5" sx={{ mb: 2 }}>
-            {selectedConversation ? 'Conversation: ' + (selectedConversations?.user?.fullName || 'Unknown') : ''}
+            {selectedConversation ? 'Conversation: ' + (selectedConversation?.user?.fullName || 'Unknown') : ''}
           </Typography>
 
           <Typography variant="subtitle1">Messages:</Typography>
