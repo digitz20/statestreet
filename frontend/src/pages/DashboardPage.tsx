@@ -842,16 +842,8 @@ const DashboardPage: React.FC = () => {
     setShowDepositForm(true);
   }, []);
 
-  const handleCloseDepositForm = useCallback(() => {
-    setShowDepositForm(false);
-  }, []);
-
   const handleOpenWithdraw = useCallback(() => {
     setShowWithdrawForm(true);
-  }, []);
-
-  const handleCloseWithdrawForm = useCallback(() => {
-    setShowWithdrawForm(false);
   }, []);
   
   // Trading state
