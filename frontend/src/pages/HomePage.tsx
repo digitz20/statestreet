@@ -369,7 +369,7 @@ const marketNewsHeadlines = [
 const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [currentNewsIndex, setCurrentNewsIndex] = useState(0);
 
-  const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
+  const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://added-desiree-webtool-a80f54c4.koyeb.app/api/v1';
 
   const imageUrls = [
     'https://i.pinimg.com/736x/e1/e0/82/e1e0829af4ecb2775b3596266708b52e.jpg',
