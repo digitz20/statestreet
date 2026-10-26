@@ -387,6 +387,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   label="Password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   fullWidth
                   value={formData.password || ''}
@@ -413,6 +414,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   label="Confirm Password"
                   name="confirmPassword"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   fullWidth
                   value={formData.confirmPassword || ''}
@@ -453,6 +455,7 @@ const AuthForm: React.FC<AuthFormProps> = ({
                   label="Password"
                   name="password"
                   type={showPassword ? 'text' : 'password'}
+                  autoComplete="new-password"
                   required
                   fullWidth
                   value={formData.password || ''}
