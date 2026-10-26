@@ -102,7 +102,7 @@ const AdminLoginPage: React.FC = () => {
               fullWidth
               label="Admin Password"
               type={showPassword ? 'text' : 'password'}
-              autoComplete="current-password"
+              autoComplete="new-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               sx={{ borderRadius: 2 }}
