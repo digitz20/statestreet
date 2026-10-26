@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
+const API_URL = import.meta.env.VITE_API_URL || 'https://added-desiree-webtool-a80f54c4.koyeb.app/api/v1';
 
 const getAuthHeaders = () => {
   const user = JSON.parse(localStorage.getItem('user') || '{}');

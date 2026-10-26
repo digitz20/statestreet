@@ -1,7 +1,7 @@
 import axios from 'axios';
 import dashboardService from './dashboardService'; // Import dashboardService
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:4988/api/v1';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'https://added-desiree-webtool-a80f54c4.koyeb.app/api/v1';
 
 const api = axios.create({
   baseURL: API_BASE_URL,
