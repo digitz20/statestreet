@@ -61,13 +61,11 @@ const WelcomeSection = ({ user }: { user: UserData | null }) => {
 const AccountInfoCard = ({ 
   dashboard, 
   onOpenDeposit, 
-  onOpenWithdraw, 
-  onOpenProfile 
+  onOpenWithdraw 
 }: { 
   dashboard: DashboardData | null;
   onOpenDeposit: () => void;
   onOpenWithdraw: () => void;
-  onOpenProfile: () => void;
 }) => {
   return (
     <div style={{ padding: '24px', borderRadius: '16px', backgroundColor: 'rgba(8, 15, 34, 0.8)', color: 'white', marginBottom: '24px' }}>
@@ -87,12 +85,6 @@ const AccountInfoCard = ({
               style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
             >
               Withdraw
-            </button>
-            <button 
-              onClick={onOpenProfile}
-              style={{ backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '8px 16px', borderRadius: '4px', cursor: 'pointer' }}
-            >
-              Profile
             </button>
           </div>
         </div>
@@ -353,167 +345,6 @@ const MarketDataCard = ({ marketData }: { marketData: any[] }) => {
           </div>
         ))}
       </div>
-    </div>
-  );
-};
-
-// Simple inline ProfileForm - no external imports
-const InlineProfileForm = ({ 
-  currentProfile, 
-  onProfileUpdated, 
-  onClose 
-}: { 
-  currentProfile: any;
-  onProfileUpdated: () => void; 
-  onClose: () => void 
-}) => {
-  const [profileFormData, setProfileFormData] = useState({
-    fullName: currentProfile?.username || currentProfile?.fullName || '',
-    balance: currentProfile?.balance || 0,
-    totalDeposit: currentProfile?.totalDeposit || 0,
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const user = JSON.parse(localStorage.getItem('user') || '{}');
-      const userId = user.data?._id;
-      
-      if (!userId) {
-        setError('User not found');
-        return;
-      }
-
-      const formData = new FormData();
-      formData.append('fullName', profileFormData.fullName);
-      formData.append('balance', profileFormData.balance.toString());
-      formData.append('totalDeposit', profileFormData.totalDeposit.toString());
-
-      await dashboardService.updateProfile(userId, formData);
-      setSuccess('Profile updated successfully');
-      onProfileUpdated();
-      setTimeout(() => onClose(), 1500);
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to update profile');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  return (
-    <div style={{ 
-      position: 'absolute', 
-      top: '50%', 
-      left: '50%', 
-      transform: 'translate(-50%, -50%)', 
-      width: '90%', 
-      maxWidth: 480, 
-      backgroundColor: 'rgba(8, 15, 34, 0.95)', 
-      color: 'white',
-      padding: '32px',
-      borderRadius: '8px'
-    }}>
-      <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 8px 0' }}>Update Profile</h3>
-      <p style={{ color: 'rgba(255,255,255,0.72)', margin: '0 0 24px 0' }}>Edit your profile information</p>
-      
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Full Name</label>
-          <input
-            type="text"
-            name="fullName"
-            value={profileFormData.fullName}
-            onChange={(e) => setProfileFormData({...profileFormData, fullName: e.target.value})}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '4px'
-            }}
-          />
-        </div>
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Balance</label>
-          <input
-            type="number"
-            name="balance"
-            value={profileFormData.balance}
-            onChange={(e) => setProfileFormData({...profileFormData, balance: parseFloat(e.target.value)})}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '4px'
-            }}
-          />
-        </div>
-        
-        <div style={{ marginBottom: '24px' }}>
-          <label style={{ display: 'block', marginBottom: '8px', color: 'rgba(255,255,255,0.7)' }}>Total Deposit</label>
-          <input
-            type="number"
-            name="totalDeposit"
-            value={profileFormData.totalDeposit}
-            onChange={(e) => setProfileFormData({...profileFormData, totalDeposit: parseFloat(e.target.value)})}
-            style={{
-              width: '100%',
-              padding: '12px',
-              backgroundColor: 'transparent',
-              color: 'white',
-              border: '1px solid rgba(255,255,255,0.3)',
-              borderRadius: '4px'
-            }}
-          />
-        </div>
-          
-
-
-          {error && (
-          <div style={{ 
-            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
-            color: '#f44336', 
-            padding: '12px', 
-            borderRadius: '4px', 
-            marginBottom: '16px',
-            border: '1px solid rgba(244, 67, 54, 0.3)'
-          }}>{error}</div>
-        )}
-        {success && (
-          <div style={{ 
-            backgroundColor: 'rgba(76, 175, 80, 0.1)', 
-            color: '#4caf50', 
-            padding: '12px', 
-            borderRadius: '4px', 
-            marginBottom: '16px',
-            border: '1px solid rgba(76, 175, 80, 0.3)'
-          }}>{success}</div>
-        )}
-
-        <div style={{ display: 'flex', gap: '12px' }}>
-          <button
-             type="submit"
-            disabled={loading}
-            style={{ flex: 1, backgroundColor: '#1976d2', color: 'white', border: 'none', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            {loading ? <span style={{ display: 'inline-block', width: '24px', height: '24px', border: '2px solid #fff', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 1s linear infinite' }}></span> : 'Update Profile'}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            style={{ flex: 1, backgroundColor: 'transparent', color: 'white', border: '1px solid rgba(255,255,255,0.3)', padding: '12px', borderRadius: '4px', cursor: 'pointer' }}
-          >
-            Cancel
-          </button>
-        </div>
-      </form>
     </div>
   );
 };
@@ -1003,32 +834,25 @@ const DashboardPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   
   // Modal states
-  const [showProfileForm, setShowProfileForm] = useState(false);
   const [showDepositForm, setShowDepositForm] = useState(false);
   const [showWithdrawForm, setShowWithdrawForm] = useState(false);
-  const [showProfileCodePrompt, setShowProfileCodePrompt] = useState(false);
-  const [profileCode, setProfileCode] = useState('');
-  const [profileCodeError, setProfileCodeError] = useState<string | null>(null);
   const [tradeHistory, setTradeHistory] = useState<any[]>([]);
 
-  const handleOpenProfile = useCallback(() => {
-    setShowProfileCodePrompt(true);
-    setProfileCode('');
-    setProfileCodeError(null);
+  const handleOpenDeposit = useCallback(() => {
+    setShowDepositForm(true);
   }, []);
 
-  const handleCloseProfileCodePrompt = useCallback(() => {
-    setShowProfileCodePrompt(false);
+  const handleCloseDepositForm = useCallback(() => {
+    setShowDepositForm(false);
   }, []);
 
-  const handleProfileCodeSubmit = useCallback(() => {
-    if (profileCode === '7036') {
-      setShowProfileCodePrompt(false);
-      setShowProfileForm(true);
-    } else {
-      setProfileCodeError('Invalid code');
-    }
-  }, [profileCode]);
+  const handleOpenWithdraw = useCallback(() => {
+    setShowWithdrawForm(true);
+  }, []);
+
+  const handleCloseWithdrawForm = useCallback(() => {
+    setShowWithdrawForm(false);
+  }, []);
   
   // Trading state
   const [assetType, setAssetType] = useState('FOREX');
@@ -1246,9 +1070,8 @@ const DashboardPage: React.FC = () => {
         {/* Component 3: AccountInfoCard - standalone */}
         <AccountInfoCard 
           dashboard={dashboard}
-          onOpenDeposit={() => setShowDepositForm(true)}
-          onOpenWithdraw={() => setShowWithdrawForm(true)}
-          onOpenProfile={handleOpenProfile}
+          onOpenDeposit={handleOpenDeposit}
+          onOpenWithdraw={handleOpenWithdraw}
         />
         
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '24px' }}>
@@ -1277,32 +1100,6 @@ const DashboardPage: React.FC = () => {
       </div>
       
       {/* Native HTML Modals - NO MUI */}
-      {showProfileForm && user?._id && dashboard && (
-        <div 
-          style={{ 
-            position: 'fixed', 
-            top: 0, 
-            left: 0, 
-            width: '100%', 
-            height: '100%', 
-            backgroundColor: 'rgba(0,0,0,0.7)', 
-            zIndex: 1000, 
-            display: 'flex', 
-            alignItems: 'center', 
-            justifyContent: 'center' 
-          }}
-          onClick={() => setShowProfileForm(false)}
-        >
-          <div onClick={(e) => e.stopPropagation()}>
-            <InlineProfileForm 
-              currentProfile={dashboard}
-              onProfileUpdated={fetchDashboardData} 
-              onClose={() => setShowProfileForm(false)} 
-            />
-          </div>
-        </div>
-      )}
-      
       {showDepositForm && user?._id && (
         <div 
           style={{ 
@@ -1354,89 +1151,8 @@ const DashboardPage: React.FC = () => {
       )}
 
 
-      {showProfileCodePrompt && (
-        <div
-          style={{
-            position: 'fixed',
-            top: 0,
-            left: 0,
-            width: '100%',
-            height: '100%',
-            backgroundColor: 'rgba(0,0,0,0.7)',
-            zIndex: 1000,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-          onClick={handleCloseProfileCodePrompt}
-        >
-          <div
-            style={{
-              backgroundColor: 'rgba(8, 15, 34, 0.95)',
-              padding: '32px',
-              borderRadius: '8px',
-              color: 'white',
-              textAlign: 'center',
-              width: '90%',
-              maxWidth: '400px',
-            }}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <h3 style={{ fontSize: '1.5rem', fontWeight: 700, margin: '0 0 16px 0' }}>Enter Access Code</h3>
-            <input
-              type="password"
-              value={profileCode}
-              onChange={(e) => setProfileCode(e.target.value)}
-              placeholder="Code"
-              style={{
-                width: '100%',
-                padding: '12px',
-                marginBottom: '16px',
-                backgroundColor: 'transparent',
-                color: 'white',
-                border: '1px solid rgba(255,255,255,0.3)',
-                borderRadius: '4px',
-                textAlign: 'center',
-              }}
-            />
-            {profileCodeError && (
-              <p style={{ color: '#f44336', marginBottom: '16px' }}>{profileCodeError}</p>
-            )}
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button
-                onClick={handleProfileCodeSubmit}
-                style={{
-                  flex: 1,
-                  backgroundColor: '#1976d2',
-                  color: 'white',
-                  border: 'none',
-                  padding: '12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Submit
-              </button>
-              <button
-                onClick={handleCloseProfileCodePrompt}
-                style={{
-                  flex: 1,
-                  backgroundColor: 'transparent',
-                  color: 'white',
-                  border: '1px solid rgba(255,255,255,0.3)',
-                  padding: '12px',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
     </div>
-  );
+  };
 };
 
 export default DashboardPage;
