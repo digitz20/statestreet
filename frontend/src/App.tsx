@@ -35,6 +35,21 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return user ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
+const AdminProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const adminToken = localStorage.getItem('adminToken');
+  const adminUserRaw = localStorage.getItem('adminUser');
+  let isAdmin = false;
+  if (adminToken && adminUserRaw) {
+    try {
+      const adminUser = JSON.parse(adminUserRaw);
+      isAdmin = !!adminUser && ['admin', 'superadmin'].includes(adminUser.role);
+    } catch {
+      isAdmin = false;
+    }
+  }
+  return isAdmin && adminToken ? <>{children}</> : <Navigate to="/admin/login" replace />;
+};
+
 function AppContent() {
   const location = useLocation();
   const [isLoading, setIsLoading] = useState(true); // State for global loading
@@ -73,7 +88,7 @@ function AppContent() {
         <Route path="/contact" element={<ContactPage />} />
         <Route path="/privacy-policy" element={<PrivacyPage />} />
         <Route path="/admin/login" element={<AdminLoginPage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboardPage />} />
+        <Route path="/admin/dashboard" element={<AdminProtectedRoute><AdminDashboardPage /></AdminProtectedRoute>} />
 
         {/* Protected Dashboard Routes */}
         <Route path="/dashboard" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>

@@ -16,11 +16,14 @@ const {
     updatePlan,
     deletePlan,
     createAdmin,
-    getAdminProfile
+    getAdminProfile,
+    adminLogin
 } = require('../controller/adminController')
 
 const { authenticateAdmin, authenticateSuperAdmin } = require('../middlewares/adminAuth')
 
+
+router.post('/login', adminLogin)
 
 router.get('/profile', authenticateAdmin, getAdminProfile)
 

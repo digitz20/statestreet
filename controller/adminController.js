@@ -481,3 +481,49 @@ exports.getAdminProfile = async (req, res) => {
         res.status(500).json({ message: 'Error retrieving admin profile', error: error.message })
     }
 }
+
+exports.adminLogin = async (req, res) => {
+    try {
+        const { email, username, password } = req.body
+
+        if (!password) {
+            return res.status(400).json({ message: 'Password is required' })
+        }
+
+        const user = await userModel.findOne({
+            $or: [
+                { email: email ? email.toLowerCase() : null },
+                { username: username || null }
+            ].filter(Boolean)
+        })
+
+        if (!user) {
+            return res.status(404).json({ message: 'Admin account not found' })
+        }
+
+        if (!['admin', 'superadmin'].includes(user.role)) {
+            return res.status(403).json({ message: 'Access denied: Admin privileges required' })
+        }
+
+        if (!user.isActive) {
+            return res.status(403).json({ message: 'Account is deactivated' })
+        }
+
+        if (password !== user.password) {
+            return res.status(400).json({ message: 'Incorrect password' })
+        }
+
+        const token = jwt.sign({ userId: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '1day' })
+
+        user.lastLogin = new Date()
+        await user.save()
+
+        const userResponse = user.toObject()
+        delete userResponse.password
+
+        res.status(200).json({ message: 'Admin login successful', data: userResponse, token })
+    } catch (error) {
+        console.error('Admin login error:', error.message)
+        res.status(500).json({ message: 'Admin login failed', error: error.message })
+    }
+}
