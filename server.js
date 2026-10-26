@@ -269,11 +269,11 @@ const swaggerSpec = swaggerJSDOC(options);
 app.use('/statestreet', swaggerUIEXPRESS.serve, swaggerUIEXPRESS.setup(swaggerSpec));
 
 
+app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/',userRouter)
 app.use('/api/v1/',transactionRouter)
 app.use('/api/v1/',dashboardRouter)
 app.use('/api/v1/',coinGeckoRouter)
-app.use('/api/v1/admin', adminRouter)
 app.use('/api/v1/chat', chatRouter)
 
 
